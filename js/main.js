@@ -210,9 +210,13 @@ MOBILE_MQ.addEventListener("change", () => {
 });
 
 const { tab: hashTab, section: hashSection } = parseRoute();
+const navEntry = performance.getEntriesByType?.("navigation")?.[0];
+/* 링크 오픈·새로고침 = navigate/reload. 뒤로가기는 back_forward */
+const isFreshOpen = !navEntry || navEntry.type === "navigate" || navEntry.type === "reload";
+const knownTab = tabs.find((tab) => tab.dataset.tab === hashTab);
 /* PC·모바일 공통 홈: 입시 정보 > 수시 > 교과 */
 const startTab =
-  tabs.find((tab) => tab.dataset.tab === hashTab) ||
+  knownTab ||
   tabs.find((tab) => tab.dataset.tab === HOME_TAB) ||
   tabs[0];
 const startKey = startTab.dataset.tab;
@@ -225,10 +229,13 @@ groups.forEach((group) => {
   setGroupOpen(group.dataset.group, group.dataset.group === startGroup);
 });
 
-if (!hashTab) {
+/* 모바일: 링크를 처음 열거나 새로고침하면 무조건 수시 › 교과 */
+if (isMobileNav() && isFreshOpen) {
+  selectTab(HOME_TAB, true, HOME_SECTION);
+} else if (!hashTab || !knownTab) {
   selectTab(HOME_TAB, true, HOME_SECTION);
 } else {
-  selectTab(startKey, true, startSection);
+  selectTab(startKey, true, startSection || (startKey === HOME_TAB ? HOME_SECTION : undefined));
 }
 
 const brandHome = document.getElementById("brand-home");
