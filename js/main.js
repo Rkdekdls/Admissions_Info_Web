@@ -2,6 +2,8 @@ const tabs = Array.from(document.querySelectorAll(".tab"));
 const panels = Array.from(document.querySelectorAll(".panel"));
 const crumbParent = document.getElementById("crumb-parent");
 const crumbCurrent = document.getElementById("crumb-current");
+const crumbSectionSep = document.getElementById("crumb-section-sep");
+const crumbSection = document.getElementById("crumb-section");
 const app = document.getElementById("app");
 const sidebarToggle = document.getElementById("sidebar-toggle");
 const mobileNavBtn = document.getElementById("mobile-nav-btn");
@@ -100,8 +102,14 @@ function setCrumb(tab, section) {
   const tabBtn = tabs.find((item) => item.dataset.tab === tab);
   const groupName = tabBtn?.dataset.group || "admission";
   if (crumbParent) crumbParent.textContent = groupTitles[groupName] || groupTitles.admission;
+  if (crumbCurrent) crumbCurrent.textContent = titles[tab] || "";
   const label = sectionLabelFor(tab, section);
-  crumbCurrent.textContent = label ? `${titles[tab]} › ${label}` : titles[tab] || "";
+  const showSection = Boolean(label);
+  if (crumbSection) {
+    crumbSection.textContent = label;
+    crumbSection.hidden = !showSection;
+  }
+  if (crumbSectionSep) crumbSectionSep.hidden = !showSection;
 }
 
 window.syncGuideHash = (tab, section) => {
