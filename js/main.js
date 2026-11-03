@@ -152,6 +152,9 @@ const brandHome = document.getElementById("brand-home");
 if (brandHome) {
   brandHome.addEventListener("click", (event) => {
     event.preventDefault();
+    /* 홈: 대입 제도 닫힘 + 입시 정보 수시·교과 */
+    setGroupOpen("admission", false);
+    setGroupOpen("info", true);
     selectTab(HOME_TAB, true, HOME_SECTION);
   });
 }
