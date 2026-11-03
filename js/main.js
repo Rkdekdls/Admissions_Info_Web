@@ -89,9 +89,25 @@ function setRoute(tab, section) {
   if (location.hash !== next) history.replaceState(null, "", next);
 }
 
+function sectionLabelFor(tab, section) {
+  if (!section) return "";
+  const panel = document.querySelector(`#panel-${tab}`);
+  const btn = panel?.querySelector(`.section-tab[data-section="${section}"]`);
+  return btn ? btn.textContent.replace(/^\d+\.\s*/, "").trim() : "";
+}
+
+function setCrumb(tab, section) {
+  const tabBtn = tabs.find((item) => item.dataset.tab === tab);
+  const groupName = tabBtn?.dataset.group || "admission";
+  if (crumbParent) crumbParent.textContent = groupTitles[groupName] || groupTitles.admission;
+  const label = sectionLabelFor(tab, section);
+  crumbCurrent.textContent = label ? `${titles[tab]} › ${label}` : titles[tab] || "";
+}
+
 window.syncGuideHash = (tab, section) => {
   if (!tab) return;
   setRoute(tab, section || "");
+  setCrumb(tab, section || "");
 };
 
 function selectTab(name, updateHash, targetId) {
@@ -112,21 +128,20 @@ function selectTab(name, updateHash, targetId) {
     panel.classList.toggle("is-active", active);
   });
 
-  if (crumbParent) crumbParent.textContent = groupTitles[groupName] || groupTitles.admission;
-  crumbCurrent.textContent = titles[key];
   document.title = "입시 정보 조회 서비스";
   Guide.open(key, targetId);
+  const panel = document.querySelector(`#panel-${key}`);
+  const activeSection =
+    targetId ||
+    panel?.querySelector(".section-tab.is-active")?.dataset.section ||
+    "";
+  setCrumb(key, activeSection);
   const main = document.querySelector(".main");
   if (main) main.scrollTop = 0;
 
   openGroupExclusive(groupName);
 
   if (updateHash) {
-    const panel = document.querySelector(`#panel-${key}`);
-    const activeSection =
-      targetId ||
-      panel?.querySelector(".section-tab.is-active")?.dataset.section ||
-      "";
     setRoute(key, activeSection);
   }
 
@@ -195,12 +210,16 @@ MOBILE_MQ.addEventListener("change", () => {
 });
 
 const { tab: hashTab, section: hashSection } = parseRoute();
+/* PC·모바일 공통 홈: 입시 정보 > 수시 > 교과 */
 const startTab =
   tabs.find((tab) => tab.dataset.tab === hashTab) ||
   tabs.find((tab) => tab.dataset.tab === HOME_TAB) ||
   tabs[0];
+const startKey = startTab.dataset.tab;
 const startGroup = startTab.dataset.group || "info";
-const startSection = hashSection || undefined;
+const startSection =
+  hashSection ||
+  (startKey === HOME_TAB ? HOME_SECTION : undefined);
 
 groups.forEach((group) => {
   setGroupOpen(group.dataset.group, group.dataset.group === startGroup);
@@ -209,7 +228,7 @@ groups.forEach((group) => {
 if (!hashTab) {
   selectTab(HOME_TAB, true, HOME_SECTION);
 } else {
-  selectTab(startTab.dataset.tab, true, startSection);
+  selectTab(startKey, true, startSection);
 }
 
 const brandHome = document.getElementById("brand-home");

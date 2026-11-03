@@ -1060,7 +1060,7 @@ const WebInfo = (() => {
     const shadow = sheet.attachShadow({ mode: "open" });
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "css/page.css?v=36";
+    link.href = "css/page.css?v=38";
     const extra = document.createElement("style");
     extra.textContent = `${[...doc.querySelectorAll("style")].map((node) => node.textContent).join("\n")}\n${bookVars}
 @media (max-width: 860px) {
@@ -1131,7 +1131,7 @@ const WebInfo = (() => {
     gap: 4mm !important;
   }
   .checkpoint-container {
-    gap: 2mm !important;
+    gap: 6mm !important;
   }
   .checkpoint-container .tip-box,
   .checkpoint-box .tip-box {
@@ -1204,12 +1204,14 @@ const WebInfo = (() => {
   .report-box > .title-3 {
     margin-bottom: 4mm !important;
   }
-  /* 표: 줄바꿈 없이 좌우 스크롤 (창의적 체험표 제외) */
+  /* 표: 줄바꿈 없이 좌우 스크롤 (창의적 체험표 제외) — 왼쪽은 본문과 동일 시작점 */
   .table-scroll {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
     width: 100% !important;
     max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
   .table-scroll > table:not(.creative-activity-table),
   .table-scroll > .comparison-table:not(.creative-activity-table),
@@ -1472,6 +1474,8 @@ li::before {
     -webkit-overflow-scrolling: touch !important;
     width: 100% !important;
     max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
   .table-scroll > table:not(.creative-activity-table),
   .table-scroll > .comparison-table.curriculum-table:not(.creative-activity-table) {

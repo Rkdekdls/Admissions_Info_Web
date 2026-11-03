@@ -1820,8 +1820,9 @@ const Guide = (() => {
       }
       return;
     }
-    if (!known.has(id)) return;
     const first = buttons[0]?.dataset.section;
+    if (!known.has(id)) id = first || "";
+    if (!id) return;
     buttons.forEach((button) => {
       const on = button.dataset.section === id;
       button.classList.toggle("is-active", on);

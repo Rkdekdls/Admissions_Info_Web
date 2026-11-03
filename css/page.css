@@ -1082,9 +1082,9 @@ body.page-title-body {
     box-sizing: border-box !important;
   }
 
-  /* 학년별 체크포인트: tip-box 하단마진+gap 중복 제거 → 다른 tip 간격에 맞춤 */
+  /* 학년별 체크포인트: PC 원본 gap(6mm) 유지, tip 마진 중복만 제거 */
   .checkpoint-container {
-    gap: 2mm !important;
+    gap: 6mm !important;
   }
   .checkpoint-container .tip-box,
   .checkpoint-box .tip-box {
@@ -1240,8 +1240,8 @@ body.page-title-body {
   }
 
   .table-scroll {
-    margin-left: -2mm;
-    margin-right: -2mm;
+    margin-left: 0;
+    margin-right: 0;
     padding-bottom: 6px;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
