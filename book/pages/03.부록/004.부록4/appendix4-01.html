@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>부록4-01</title>
+  <link rel="stylesheet" href="../../../css/styles.css">
+  <style>body{min-height:100vh;min-height:100dvh}</style>
+  <script src="../../../js/page.js"></script>
+  <style>
+    .subject-table-wrapper {
+      margin-top: 3mm;
+      width: 100%;
+      overflow: visible;
+    }
+    
+    .subject-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 14px;
+      background-color: #ffffff;
+      border-radius: 0;
+      overflow: hidden;
+      table-layout: fixed;
+      border: 1px solid #E5E7EB;
+    }
+    
+    .subject-table th,
+    .subject-table td {
+      padding: 2mm 1.5mm;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid #E5E7EB;
+      border-right: 1px solid #E5E7EB;
+      word-break: keep-all;
+      white-space: normal;
+      overflow: visible;
+    }
+    
+    /* 권장과목 헤더 셀(1행 3번째 th)만 높이 더 작게 */
+    .subject-table thead tr:first-child th:nth-child(3) {
+      padding-top: 0.5mm;
+      padding-bottom: 0.5mm;
+      line-height: 1.1;
+    }
+    
+    /* 데이터 셀의 왼쪽 패딩 증가 */
+    .subject-table td {
+      padding-left: 2.5mm;
+    }
+    
+    /* 마지막 컬럼은 오른쪽 선 제거 */
+    .subject-table th:last-child,
+    .subject-table td:last-child {
+      border-right: none;
+    }
+    
+    /* 마지막 행은 하단 선 제거 */
+    .subject-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* 첫 번째 행의 첫 번째 셀 - 상단 왼쪽 모서리 */
+    .subject-table thead tr:first-child th:first-child {
+      border-top-left-radius: 0;
+    }
+    
+    /* 첫 번째 행의 마지막 셀 - 상단 오른쪽 모서리 */
+    .subject-table thead tr:first-child th:last-child {
+      border-top-right-radius: 0;
+    }
+    
+    /* 마지막 행의 마지막 셀 - 하단 오른쪽 모서리 */
+    .subject-table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 0;
+    }
+    
+    /* 헤더 스타일 - 첫 번째 행 */
+    .subject-table thead tr:first-child th {
+      background-color: var(--color-primary);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      padding: 3mm 1.5mm !important;
+      text-align: center;
+      vertical-align: middle;
+      word-break: keep-all;
+      white-space: normal;
+      overflow: visible;
+    }
+    
+    /* 모든 헤더 기본 스타일 */
+    .subject-table th {
+      background-color: var(--color-primary);
+      color: #ffffff;
+      font-weight: 600;
+      text-align: center;
+      word-break: keep-all;
+      white-space: normal;
+      overflow: visible;
+    }
+    
+    /* 헤더 스타일 - 두 번째 행 */
+    .subject-table thead tr:nth-child(2) th {
+      background-color: var(--color-primary);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 2mm 1.5mm !important;
+      text-align: center;
+      vertical-align: middle;
+      word-break: keep-all;
+      white-space: normal;
+      overflow: visible;
+    }
+    
+    /* 단과대학 열: 헤더는 너비만 지정 */
+    .subject-table th:first-child {
+      width: 18%;
+    }
+    
+    .subject-table td:first-child {
+      width: 15%;
+    }
+    
+    /* 단과대학 이름이 들어간 셀만 배경 + 볼드 처리 */
+    .subject-table td.college-cell {
+      background-color: #FAFAFA;
+      font-weight: 600;
+    }
+    
+    /* 농업생명과학대학 셀(마지막 단과대학, rowspan=2)의 하단 이중선 제거 */
+    .subject-table td.college-cell-last {
+      border-bottom: none;
+    }
+    
+    /* 수학/과학/제2외/한 컬럼 너비 축소 */
+    .subject-table th:nth-child(3),
+    .subject-table th:nth-child(4),
+    .subject-table th:nth-child(5),
+    .subject-table td:nth-child(3),
+    .subject-table td:nth-child(4),
+    .subject-table td:nth-child(5) {
+      width: 53%;
+    }
+    
+    /* 선택 과목 내부 구분 */
+    .subject-item {
+      display: block;
+      margin-bottom: 0.8mm;
+      word-break: keep-all;
+      white-space: normal;
+      line-height: 1.4;
+    }
+    
+    /* 선택 과목 셀의 subject-item은 인라인으로 표시 */
+    .subject-table td:nth-child(3) .subject-item,
+    .subject-table td:nth-child(4) .subject-item,
+    .subject-table td:nth-child(5) .subject-item {
+      display: inline;
+      margin-bottom: 0;
+    }
+    
+    /* 선택 과목 셀의 쉼표 뒤 공백 추가 */
+    .subject-table td:nth-child(3) .subject-item::after,
+    .subject-table td:nth-child(4) .subject-item::after,
+    .subject-table td:nth-child(5) .subject-item::after {
+      content: '';
+    }
+    
+    .subject-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* 빨간색 강조 스타일 */
+    .subject-highlight {
+      color: #DC2626;
+      font-weight: 500;
+    }
+    
+    .subject-type-label {
+      font-weight: 600;
+      color: var(--color-text);
+      margin-top: 1mm;
+      margin-bottom: 0.5mm;
+      display: block;
+    }
+    
+    .subject-type-label:first-child {
+      margin-top: 0;
+    }
+    
+    .subject-type-general {
+      color: var(--color-text);
+    }
+    
+    .subject-type-career {
+      color: var(--color-text);
+    }
+    
+    .subject-type-convergence {
+      color: var(--color-text);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 -->
+    <h2 class="title-2">
+      Chapter 4. 대학별 전공 연계 과목
+    </h2>
+    
+    <!-- 소제목 -->
+    <h3 class="title-3">4-1. [서울대] 전공 연계 과목</h3>
+    
+    <!-- 권장과목 표 -->
+    <div class="subject-table-wrapper">
+      <table class="subject-table">
+        <thead>
+          <tr>
+            <th rowspan="2">단과대학</th>
+            <th rowspan="2">모집단위</th>
+            <th colspan="3">권장과목</th>
+          </tr>
+          <tr>
+            <th>수학</th>
+            <th>과학</th>
+            <th>제2외/한</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="college-cell">인문대학<br>사회과학대학<br>경영대학</td>
+            <td>전체</td>
+            <td></td>
+            <td></td>
+            <td>1과목 이상</td>
+          </tr>
+          <tr>
+            <td rowspan="5" class="college-cell">자연과학대학</td>
+            <td>수리과학부, 통계학과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>물리·천문학부/물리학전공</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[일반] 물리학<br/>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>물리·천문학부/천문학전공,<br>지구환경과학부</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[일반] 지구과학<br/>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>화학부</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[일반] 화학<br/>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>생명과학부</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[일반] 생명과학<br/>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="college-cell">간호대학</td>
+            <td>전체</td>
+            <td>기하 또는 미적분Ⅱ</td>
+            <td>[진로] 3과목 이상</td>
+            <td>1과목 이상</td>
+          </tr>
+          <tr>
+            <td rowspan="2" class="college-cell">공과대학</td>
+            <td>건설환경도시공학부, 재료공학부,<br>컴퓨터공학부, 화학생물공학부,<br>건축학과, 산업공학과,<br>에너지자원공학과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>기계공학부, 전기·정보공학부,<br>원자핵공학과, 조선해양공학과,<br>항공우주공학과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[일반] 물리학<br/>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td rowspan="2" class="college-cell">생활과학대학</td>
+            <td>소비자아동학부/소비자학전공,<br>소비자아동학부/아동가족학전공</td>
+            <td></td>
+            <td></td>
+            <td>1과목 이상</td>
+          </tr>
+          <tr>
+            <td>식품영양학과, 의류학과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[진로] 3과목 이상</td>
+            <td>1과목 이상</td>
+          </tr>
+          <tr>
+            <td rowspan="2" class="college-cell">농업생명과학대학</td>
+            <td>농경제사회학부</td>
+            <td></td>
+            <td></td>
+            <td>1과목 이상</td>
+          </tr>
+          <tr>
+            <td>식물생산과학부, 산림과학부,<br>식품·동물생명공학부,<br>응용생물화학부,<br>조경·지역시스템공학부,<br>바이오시스템·소재학부,<br>스마트시스템과학과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td rowspan="7" class="college-cell">사범대학</td>
+            <td>교육학과, 국어교육과, 영어교육과,<br>독어교육과, 불어교육과,<br>사회교육과, 역사교육과,<br>지리교육과, 윤리교육과</td>
+            <td></td>
+            <td></td>
+            <td>1과목 이상</td>
+          </tr>
+          <tr>
+            <td>수학교육과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>물리교육과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[일반] 물리학<br/>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>화학교육과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[일반] 화학<br/>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>생물교육과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[일반] 생명과학<br/>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>지구과학교육과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[일반] 지구과학<br/>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>체육교육과</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="college-cell">미술대학<br>음악대학</td>
+            <td>전체</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="college-cell">수의과대학</td>
+            <td>수의예과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="college-cell">약학대학</td>
+            <td>약학계열</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[일반] 화학<br>또는 생명과학<br>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="college-cell">의과대학</td>
+            <td>의예과</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[일반] 생명과학<br>[진로] 생물의유전,<br>세포와물질대사<br>포함 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="college-cell">첨단융합학부</td>
+            <td>첨단융합학부</td>
+            <td>기하, 미적분Ⅱ</td>
+            <td>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="college-cell">학부대학</td>
+            <td>자유전공학부</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="college-cell college-cell-last">치의학대학원</td>
+            <td>치의학과</td>
+            <td>기하 또는 미적분Ⅱ</td>
+            <td>[진로] 3과목 이상</td>
+            <td></td>
+          </tr>
+        </tbody>        
+      </table>
+    </div>
+
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 55 -</div>
+  </div>
+</body>
+</html>

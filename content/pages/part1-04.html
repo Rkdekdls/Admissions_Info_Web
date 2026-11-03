@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트1-04</title>
+  <link rel="stylesheet" href="../../../css/styles.css">
+  <style>body{min-height:100vh;min-height:100dvh}</style>
+  <script src="../../../js/page.js"></script>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 (연속) -->
+    <h2 class="title-2">
+      Chapter 2. 2022 개정 교육과정 이해
+    </h2>
+    
+    <!-- 소제목 -->
+    <h3 class="title-3">1-1. 학생부 내신 (9등급제 vs 5등급제)</h3>
+    
+    <!-- 상단 설명 -->
+    <div class="text-body" style="margin-bottom: 3mm;">
+      고등학교 성적은 수시(교과·종합) 전형의 핵심 자료입니다. 따라서 현재 적용되는 제도(등급체계·교육과정·수능구조)를 정확히 이해하고, 이에 맞는 학습 및 대입 전략을 수립하는 것이 중요합니다.
+    </div>
+    
+    <!-- 비교 차트 박스 -->
+    <div class="report-box" style="margin-top: 2mm;">
+      <h4 class="title-3" style="text-align:center; margin:2mm 0 4mm 0; color:#555; font-size:16px !important;">9등급제 vs 5등급제 비율 비교</h4>
+
+      <div class="chart-compare" style="display:flex; align-items:flex-start; justify-content:center; gap: 8mm; padding: 5mm 4mm 2mm 4mm; box-sizing: border-box;">
+        
+        <div style="text-align:center; width: 32mm;">
+          <!-- ✅ 9등급제 파이 차트 (상위 4% 정확 각도 적용) -->
+          <svg width="32mm" height="32mm" viewBox="0 0 100 100"
+               style="margin:0 auto 2mm auto; display:block; font-size: 12px !important;"
+               shape-rendering="geometricPrecision">
+            <!-- 배경 원 -->
+            <circle cx="50" cy="50" r="50" fill="#eef0f3"/>
+            <!-- 상위 4% 조각 (14.4°) : 시작점 12시(50,0) → 시계방향 -->
+            <path d="M 50 50 L 50 0 A 50 50 0 0 1 62.43 1.57 Z" fill="#6b7280"/>
+            <!-- 중앙 텍스트 -->
+            <text x="50" y="65" text-anchor="middle" dominant-baseline="middle"
+                  class="pie-label" font-weight="700" font-size="12" fill="#6b7280" style="font-size: 12px !important;">9등급제</text>
+          </svg>
+
+          <div style="font-size:14px !important; color:#6b7280; font-weight:700;">상위 4%</div>
+        </div>
+
+        <div style="width:5mm; flex:0 0 5mm; height:32mm; font-size:16px !important; font-weight:400; color:#6b7280; line-height:normal; display:flex; align-items:center; justify-content:center;">→</div>
+
+        <div style="text-align:center; width: 32mm;">
+          <!-- ✅ 5등급제 파이 차트 (상위 10% 정확 각도 적용) -->
+          <svg width="32mm" height="32mm" viewBox="0 0 100 100"
+               style="margin:0 auto 2mm auto; display:block; font-size: 12px !important;"
+               shape-rendering="geometricPrecision">
+            <!-- 배경 원 -->
+            <circle cx="50" cy="50" r="50" fill="#dbeafe"/>
+            <!-- 상위 10% 조각 (36°) : 시작점 12시(50,0) → 시계방향 -->
+            <path d="M 50 50 L 50 0 A 50 50 0 0 1 79.39 9.55 Z" fill="#3B82F6"/>
+            <!-- 중앙 텍스트 -->
+            <text x="50" y="65" text-anchor="middle" dominant-baseline="middle"
+                  class="pie-label" font-weight="700" font-size="12" fill="#3B82F6" style="font-size: 12px !important;">5등급제</text>
+          </svg>
+
+          <div style="font-size:14px !important; color:#3B82F6; font-weight:700;">상위 10%</div>
+        </div>
+
+      </div>
+
+      <p class="img-caption" style="margin-top:3mm; margin-bottom:2mm; font-size:15px !important;">
+        1등급에 해당하는 학생 비율이 9등급제 대비 5등급제가 약 2.5배 높습니다.
+      </p>
+    </div>
+    
+    <!-- 비교 테이블 -->
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th style="width: 50%;">이전 교육과정</th>
+          <th style="width: 50%; background-color: #1653c9;">현행 교육과정</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="width: 50%;">9등급제 + 표준편차</td>
+          <td style="width: 50%;">5등급제 + 성취도 (A~E)</td>
+        </tr>
+        <tr>
+          <td style="width: 50%;">1등급: 상위 4%<br>2등급: 누적 11%<br>3등급: 누적 23%</td>
+          <td style="width: 50%;">1등급: 상위 10%<br>2등급: 누적 34%<br>3등급: 누적 66%</td>
+        </tr>
+        <tr>
+          <td style="width: 50%;">소수점 차이로 등급 갈림</td>
+          <td style="width: 50%;">내신 등급 경쟁 다소 완화</td>
+        </tr>
+        <tr>
+          <td style="width: 50%;">등급 관리가 최우선 과제</td>
+          <td style="width: 50%;">세특, 과목선택, 원점수, 성취도 중요</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 06 -</div>
+  </div>
+</body>
+</html>

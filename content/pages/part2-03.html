@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트2-03</title>
+  <link rel="stylesheet" href="../../../css/styles.css">
+  <style>body{min-height:100vh;min-height:100dvh}</style>
+  <script src="../../../js/page.js"></script>
+  <style>
+    /* 교육과정 편제표 축소 스타일 */
+    .curriculum-table {
+      font-size: 11px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 0 !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+    }
+    .curriculum-table th,
+    .curriculum-table td {
+      padding: 1mm 1.6mm !important;
+      font-size: 11px !important;
+      line-height: 1.5 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+    }
+    .curriculum-table thead th {
+      padding: 1.6mm 1.6mm !important;
+      font-size: 11px !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+    }
+    .curriculum-table tbody tr {
+      height: auto !important;
+    }
+    .curriculum-table tbody td {
+      padding: 1mm 1.6mm !important;
+      font-size: 11.5px !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+    }
+    /* 마지막 컬럼(3-2 학점) 오른쪽 모서리 이중선 제거 */
+    .curriculum-table th:last-child,
+    .curriculum-table td:last-child {
+      border-right: none !important;
+    }
+    /* 과목 컬럼 (1, 3, 5, 7, 9, 11번째) 가로 넓이 지정 */
+    .curriculum-table th:nth-child(1),
+    .curriculum-table th:nth-child(3),
+    .curriculum-table th:nth-child(5),
+    .curriculum-table th:nth-child(7),
+    .curriculum-table th:nth-child(9),
+    .curriculum-table th:nth-child(11),
+    .curriculum-table td:nth-child(1),
+    .curriculum-table td:nth-child(3),
+    .curriculum-table td:nth-child(5),
+    .curriculum-table td:nth-child(7),
+    .curriculum-table td:nth-child(9),
+    .curriculum-table td:nth-child(11) {
+      width: 10% !important;
+    }
+    /* 학점 컬럼 (2, 4, 6, 8, 10, 12번째) 가로 넓이 지정 */
+    .curriculum-table th:nth-child(2),
+    .curriculum-table th:nth-child(4),
+    .curriculum-table th:nth-child(6),
+    .curriculum-table th:nth-child(8),
+    .curriculum-table th:nth-child(10),
+    .curriculum-table th:nth-child(12),
+    .curriculum-table td:nth-child(2),
+    .curriculum-table td:nth-child(4),
+    .curriculum-table td:nth-child(6),
+    .curriculum-table td:nth-child(8),
+    .curriculum-table td:nth-child(10),
+    .curriculum-table td:nth-child(12) {
+      width:3% !important;
+    }
+    /* 마지막 행은 하단 선 제거 (바깥 테두리만 남기기) */
+    .curriculum-table tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+    /* 계 행만 회색, 나머지 행은 회색 배경 제거 */
+    .curriculum-table tbody tr:not(:last-child) {
+      background-color: transparent !important;
+    }
+    /* 모든 셀의 border-radius 제거 - 테이블 바깥쪽 테두리만 둥글게 */
+    .curriculum-table th,
+    .curriculum-table td {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+
+    /* 이수·미이수 기준 표 - 셀 높이 모두 동일 + 헤더 디자인 (comparison-table 중 curriculum-table 제외) */
+    .comparison-table:not(.curriculum-table) {
+      table-layout: fixed !important;
+    }
+    .comparison-table:not(.curriculum-table) th,
+    .comparison-table:not(.curriculum-table) td {
+      height: 8mm !important;
+      min-height: 8mm !important;
+      box-sizing: border-box !important;
+      vertical-align: middle !important;
+    }
+    /* 로우 셀(본문) 디자인 */
+    .comparison-table:not(.curriculum-table) td {
+      font-size: 14px !important;
+      padding-top: 2mm !important;
+      padding-bottom: 2mm !important;
+      padding-left: 3mm !important;
+      padding-right: 3mm !important;
+      font-weight: 400 !important;
+    }
+    .comparison-table:not(.curriculum-table) td * {
+      font-size: 14px !important;
+      font-weight: 400 !important;
+    }
+    /* 컬럼(헤더) 디자인 */
+    .comparison-table:not(.curriculum-table) th {
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      padding: 2.5mm 8mm !important;
+      background-color: #3B82F6 !important;
+      text-align: center !important;
+      color: #FFFFFF !important;
+    }
+    .comparison-table:not(.curriculum-table) th * {
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #FFFFFF !important;
+    }
+
+    /* 이수/미이수 조건 컬럼 가로 넓이 동일하게 */
+    .comparison-table:not(.curriculum-table) th:nth-child(2),
+    .comparison-table:not(.curriculum-table) td:nth-child(2),
+    .comparison-table:not(.curriculum-table) th:nth-child(3),
+    .comparison-table:not(.curriculum-table) td:nth-child(3) {
+      width: 43% !important;
+    }
+
+    /* 이수·미이수 기준 카드형 디자인 */
+    .credit-cards-wrap {
+      display: flex;
+      align-items: stretch;
+      gap: 3.5mm;
+    }
+    .credit-card {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      min-height: 20mm;
+      box-sizing: border-box;
+      border: 1px solid #E5E7EB;
+      border-radius: 0;
+      overflow: hidden;
+      margin-bottom: 0;
+      background: #fff;
+    }
+    .credit-card-label {
+      width: 100%;
+      min-width: 0;
+      height: 12mm;
+      background: #3B82F6;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 0 2mm;
+      text-align: center;
+      line-height: 1.3;
+      box-sizing: border-box;
+    }
+    .credit-card-content {
+      flex: 1;
+      padding: 3mm 4mm;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    .credit-card-content ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .credit-card-content li {
+      padding-left: 5mm;
+      position: relative;
+      margin-bottom: 1mm;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #1F2937;
+    }
+    .credit-card-content li:last-child { margin-bottom: 0; }
+    .credit-card-content li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #3B82F6;
+      font-weight: bold;
+    }
+    .credit-card-toggle {
+      flex-shrink: 0;
+      width: 6mm;
+      height: 6mm;
+      min-width: 6mm;
+      min-height: 6mm;
+      border-radius: 50%;
+      background: #3B82F6;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 (연속) -->
+    <h2 class="title-2">
+      Chapter 2. 고교학점제 핵심 개념
+    </h2>
+    
+    <!-- 소제목 2-1 -->
+    <h3 class="title-3">2-1. 보통교과 구조 (공통 과목/선택 과목)</h3>
+    
+    <div class="text-body">
+        공통 과목·일반 선택 교과는 '기초적인 학업역량'을 다지는 역할을 하고, 진로 선택·융합 선택 교과는 '전공과의 연계성과 학업 심화 수준'을 보여주는 핵심 과목군입니다.
+    </div>
+
+    <!-- 보통교과 구조 다이어그램 -->
+    <div class="report-box" style="margin-top: 1mm; border: none; padding: 0;">
+      <div class="grade-track" style="display:flex; align-items:stretch; gap: 3.5mm;">
+        <!-- 1학년 -->
+        <div style="flex: 1; min-width: 0; display:flex; flex-direction:column;">
+          <div style="padding: 2mm 8mm; background-color:#3B82F6; font-size:14px !important; font-weight:600; text-align:center; box-sizing: border-box; color: #FFFFFF; border-radius: 0;">
+            1학년
+          </div>
+          <div style="flex:1; border: 1px solid #E5E7EB; border-top: none; padding: 3mm 4mm; box-sizing: border-box; background-color:#ffffff; border-radius: 0; display:flex; flex-direction:column;">
+            <div style="font-size:14px !important; font-weight:600; margin-bottom:1.5mm; color: #1F2937; text-align:center;">공통 과목</div>
+            <div class="text-small" style="margin-top:0; font-size:14px !important; text-align:center;">
+              공통국어1/2, 공통수학1/2, 기본수학1/2, 공통영어1/2, 기본영어1/2 등
+            </div>
+            <div style="margin-top:auto; border: 1px solid #3B82F6; padding: 2.5mm 2mm; font-size:14px !important; font-weight:700; line-height:1.5; text-align:center; background-color:#FAFAFA; color: #3B82F6; border-radius: 0;">
+              기초 학업역량 평가
+            </div>
+          </div>
+        </div>
+
+        <!-- 오른쪽 화살표 -->
+        <div style="flex: 0 0 5mm; width: 5mm; display:flex; align-items:center; justify-content:center; color: #6b7280; font-size:16px; font-weight:400;">→</div>
+
+        <!-- 2·3학년 -->
+        <div style="flex: 1.85; min-width: 0; display:flex; flex-direction:column;">
+          <div style="padding: 2mm 8mm; background-color:#3B82F6; font-size:14px !important; font-weight:600; text-align:center; box-sizing: border-box; color: #FFFFFF; border-radius: 0;">
+            2·3학년
+          </div>
+          <div style="flex:1; display:flex; border: 1px solid #E5E7EB; border-top: none; background-color:#ffffff; box-sizing:border-box;">
+            <!-- ② 일반 선택 -->
+            <div style="flex:1; min-width: 0; padding: 3mm 3mm; box-sizing:border-box; display:flex; flex-direction:column;">
+              <div style="font-size:14px !important; font-weight:600; margin-bottom:1.5mm; color: #1F2937; text-align:center;">일반 선택</div>
+              <div class="text-small" style="margin-top:0; font-size:14px !important; text-align:center;">
+                화법과언어, 확률과통계, 영어독해와작문 등
+              </div>
+              <div style="margin-top:auto; border: 1px solid #3B82F6; padding: 2.5mm 2mm; font-size:14px !important; font-weight:700; line-height:1.5; text-align:center; background-color:#FAFAFA; color: #3B82F6; border-radius: 0;">
+                학업 성실성 평가
+              </div>
+            </div>
+
+            <!-- ③ 진로 선택 -->
+            <div style="flex:1; min-width: 0; padding: 3mm 3mm; box-sizing:border-box; display:flex; flex-direction:column; border-left: 1px solid #E5E7EB;">
+              <div style="font-size:14px !important; font-weight:600; margin-bottom:1.5mm; color: #1F2937; text-align:center;">진로 선택</div>
+              <div class="text-small" style="margin-top:0; font-size:14px !important; text-align:center;">
+                주제탐구독서, 영미문학읽기, 한국지리탐구 등
+              </div>
+              <div style="margin-top:auto; border: 1px solid #3B82F6; padding: 2.5mm 2mm; font-size:14px !important; font-weight:700; line-height:1.5; text-align:center; background-color:#FAFAFA; color: #3B82F6; border-radius: 0;">
+                전공 적합성 평가
+              </div>
+            </div>
+
+            <!-- ④ 융합 선택 -->
+            <div style="flex:1; min-width: 0; padding: 3mm 3mm; box-sizing:border-box; display:flex; flex-direction:column; border-left: 1px solid #E5E7EB;">
+              <div style="font-size:14px !important; font-weight:600; margin-bottom:1.5mm; color: #1F2937; text-align:center;">융합 선택</div>
+              <div class="text-small" style="margin-top:0; font-size:14px !important; text-align:center;">
+                매체의사소통, 수학과문학, 미디어영어 등
+              </div>
+              <div style="margin-top:auto; border: 1px solid #3B82F6; padding: 2.5mm 2mm; font-size:14px !important; font-weight:700; line-height:1.5; text-align:center; background-color:#FAFAFA; color: #3B82F6; border-radius: 0;">
+                융합 사고력 평가
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 소제목 1-2 -->
+    <h3 class="title-3" style="margin-bottom: 3.5mm; margin-top: 5mm;">2-2. 학교 교육과정 편제표 읽기</h3>
+    
+    <div class="text-body" style="margin-bottom: 2mm;">
+      각 고등학교는 3년간 개설 과목과 이수 학점을 교육과정 편제표로 공개합니다. 아래에 제시된 내용은 편제표의 이해를 돕기 위한 자료로, 대학별 기계공학과 추천 과목(빨간색 음영)을 참고해 구성한 일부 샘플입니다.
+    </div>
+    
+    <!-- 교육과정 편제표 -->
+    <table class="comparison-table curriculum-table" style="margin-top: 2mm;">
+      <thead>
+        <tr>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">1-1</th>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">1-2</th>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">2-1</th>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">2-2</th>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">3-1</th>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">3-2</th>
+        </tr>
+        <tr>
+          <th>과목</th>
+          <th>학점</th>
+          <th>과목</th>
+          <th>학점</th>
+          <th>과목</th>
+          <th>학점</th>
+          <th>과목</th>
+          <th>학점</th>
+          <th>과목</th>
+          <th>학점</th>
+          <th>과목</th>
+          <th>학점</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>공통국어1</td>
+          <td>4</td>
+          <td>공통국어2</td>
+          <td>4</td>
+          <td>문학</td>
+          <td>4</td>
+          <td>화법과언어</td>
+          <td>4</td>
+          <td>독서와작문</td>
+          <td>4</td>
+          <td>매체의사소통</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>공통수학1</td>
+          <td>4</td>
+          <td>공통수학2</td>
+          <td>4</td>
+          <td>영어독해와작문</td>
+          <td>3</td>
+          <td>영어발표와토톤</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">미적분 Ⅱ</td>
+          <td>3</td>
+          <td>미디어영어</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>공통영어1</td>
+          <td>4</td>
+          <td>공통영어2</td>
+          <td>4</td>
+          <td>정보</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">기하</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">확률과통계</td>
+          <td>4</td>
+          <td>수학과제탐구</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>통합사회1</td>
+          <td>4</td>
+          <td>통합사회2</td>
+          <td>4</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">대수</td>
+          <td>4</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">미적분Ⅰ</td>
+          <td>4</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">역학과에너지</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">전자기와양자</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>통합과학1</td>
+          <td>4</td>
+          <td>통합과학2</td>
+          <td>4</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">화학</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">물리학</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">화학반응의세계</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">물질과에너지</td>
+          <td>3</td>
+        </tr>
+        <tr style="font-weight: 600; background-color: #f3f4f6;">
+          <td>계</td>
+          <td>20</td>
+          <td>계</td>
+          <td>20</td>
+          <td>계</td>
+          <td>17</td>
+          <td>계</td>
+          <td>17</td>
+          <td>계</td>
+          <td>17</td>
+          <td>계</td>
+          <td>15</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- 세련된 팁 박스 -->
+    <div class="tip-box" style="font-size: 15px !important; margin-top: 1mm; padding-top: 4mm !important; padding-bottom: 3mm !important;">
+      <div class="tip-title" style="font-size: 15px !important;">체크 포인트</div>
+      <ul class="list-check" style="font-size: 15px !important;">
+        <li style="font-size: 15px !important;"><strong>전공 연계 : </strong>2∙3학년에 내 진로(희망 전공)와 관련된 과목이 개설되어 있는지 확인합니다.</li>
+        <li style="font-size: 15px !important;"><strong>과목 위계 : </strong>공통수학1/2 → 대수·미적분Ⅰ→ 미적분Ⅱ처럼 단계별 이수가 가능한지 확인합니다.</li>
+      </ul>
+    </div>
+    
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 11 -</div>
+  </div>
+</body>
+</html>

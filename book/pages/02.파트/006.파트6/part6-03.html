@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트6-03</title>
+  <link rel="stylesheet" href="../../../css/styles.css">
+  <style>body{min-height:100vh;min-height:100dvh}</style>
+  <script src="../../../js/page.js"></script>
+  <style>
+    .comparison-container {
+      display: flex;
+      gap: 6mm;
+      margin-top: 2mm;
+      margin-bottom: 3mm;
+    }
+    
+    .comparison-card {
+      flex: 1;
+      border-radius: 0;
+      padding: 5mm;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    
+    .comparison-card.old-system {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.new-system {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .card-header {
+      text-align: center;
+      padding: 4mm 3mm;
+      margin: -5mm -5mm 3mm -5mm;
+      background-color: var(--color-primary);
+      color: #ffffff;
+      border-radius: 0;
+      border-bottom: none;
+    }
+    
+    .card-header.old-system {
+      border-bottom: none;
+    }
+    
+    .card-header.new-system {
+      background-color: #1653c9;
+      border-bottom: none;
+    }
+    
+    .card-grade {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 1mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-year {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.8;
+      margin-bottom: 0mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-revision {
+      display: inline-block;
+      padding: 1.5mm 4mm;
+      border-radius: 0;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 1mm;
+    }
+    
+    .card-revision.old {
+      background-color: #F3F4F6;
+      color: #6B7280;
+    }
+    
+    .card-revision.new {
+      background-color: #DBEAFE;
+      color: var(--color-primary-dark);
+    }
+    
+    .section-block {
+      margin-top: 2.45mm;
+      margin-bottom: 2.45mm;
+      background-color: #FAFAFA;
+      border: 1px solid #F0F0F0;
+      border-radius: 0;
+      padding: 3.5mm;
+    }
+    
+    .comparison-card .section-block:first-of-type {
+      margin-top: 0;
+    }
+    
+    .comparison-card .section-block:last-of-type {
+      margin-bottom: 0.3mm;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3mm;
+      padding-bottom: 3.5mm;
+      border-bottom: 1.5px solid #E5E7EB;
+      color: var(--color-text);
+    }
+    
+    .section-content {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 0;
+      color: var(--color-text);
+    }
+    
+    .section-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    
+    .section-content li {
+      padding-left: 5.5mm;
+      position: relative;
+      margin-bottom: 2mm;
+      line-height: 1.8;
+    }
+    
+    .section-content li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-content li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    /* part2-06.html 스타일과 동일한 bullet point */
+    .section-block:not(.comparison-card .section-block) .section-content li {
+      padding-left: 5mm;
+      position: relative;
+      margin-bottom: 0.8mm;
+    }
+    
+    .section-block:not(.comparison-card .section-block) .section-content li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-block:not(.comparison-card .section-block) .section-content li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+    
+    .section-content li.no-bullet {
+      padding-left: 0;
+      text-align: justify;
+    }
+    
+    .section-content li.no-bullet::before {
+      display: none;
+    }
+    
+    .section-badge {
+      display: inline-block;
+      padding: 1.5mm 3.5mm;
+      border-radius: 0;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 2.5mm;
+      background-color: #EFF6FF;
+      color: var(--color-primary-dark);
+    }
+    
+    .highlight-box {
+      margin-top: 3mm;
+      padding: 3mm;
+      border-radius: 0;
+      font-size: 12.5px;
+      line-height: 1.7;
+      background-color: #F0F9FF;
+      border-left: 3px solid var(--color-primary);
+      color: var(--color-text);
+    }
+    
+    .intro-text {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--color-text-light);
+      margin-bottom: 4mm;
+      text-align: center;
+      padding: 3mm 4mm;
+      background-color: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 0;
+    }
+    
+    .conclusion-box {
+      margin-top: 2.5mm;
+      border: 1px solid #3B82F6;
+      padding: 2.5mm 2mm;
+      font-size: 13.5px !important;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+      background-color: #FAFAFA;
+      color: #3B82F6;
+      border-radius: 0;
+    }
+    
+    /* 교육과정 편제표 축소 스타일 */
+    .comparison-table.curriculum-table {
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 0 !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+      table-layout: fixed !important;
+      width: 100% !important;
+    }
+    
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      padding: 1mm 1.6mm !important;
+      font-size: 14px !important;
+      line-height: 1.5 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+      margin: 0 !important;
+    }
+    
+    /* 이중 테두리 방지 - 첫 번째 열은 왼쪽 테두리 제거 */
+    .comparison-table.curriculum-table th:first-child,
+    .comparison-table.curriculum-table td:first-child {
+      border-left: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th {
+      padding: 1.6mm 1.6mm !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      background-color: var(--color-primary) !important;
+      color: #ffffff !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+    
+    /* 마지막 컬럼 헤더의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table thead th:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th * {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr {
+      height: auto !important;
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td {
+      padding: 2mm 2mm !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      background-color: #ffffff !important;
+      color: var(--color-text) !important;
+      text-align: center !important;
+    }
+    
+    /* 마지막 컬럼 데이터 셀의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td * {
+      font-size: 14px !important;
+    }
+    
+    /* 모든 행은 하얀색 배경 */
+    .comparison-table.curriculum-table tbody tr {
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr td {
+      background-color: #ffffff !important;
+    }
+    
+    /* 마지막 컬럼 오른쪽 모서리 이중선 제거 */
+    .comparison-table.curriculum-table th:last-child,
+    .comparison-table.curriculum-table td:last-child,
+    .comparison-table.curriculum-table thead th:last-child,
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    /* 마지막 행은 하단 선 제거 (바깥 테두리만 남기기) */
+    .comparison-table.curriculum-table tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+    
+    /* 모든 셀의 border-radius 제거 - 테이블 바깥쪽 테두리만 둥글게 */
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    
+    /* 첫 번째 행의 첫 번째 셀 - 상단 왼쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:first-child {
+      border-top-left-radius: 0 !important;
+    }
+    
+    /* 첫 번째 행의 마지막 셀 - 상단 오른쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:last-child {
+      border-top-right-radius: 0 !important;
+    }
+    
+    /* 마지막 행의 첫 번째 셀 - 하단 왼쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 0 !important;
+    }
+    
+    /* 마지막 행의 마지막 셀 - 하단 오른쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 0 !important;
+      border-right: none !important;
+    }
+    
+    /* 교시 컬럼(1번째) 너비 줄이기 */
+    .comparison-table.curriculum-table th:nth-child(1),
+    .comparison-table.curriculum-table td:nth-child(1) {
+      width: 10% !important;
+    }
+    
+    /* 문항 수 컬럼(4번째) 너비 */
+    .comparison-table.curriculum-table th:nth-child(4),
+    .comparison-table.curriculum-table td:nth-child(4) {
+      width: 12% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 (연속) -->
+    <h2 class="title-2">
+      Chapter 2. 원서접수 전략 설계 방식
+    </h2>
+    
+    <!-- 소제목 -->
+    <h3 class="title-3">1-1. 수시 원서접수 기본 원칙 - 6회 지원</h3>
+    
+    <!-- 상단 설명 -->
+    <div class="text-body" style="margin-bottom: 3mm;">
+      수시 6장을 상향 또는 적정으로만 구성하는 것은 불확실성을 크게 키우는 선택입니다. 합격 가능성과 도전 수준을 고려해 상향·적정·안정을 분산 배치해야 전체 지원 전략의 안정성을 확보할 수 있습니다.
+    </div>
+
+    <!-- 3가지 핵심 역량 비교 박스 -->
+    <div style="display: flex; gap: 6mm; align-items: flex-start; margin-top: 1mm; margin-bottom: 3mm;">
+      <!-- 학업역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 0;">
+          <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">🥇</div>
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">상향 지원</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6;">
+            합격 가능 낮음<br>
+            도전 가치 존재
+          </div>
+        </div>
+      </div>
+
+      <!-- 진로역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 0;">
+          <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">🥈</div>
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">적정 지원</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6;">
+            추합 가능 높음<br>
+            주력 합격 카드
+          </div>
+        </div>
+      </div>
+
+      <!-- 공동체역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 0;">
+          <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">🥉</div>
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">안정 지원</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6;">
+            최초 합격 가능<br>
+            보험 역할 수행
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 소제목 1-2 -->
+    <h3 class="title-3" style="margin-top: 1.5mm;">1-2. 정시 원서접수 기본 원칙 - 3회 지원</h3>
+    
+    <div class="text-body" style="margin-top: 0mm;">
+      정시는 가·나·다 군별로 각 1개 대학만 지원할 수 있기 때문에, 한 장의 선택이 결과에 미치는 영향이 큽니다. 따라서 각 군의 합격 가능성과 지원 목적을 명확히 구분해 전략적으로 배치해야 합니다.
+    </div>
+
+    <!-- 3가지 핵심 역량 비교 박스 -->
+    <div style="display: flex; gap: 6mm; align-items: flex-start; margin-top: 1mm; margin-bottom: 3mm;">
+      <!-- 학업역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 0;">
+          <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">⚽</div>
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">가군</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6;">
+            상위권 대학 다수 포진
+          </div>
+        </div>
+      </div>
+
+      <!-- 진로역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 0;">
+          <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">🏀</div>
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">나군</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6;">
+            최상위권 서울대 포함
+          </div>
+        </div>
+      </div>
+
+      <!-- 공동체역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 0;">
+          <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">🥎</div>
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">다군</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6;">
+            상대적으로 적은 모집인원
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 41 -</div>
+  </div>
+</body>
+</html>
