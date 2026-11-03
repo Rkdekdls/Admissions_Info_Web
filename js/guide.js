@@ -194,14 +194,8 @@ const Guide = (() => {
       title: "정시",
       numberNav: false,
       search: "jeongsi",
-      nav: [
-        { href: "#jeongsi-score", label: "지원가능 점수" },
-        { href: "#jeongsi-compare", label: "대학별 점수비교" },
-      ],
-      blocks: [
-        { id: "jeongsi-score", title: "", heading: "지원가능 점수", pages: [] },
-        { id: "jeongsi-compare", title: "", heading: "대학별 점수비교", pages: [] },
-      ],
+      nav: [],
+      blocks: [],
     },
     university: {
       kicker: "",
@@ -280,19 +274,19 @@ const Guide = (() => {
       /* 2024 대학알리미 기준(입시톡 정리) — 정원내 입학정원·경쟁률·충원율 */
       const uniRows = [
         ["한국외국어대학교(서울)", "서울", "사립", "3,490명", "13.1:1", "99.8%"],
-        ["연세대학교(신촌)", "서울", "사립", "3,495명", "10.9:1", "99.5%"],
+        ["연세대학교(서울)", "서울", "사립", "3,495명", "10.9:1", "99.5%"],
         ["고려대학교(서울)", "서울", "사립", "3,992명", "9.8:1", "99.7%"],
-        ["성균관대학교(본교)", "서울", "사립", "3,447명", "21.2:1", "99.4%"],
+        ["성균관대학교(수원)", "경기", "사립", "3,447명", "21.2:1", "99.4%"],
         ["한양대학교(서울)", "서울", "사립", "2,906명", "19.3:1", "99.9%"],
-        ["서강대학교(본교)", "서울", "사립", "1,602명", "20.3:1", "99.1%"],
+        ["서강대학교", "서울", "사립", "1,602명", "20.3:1", "99.1%"],
         ["중앙대학교(서울)", "서울", "사립", "3,210명", "26.3:1", "99.9%"],
         ["경희대학교(서울)", "서울", "사립", "4,840명", "15.9:1", "99.9%"],
-        ["이화여자대학교(본교)", "서울", "사립", "3,197명", "10.1:1", "99.7%"],
+        ["이화여자대학교", "서울", "사립", "3,197명", "10.1:1", "99.7%"],
         ["홍익대학교(서울)", "서울", "사립", "2,421명", "18.0:1", "100.0%"],
         ["건국대학교(서울)", "서울", "사립", "3,000명", "19.9:1", "100.0%"],
         ["동국대학교(서울)", "서울", "사립", "2,823명", "18.1:1", "99.9%"],
-        ["인하대학교(본교)", "인천", "사립", "3,444명", "15.0:1", "100.0%"],
-        ["부산대학교(부산)", "부산", "국립", "4,311명", "8.6:1", "99.7%"],
+        ["인하대학교", "인천", "사립", "3,444명", "15.0:1", "100.0%"],
+        ["부산대학교", "부산", "국립", "4,311명", "8.6:1", "99.7%"],
         ["연세대학교(미래)", "강원", "사립", "1,409명", "10.3:1", "100.0%"],
       ]
         .map(([name, region, founding, quota, rate, fill], index, list) => {
@@ -467,7 +461,8 @@ const Guide = (() => {
           </select>
         </div>
         ${susiUnitTableHtml()}`
-          : `<div class="admit-list-head">
+          : `${jeongsiChartHtml()}
+        <div class="admit-list-head">
           <h2 class="title-3 admit-list-title">모집단위 목록</h2>
           <select class="admit-search-select" name="sort" aria-label="정렬" data-jeongsi-sort>
             <option value="name">대학명순</option>
@@ -475,8 +470,8 @@ const Guide = (() => {
             <option value="quota-asc">모집인원 적은순</option>
             <option value="rate-desc">경쟁률 높은순</option>
             <option value="rate-asc">경쟁률 낮은순</option>
-            <option value="score-desc">지원가능 점수 높은순</option>
-            <option value="score-asc">지원가능 점수 낮은순</option>
+            <option value="percentile-desc">백분위 평균 높은순</option>
+            <option value="percentile-asc">백분위 평균 낮은순</option>
           </select>
         </div>
         ${jeongsiUnitTableHtml()}`
@@ -484,9 +479,9 @@ const Guide = (() => {
     </section>`;
   }
 
-  function jeongsiUnitTableHtml() {
+  function jeongsiUnitsData() {
     /* 대학명·지역·계열·모집단위는 수시와 동일 / 군·전형·인원·경쟁률 등은 2025 정시 실데이터 */
-    const units = [
+    return [
       {
         univ: "한국외국어대학교(서울)",
         region: "서울",
@@ -504,7 +499,7 @@ const Guide = (() => {
         score: "268.50",
       },
       {
-        univ: "연세대학교(신촌)",
+        univ: "연세대학교(서울)",
         region: "서울",
         track: "인문",
         group: "가군",
@@ -518,6 +513,22 @@ const Guide = (() => {
         areaKey: "area-0",
         inquiry: "2",
         score: "292.80",
+      },
+      {
+        univ: "연세대학교(서울)",
+        region: "서울",
+        track: "인문",
+        group: "가군",
+        groupKey: "ga",
+        typeName: "일반전형",
+        unit: "국어국문학과",
+        quota: "28명",
+        rate: "4.12",
+        method: "수능 100%",
+        area: "국·수·영·탐",
+        areaKey: "area-0",
+        inquiry: "2",
+        score: "268.40",
       },
       {
         univ: "고려대학교(서울)",
@@ -536,8 +547,24 @@ const Guide = (() => {
         score: "290.10",
       },
       {
-        univ: "성균관대학교(본교)",
+        univ: "고려대학교(서울)",
         region: "서울",
+        track: "인문",
+        group: "가군",
+        groupKey: "ga",
+        typeName: "일반전형",
+        unit: "사회학과",
+        quota: "22명",
+        rate: "5.41",
+        method: "수능 100%",
+        area: "국·수·영·탐",
+        areaKey: "area-0",
+        inquiry: "2",
+        score: "255.70",
+      },
+      {
+        univ: "성균관대학교(수원)",
+        region: "경기",
         track: "자연",
         group: "나군",
         groupKey: "na",
@@ -568,7 +595,23 @@ const Guide = (() => {
         score: "276.20",
       },
       {
-        univ: "서강대학교(본교)",
+        univ: "한양대학교(서울)",
+        region: "서울",
+        track: "자연",
+        group: "가군",
+        groupKey: "ga",
+        typeName: "일반전형",
+        unit: "건축학부",
+        quota: "30명",
+        rate: "4.15",
+        method: "수능 100%",
+        area: "국·수·영·탐",
+        areaKey: "area-0",
+        inquiry: "2",
+        score: "259.80",
+      },
+      {
+        univ: "서강대학교",
         region: "서울",
         track: "인문",
         group: "나군",
@@ -582,6 +625,22 @@ const Guide = (() => {
         areaKey: "area-0",
         inquiry: "2",
         score: "284.60",
+      },
+      {
+        univ: "서강대학교",
+        region: "서울",
+        track: "인문",
+        group: "나군",
+        groupKey: "na",
+        typeName: "일반전형",
+        unit: "철학과",
+        quota: "12명",
+        rate: "6.33",
+        method: "수능 100%",
+        area: "국·수·영·탐",
+        areaKey: "area-0",
+        inquiry: "2",
+        score: "248.20",
       },
       {
         univ: "중앙대학교(서울)",
@@ -616,7 +675,7 @@ const Guide = (() => {
         score: "268.90",
       },
       {
-        univ: "이화여자대학교(본교)",
+        univ: "이화여자대학교",
         region: "서울",
         track: "인문",
         group: "나군",
@@ -630,6 +689,22 @@ const Guide = (() => {
         areaKey: "area-0",
         inquiry: "2",
         score: "281.70",
+      },
+      {
+        univ: "이화여자대학교",
+        region: "서울",
+        track: "인문",
+        group: "나군",
+        groupKey: "na",
+        typeName: "일반전형",
+        unit: "영어영문학과",
+        quota: "40명",
+        rate: "3.85",
+        method: "수능 100%",
+        area: "국·수·영·탐",
+        areaKey: "area-0",
+        inquiry: "2",
+        score: "264.30",
       },
       {
         univ: "홍익대학교(서울)",
@@ -680,7 +755,7 @@ const Guide = (() => {
         score: "270.50",
       },
       {
-        univ: "인하대학교(본교)",
+        univ: "인하대학교",
         region: "인천",
         track: "자연",
         group: "나군",
@@ -696,7 +771,7 @@ const Guide = (() => {
         score: "262.10",
       },
       {
-        univ: "부산대학교(부산)",
+        univ: "부산대학교",
         region: "부산",
         track: "공통",
         group: "가군",
@@ -728,14 +803,137 @@ const Guide = (() => {
         score: "245.60",
       },
     ];
+  }
 
+  function shortUnivLabel(univ) {
+    const raw = String(univ || "").trim();
+    const campus = raw.match(/\(([^)]+)\)/);
+    const base = raw
+      .replace(/\([^)]*\)/g, "")
+      .replace(/여자대학교$/g, "여대")
+      .replace(/외국어대학교$/g, "외국어대")
+      .replace(/대학교$/g, "대")
+      .trim();
+    /* 캠퍼스 다르면 다른 대학 — 라벨에도 구분 */
+    return campus ? `${base}(${campus[1]})` : base;
+  }
+
+  function jeongsiChartHtml() {
+    return `<div class="admit-list-head admit-jeongsi-chart-title-head">
+        <h2 class="title-3 admit-list-title">대학별 백분위 평균</h2>
+      </div>
+      <div class="admit-jeongsi-chart" data-jeongsi-chart>
+        <ul class="admit-jeongsi-chart-legend" aria-label="모집군 범례">
+          <li class="is-ga"><span aria-hidden="true"></span>가군</li>
+          <li class="is-na"><span aria-hidden="true"></span>나군</li>
+          <li class="is-da"><span aria-hidden="true"></span>다군</li>
+        </ul>
+        <div class="admit-jeongsi-chart-body" data-jeongsi-chart-body></div>
+      </div>`;
+  }
+
+  function renderJeongsiChart(root) {
+    const body = root.querySelector("[data-jeongsi-chart-body]");
+    if (!body) return;
+
+    /* 표에 보이는 행 → 대학별 min~max / X축은 max 높은 순(왼쪽→오른쪽) */
+    const visibleRows = [
+      ...root.querySelectorAll("[data-jeongsi-unit-table] tbody tr[data-jeongsi-row]:not([hidden])"),
+    ];
+    const byUniv = new Map();
+    visibleRows.forEach((row) => {
+      const pct = Number.parseFloat(row.dataset.percentile);
+      const fallback = Number.isFinite(pct)
+        ? pct
+        : parseAdmitNumber(row.cells[12]?.textContent);
+      if (!Number.isFinite(fallback)) return;
+      const univ = row.cells[0]?.textContent.trim() || "";
+      if (!univ) return;
+      const groupKey = row.dataset.group || "ga";
+      const prev = byUniv.get(univ);
+      if (!prev) {
+        byUniv.set(univ, {
+          univ,
+          label: shortUnivLabel(univ),
+          groupKey,
+          min: fallback,
+          max: fallback,
+        });
+        return;
+      }
+      if (fallback > prev.max) prev.groupKey = groupKey;
+      prev.min = Math.min(prev.min, fallback);
+      prev.max = Math.max(prev.max, fallback);
+    });
+
+    const series = [...byUniv.values()].sort((a, b) => {
+      if (b.max !== a.max) return b.max - a.max; /* max 큰 대학이 왼쪽 */
+      return a.label.localeCompare(b.label, "ko");
+    });
+    if (!series.length) {
+      body.innerHTML = `<p class="admit-jeongsi-chart-empty">조건에 맞는 모집단위가 없습니다.</p>`;
+      return;
+    }
+
+    const pad = { top: 16, right: 12, bottom: 44, left: 48 };
+    const plotH = 280;
+    const visibleSlots = 10; /* 한 화면에 10개 기준, 이하면 빈 칸 유지 */
+    const availW = Math.max((body.clientWidth || root.clientWidth || 640) - pad.left - pad.right, 480);
+    const colW = availW / visibleSlots;
+    const slotCount = Math.max(series.length, visibleSlots);
+    const plotW = slotCount * colW;
+    const width = pad.left + plotW + pad.right;
+    const height = pad.top + plotH + pad.bottom;
+    const yAt = (v) => pad.top + ((100 - v) / 100) * plotH;
+    const xAt = (index) => pad.left + index * colW + colW / 2;
+    const groupClass = { ga: "is-ga", na: "is-na", da: "is-da" };
+    const yTicks = [100, 80, 60, 40, 20, 0];
+
+    const hGrid = yTicks
+      .map((v) => {
+        const y = yAt(v);
+        return `<line class="admit-jeongsi-grid" x1="${pad.left}" y1="${y}" x2="${pad.left + plotW}" y2="${y}" />
+          <text class="admit-jeongsi-y" x="${pad.left - 14}" y="${y + 4}" text-anchor="end">${v}</text>`;
+      })
+      .join("");
+
+    const marks = series
+      .map((item, index) => {
+        const x = xAt(index);
+        const yMax = yAt(item.max);
+        const yMin = yAt(item.min);
+        const cls = groupClass[item.groupKey] || "is-ga";
+        const span = Math.abs(item.max - item.min);
+        /* 위끝=max 고정 → 왼쪽(max↑)에서 오른쪽(max↓)으로 내려가는 모양 */
+        const barW = 20;
+        const barTop = Math.min(yMax, yMin);
+        const barH = span < 0.05 ? barW : Math.max(barW, Math.abs(yMin - yMax));
+        const mark = `<rect x="${x - barW / 2}" y="${barTop}" width="${barW}" height="${barH}" rx="0" />`;
+        return `<g class="admit-jeongsi-mark ${cls}">
+          ${mark}
+          <text class="admit-jeongsi-x" x="${x}" y="${pad.top + plotH + 26}" text-anchor="middle">${item.label}</text>
+        </g>`;
+      })
+      .join("");
+
+    body.innerHTML = `<svg class="admit-jeongsi-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" preserveAspectRatio="xMinYMid meet" role="img" aria-label="대학별 백분위 평균 분포">
+        ${hGrid}
+        ${marks}
+      </svg>`;
+  }
+
+  function jeongsiUnitTableHtml() {
+    const units = jeongsiUnitsData();
     const rows = units
       .map((item, index) => {
         const classes = [];
         if (index % 2 === 1) classes.push("is-alt");
         if (index === units.length - 1) classes.push("is-last-visible");
         const cls = classes.length ? ` class="${classes.join(" ")}"` : "";
-        return `<tr data-jeongsi-row data-group="${item.groupKey}" data-area="${item.areaKey}" data-inquiry="${item.inquiry}"${cls}>
+        const regionKey = REGION_KEY[item.region] || "";
+        const trackKey = TRACK_KEY[item.track] || "";
+        const percentile = jeongsiPercentile(item.score, item.area, item.inquiry);
+        return `<tr data-jeongsi-row data-region="${regionKey}" data-track="${trackKey}" data-group="${item.groupKey}" data-area="${item.areaKey}" data-inquiry="${item.inquiry}" data-quota="${item.quota}" data-rate="${item.rate}" data-score="${item.score}" data-percentile="${Number.isFinite(percentile) ? percentile.toFixed(2) : ""}"${cls}>
             <td class="admit-data-name">${item.univ}</td>
             <td>${item.region}</td>
             <td>${item.track}</td>
@@ -747,7 +945,8 @@ const Guide = (() => {
             <td>${item.method}</td>
             <td>${item.area}</td>
             <td>${item.inquiry}과목</td>
-            <td>${Number(item.score).toFixed(2)}</td>
+            <td class="admit-highlight-score admit-jeongsi-score">${formatJeongsiScore(item.score, item.area, item.inquiry)}</td>
+            <td class="admit-highlight-score">${formatJeongsiPercentile(item.score, item.area, item.inquiry)}</td>
             <td><button type="button" class="admit-data-view">보기</button></td>
           </tr>`;
       })
@@ -772,6 +971,7 @@ const Guide = (() => {
             ${th("반영영역")}
             ${th("탐구반영")}
             ${th("지원가능 점수")}
+            ${th("백분위 평균")}
             ${th("상세")}
           </tr>
         </thead>
@@ -793,7 +993,7 @@ const Guide = (() => {
         논술: ["31명", "74.58", "논술 100%", "적용"],
       },
       {
-        univ: "연세대학교(신촌)",
+        univ: "연세대학교(서울)",
         region: "서울",
         track: "인문",
         unit: "경영학과",
@@ -811,8 +1011,8 @@ const Guide = (() => {
         논술: ["13명", "81.85", "논술 100%", "적용"],
       },
       {
-        univ: "성균관대학교(본교)",
-        region: "서울",
+        univ: "성균관대학교(수원)",
+        region: "경기",
         track: "자연",
         unit: "소프트웨어학과",
         교과: ["10명", "13.10", "학생부 100%", "1.55", "적용"],
@@ -829,7 +1029,7 @@ const Guide = (() => {
         논술: ["9명", "112.40", "논술 100%", "미적용"],
       },
       {
-        univ: "서강대학교(본교)",
+        univ: "서강대학교",
         region: "서울",
         track: "인문",
         unit: "커뮤니케이션학부",
@@ -856,7 +1056,7 @@ const Guide = (() => {
         논술: ["6명", "61.71", "논술 100%", "적용"],
       },
       {
-        univ: "이화여자대학교(본교)",
+        univ: "이화여자대학교",
         region: "서울",
         track: "인문",
         unit: "심리학과",
@@ -892,7 +1092,7 @@ const Guide = (() => {
         논술: ["15명", "48.80", "논술 100%", "적용"],
       },
       {
-        univ: "인하대학교(본교)",
+        univ: "인하대학교",
         region: "인천",
         track: "자연",
         unit: "항공우주공학과",
@@ -901,7 +1101,7 @@ const Guide = (() => {
         논술: ["9명", "30.40", "논술 100%", "적용"],
       },
       {
-        univ: "부산대학교(부산)",
+        univ: "부산대학교",
         region: "부산",
         track: "공통",
         unit: "간호학과",
@@ -930,8 +1130,8 @@ const Guide = (() => {
           if (typeKey === "교과" && index === units.length - 1) classes.push("is-last-visible");
           const cls = classes.length ? ` class="${classes.join(" ")}"` : "";
           const gradeCell = hasGrade
-            ? `<td data-susi-grade-col>${formatAdmitGrade(stats[3])}</td>`
-            : `<td data-susi-grade-col hidden></td>`;
+            ? `<td class="admit-highlight-score" data-susi-grade-col>${formatAdmitGrade(stats[3])}</td>`
+            : `<td class="admit-highlight-score" data-susi-grade-col hidden></td>`;
           const minimum = hasGrade ? stats[4] : stats[3];
           return `<tr data-susi-type="${typeKey}"${cls}${typeKey === "교과" ? "" : " hidden"}>
             <td class="admit-data-name">${item.univ}</td>
@@ -1019,9 +1219,22 @@ const Guide = (() => {
       const n = parseFloat(ratio[1]);
       return Number.isFinite(n) ? n : NaN;
     }
+    /* 지원가능 점수 "292.80 / 400" → 292.80 */
+    const scored = raw.match(/^([\d.]+)\s*\//);
+    if (scored) {
+      const n = parseFloat(scored[1]);
+      return Number.isFinite(n) ? n : NaN;
+    }
     const n = parseFloat(raw.replace(/,/g, "").replace(/[^0-9.]/g, ""));
     return Number.isFinite(n) ? n : NaN;
   }
+
+  const REGION_KEY = Object.fromEntries(
+    Object.entries(REGION_LABEL).map(([key, label]) => [label, key])
+  );
+  const TRACK_KEY = Object.fromEntries(
+    Object.entries(TRACK_LABEL).map(([key, label]) => [label, key])
+  );
 
   function formatAdmitRate(value) {
     if (value == null || value === "" || value === "—") return "—";
@@ -1033,6 +1246,37 @@ const Guide = (() => {
     if (value == null || value === "" || value === "—") return "—";
     const n = parseFloat(String(value).trim());
     return Number.isFinite(n) ? n.toFixed(2) : "—";
+  }
+
+  /* 국·수·영 각 100점, 탐구 1과목당 50점 */
+  function jeongsiScoreMax(area, inquiry) {
+    const text = String(area || "");
+    let max = 0;
+    if (text.includes("국")) max += 100;
+    if (text.includes("수")) max += 100;
+    if (text.includes("영")) max += 100;
+    if (text.includes("탐")) max += 50 * (Number(inquiry) || 0);
+    return max;
+  }
+
+  function formatJeongsiScore(score, area, inquiry) {
+    const n = Number(score);
+    const max = jeongsiScoreMax(area, inquiry);
+    if (!Number.isFinite(n) || !max) return "—";
+    return `${n.toFixed(2)} / ${max}`;
+  }
+
+  /* 지원가능 점수 → 100점 만점 환산 */
+  function jeongsiPercentile(score, area, inquiry) {
+    const n = Number(score);
+    const max = jeongsiScoreMax(area, inquiry);
+    if (!Number.isFinite(n) || !max) return NaN;
+    return (n / max) * 100;
+  }
+
+  function formatJeongsiPercentile(score, area, inquiry) {
+    const pct = jeongsiPercentile(score, area, inquiry);
+    return Number.isFinite(pct) ? `${pct.toFixed(2)} / 100` : "—";
   }
 
   function stripeVisibleRows(rows) {
@@ -1174,42 +1418,44 @@ const Guide = (() => {
     const table = root.querySelector("[data-jeongsi-unit-table]");
     if (!table) return;
     const tbody = table.tBodies[0];
+    if (!tbody) return;
     const keyword = (root.querySelector('input[name="keyword"]')?.value || "").trim().toLowerCase();
     const regionVal = root.querySelector('select[name="region"]')?.value || "";
     const trackVal = root.querySelector('select[name="track"]')?.value || "";
     const groupVal = root.querySelector('select[name="group"]')?.value || "";
     const areaVal = root.querySelector('select[name="area"]')?.value || "";
     const inquiryVal = root.querySelector('select[name="inquiry"]')?.value || "";
-    const sortVal = root.querySelector("[data-jeongsi-sort]")?.value || "name";
-    const regionLabel = REGION_LABEL[regionVal] || "";
-    const trackLabel = TRACK_LABEL[trackVal] || "";
+    const sortVal =
+      root.querySelector("[data-jeongsi-sort]")?.value ||
+      root.querySelector('select[name="sort"]')?.value ||
+      "name";
 
     const rows = [...tbody.querySelectorAll("tr[data-jeongsi-row]")];
     rows.sort((a, b) =>
       compareAdmitRows(a, b, sortVal, {
         name: (row) => row.cells[0]?.textContent.trim() || "",
-        quota: (row) => parseAdmitNumber(row.cells[6]?.textContent),
-        rate: (row) => parseAdmitNumber(row.cells[7]?.textContent),
-        score: (row) => parseAdmitNumber(row.cells[11]?.textContent),
+        quota: (row) => parseAdmitNumber(row.dataset.quota || row.cells[6]?.textContent),
+        rate: (row) => parseAdmitNumber(row.dataset.rate || row.cells[7]?.textContent),
+        score: (row) => parseAdmitNumber(row.dataset.score || row.cells[11]?.textContent),
+        percentile: (row) => parseAdmitNumber(row.dataset.percentile || row.cells[12]?.textContent),
       })
     );
     rows.forEach((row) => tbody.appendChild(row));
 
     rows.forEach((row) => {
       const univ = row.cells[0]?.textContent.trim() || "";
-      const region = row.cells[1]?.textContent.trim() || "";
-      const track = row.cells[2]?.textContent.trim() || "";
       const unit = row.cells[5]?.textContent.trim() || "";
       const keywordOk =
         !keyword || univ.toLowerCase().includes(keyword) || unit.toLowerCase().includes(keyword);
-      const regionOk = !regionLabel || region === regionLabel;
-      const trackOk = !trackLabel || track === trackLabel;
+      const regionOk = !regionVal || row.dataset.region === regionVal;
+      const trackOk = !trackVal || row.dataset.track === trackVal;
       const groupOk = !groupVal || row.dataset.group === groupVal;
       const areaOk = !areaVal || row.dataset.area === areaVal;
       const inquiryOk = !inquiryVal || row.dataset.inquiry === inquiryVal;
       row.hidden = !(keywordOk && regionOk && trackOk && groupOk && areaOk && inquiryOk);
     });
     stripeVisibleRows(rows);
+    renderJeongsiChart(root);
   }
 
   function applyAdmitFilters(panel, sectionId) {
@@ -1270,15 +1516,21 @@ const Guide = (() => {
     });
 
     const refresh = () => applyAdmitFilters(panel);
-    root.querySelectorAll("input[name='keyword']").forEach((el) => {
-      el.addEventListener("input", refresh);
-      el.addEventListener("search", refresh);
+    root.addEventListener("input", (event) => {
+      if (event.target.matches?.('input[name="keyword"]')) refresh();
     });
-    root
-      .querySelectorAll(
-        "select[name='region'], select[name='track'], select[name='minimum'], select[name='founding'], select[name='year'], select[name='sort'], select[name='group'], select[name='area'], select[name='inquiry']"
-      )
-      .forEach((el) => el.addEventListener("change", refresh));
+    root.addEventListener("search", (event) => {
+      if (event.target.matches?.('input[name="keyword"]')) refresh();
+    });
+    root.addEventListener("change", (event) => {
+      if (
+        event.target.matches?.(
+          'select[name="region"], select[name="track"], select[name="minimum"], select[name="founding"], select[name="year"], select[name="sort"], select[name="group"], select[name="area"], select[name="inquiry"]'
+        )
+      ) {
+        refresh();
+      }
+    });
     refresh();
   }
 
@@ -1336,6 +1588,8 @@ const Guide = (() => {
     });
     if (guide.nav[0]) {
       activate(panel, guide.nav[0].href.replace("#", ""), false);
+    } else if (guide.search) {
+      applyAdmitFilters(panel);
     }
   }
 

@@ -79,17 +79,20 @@ input {
   display: none;
 }
 
+/* 접힌 레일: 열린 상태 + 그룹 접힘일 때와 같은 아이콘 위치/크기 */
 .app.is-collapsed .nav {
   align-items: center;
-  padding: 44px 0 24px;
-  gap: 2px;
+  padding: 8px 0 24px;
+  gap: 4px;
 }
 
 .app.is-collapsed .nav-parent {
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
+  align-items: center;
+  width: auto;
+  /* 열린 상태(라벨 포함, 그룹 접힘) 행 높이에 맞춤: padding 12 + 글줄 ~24 */
+  min-height: 48px;
+  padding: 12px;
 }
 
 .app.is-collapsed .nav-parent-main {
@@ -119,7 +122,9 @@ input {
 
 .app.is-collapsed .brand {
   justify-content: center;
-  padding: 12px 0 4px;
+  /* 로고는 숨기되, 열린 상태와 같은 상단 공간을 유지해 아이콘 Y위치를 맞춤 */
+  padding: 20px 0 6px;
+  min-height: calc(20px + 38px + 6px);
 }
 
 .brand-mega {
@@ -196,9 +201,9 @@ input {
 }
 
 .app.is-collapsed .nav-icon {
-  width: 23px;
-  height: 23px;
-  flex-basis: 23px;
+  width: 19px;
+  height: 19px;
+  flex-basis: 19px;
 }
 
 .nav-split {
@@ -588,6 +593,7 @@ input {
   position: absolute;
   right: 0;
   top: 50%;
+  z-index: 2;
   width: auto;
   min-width: 180px;
   max-width: calc(100% - 120px);
@@ -599,6 +605,131 @@ input {
 .admit-search[data-search-type="susi"] .admit-list-head .admit-search-select,
 .admit-search[data-search-type="jeongsi"] .admit-list-head .admit-search-select {
   margin-top: calc(var(--admit-control-h) / -2 + 2px);
+}
+
+/* 정시: 백분위 평균 분포 그래프 (계열·반영영역·탐구·모집군만 반영) */
+.admit-jeongsi-chart-title-head {
+  margin-bottom: 0;
+}
+
+.admit-jeongsi-chart-title-head .admit-list-title {
+  padding-right: 0;
+}
+
+.admit-jeongsi-chart {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 10px;
+  padding: 20px 20px 20px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.admit-jeongsi-chart-legend {
+  display: flex;
+  align-items: center;
+  align-self: flex-end;
+  gap: 14px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+  color: #1f2937;
+  font-family: var(--admit-font);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+
+.admit-jeongsi-chart-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admit-jeongsi-chart-legend span {
+  width: 10px;
+  height: 10px;
+  border-radius: 0;
+}
+
+.admit-jeongsi-chart-legend .is-ga span {
+  background: #ea580c; /* 교대·초등교육 */
+}
+
+.admit-jeongsi-chart-legend .is-na span {
+  background: #7c3aed; /* 사범계열 */
+}
+
+.admit-jeongsi-chart-legend .is-da span {
+  background: #0f766e; /* 첨단학과 */
+}
+
+.admit-jeongsi-chart-body {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.admit-jeongsi-chart-body::-webkit-scrollbar {
+  height: 6px;
+}
+
+.admit-jeongsi-chart-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admit-jeongsi-chart-body::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.admit-jeongsi-chart-body::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.admit-jeongsi-chart-empty {
+  margin: 28px 0;
+  color: #9ca3af;
+  font-size: 13px;
+  text-align: center;
+}
+
+.admit-jeongsi-svg {
+  display: block;
+  max-width: none;
+  height: auto;
+  vertical-align: top;
+}
+
+.admit-jeongsi-grid {
+  stroke: #e5e7eb;
+  stroke-width: 1;
+}
+
+.admit-jeongsi-y,
+.admit-jeongsi-x {
+  fill: #6b7280;
+  font-family: var(--admit-font);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+}
+
+.admit-jeongsi-mark.is-ga rect {
+  fill: #ea580c; /* 교대·초등교육 */
+}
+
+.admit-jeongsi-mark.is-na rect {
+  fill: #7c3aed; /* 사범계열 */
+}
+
+.admit-jeongsi-mark.is-da rect {
+  fill: #0f766e; /* 첨단학과 */
 }
 
 /* 제목 = 콘텐츠 .title-3 표시 간격 (17 / 600 · 상하 18px · #1F2937) */
@@ -713,10 +844,20 @@ input {
   padding-bottom: 0 !important;
 }
 
-.admit-data-table .admit-data-name {
+.admit-data-table .admit-jeongsi-score {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.admit-data-table .admit-data-name,
+.admit-data-table .admit-highlight-score {
   text-align: center;
   font-weight: 500;
   white-space: nowrap;
+}
+
+.admit-data-table .admit-highlight-score {
+  color: #e11d48;
 }
 
 .admit-search[data-search-type="university"] .admit-data-table th:nth-child(1),
@@ -734,7 +875,8 @@ input {
   font-weight: 400;
 }
 
-.admit-search[data-search-type="susi"] .admit-data-table td.admit-data-name {
+.admit-search[data-search-type="susi"] .admit-data-table td.admit-data-name,
+.admit-search[data-search-type="susi"] .admit-data-table td.admit-highlight-score {
   font-weight: 500;
   white-space: nowrap;
 }
