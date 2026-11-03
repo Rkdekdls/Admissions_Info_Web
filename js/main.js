@@ -210,11 +210,14 @@ MOBILE_MQ.addEventListener("change", () => {
 });
 
 const { tab: hashTab, section: hashSection } = parseRoute();
-const navEntry = performance.getEntriesByType?.("navigation")?.[0];
-/* 링크 오픈·새로고침 = navigate/reload. 뒤로가기는 back_forward */
-const isFreshOpen = !navEntry || navEntry.type === "navigate" || navEntry.type === "reload";
 const knownTab = tabs.find((tab) => tab.dataset.tab === hashTab);
-/* PC·모바일 공통 홈: 입시 정보 > 수시 > 교과 */
+/*
+ * 라우팅 규칙 (PC·모바일 동일)
+ * - 첫 인입(해시 없음) / 로고 클릭 → 입시 정보 › 수시 › 교과
+ * - 입시 정보 그룹만 클릭 → 수시 › 교과
+ * - 대입 제도 그룹만 클릭 → 교육과정 체계
+ * - 새로고침 → 현재 해시 화면 유지
+ */
 const startTab =
   knownTab ||
   tabs.find((tab) => tab.dataset.tab === HOME_TAB) ||
@@ -229,10 +232,7 @@ groups.forEach((group) => {
   setGroupOpen(group.dataset.group, group.dataset.group === startGroup);
 });
 
-/* 모바일: 링크를 처음 열거나 새로고침하면 무조건 수시 › 교과 */
-if (isMobileNav() && isFreshOpen) {
-  selectTab(HOME_TAB, true, HOME_SECTION);
-} else if (!hashTab || !knownTab) {
+if (!hashTab || !knownTab) {
   selectTab(HOME_TAB, true, HOME_SECTION);
 } else {
   selectTab(startKey, true, startSection || (startKey === HOME_TAB ? HOME_SECTION : undefined));
