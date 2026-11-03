@@ -300,8 +300,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -381,19 +381,14 @@
     
     <!-- 비교 차트 박스 -->
     <div class="report-box" style="margin-top: 2mm;">
-      <h4 class="title-3" style="text-align:center; margin:2mm 0 -7mm 0; color:#555; font-size:16px !important;">명목 경쟁률 vs 실질 경쟁률 비교</h4>
-      <div class="chart-compare" style="display: flex; align-items: flex-end; justify-content: center; height: 50mm; gap: 8mm; padding: 5mm 4mm 2mm 4mm; position: relative; box-sizing: border-box;">
+      <h4 class="title-3" style="text-align:center; margin:2mm 0 4mm 0; color:#555; font-size:16px !important;">명목 경쟁률 vs 실질 경쟁률 비교</h4>
+      <div class="chart-compare" style="display: flex; align-items: flex-end; justify-content: center; min-height: 50mm; gap: 8mm; padding: 5mm 4mm 2mm 4mm; position: relative; box-sizing: border-box;">
         <div style="text-align: center; width: 25mm; flex: 0 0 25mm; display: flex; flex-direction: column; align-items: center;">
           <div style="font-size:14px; font-weight:bold; color:#6b7280; margin-bottom: 1.5mm; white-space: nowrap;">9 대 1</div>
           <div style="height: 21mm; background: #6b7280; width: 100%; border-radius: 0; margin-top: auto; min-height: 19mm;"></div>
           <div style="font-weight:bold; margin-top:1.5mm; color:#6b7280; font-size:14px; white-space: nowrap;">명목 경쟁률</div>
         </div>
-        <div style="width:5mm; flex: 0 0 5mm; display:flex; flex-direction:column; align-items:center;">
-          <div style="height: 21mm; display:flex; align-items:center; justify-content:center; font-size:16px !important; font-weight:400; color:#6b7280; line-height:normal;">
-            <span style="transform: rotate(22deg);">→</span>
-          </div>
-          <div style="font-weight:bold; margin-top:1.5mm; font-size:14px; line-height:normal; visibility:hidden;">&nbsp;</div>
-        </div>
+        <div class="chart-arrow" style="width:5mm; flex: 0 0 5mm; height: 21mm; margin-bottom: 15.5mm; display:flex; align-items:center; justify-content:center; font-size:16px !important; font-weight:400; color:#6b7280; line-height:normal;">→</div>
         <div style="text-align: center; width: 25mm; flex: 0 0 25mm; display: flex; flex-direction: column; align-items: center;">
           <div style="font-size:14px; font-weight:bold; color:var(--color-primary); margin-bottom: 1.5mm; white-space: nowrap;">2 대 1</div>
           <div style="height: 9mm; background: var(--color-primary); width: 100%; border-radius: 0; margin-top: auto; min-height: 8mm;"></div>

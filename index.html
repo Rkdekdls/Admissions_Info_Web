@@ -6,10 +6,11 @@
   <title>입시 정보 조회 서비스</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=281">
+  <link rel="stylesheet" href="css/styles.css?v=295">
 </head>
 <body>
   <div class="app" id="app">
+    <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
     <aside class="sidebar" id="sidebar">
       <a class="brand" href="./index.html#susi/susi-subject" id="brand-home" aria-label="입시 정보 수시 교과로 이동">
         <img src="img/logo.jpg" alt="megastudy">
@@ -100,13 +101,20 @@
     </button>
 
     <main class="main">
-      <p class="crumb">
-        <span id="crumb-parent">입시 정보</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span id="crumb-current">수시</span>
-      </p>
+      <div class="main-top">
+        <button type="button" class="mobile-nav-btn" id="mobile-nav-btn" aria-controls="sidebar" aria-expanded="false" aria-label="메뉴 열기">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <p class="crumb">
+          <span id="crumb-parent">입시 정보</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="crumb-current">수시</span>
+        </p>
+      </div>
 
       <section class="panel" id="panel-curriculum" data-guide="curriculum" role="tabpanel" aria-labelledby="tab-curriculum" hidden></section>
       <section class="panel" id="panel-record" data-guide="record" role="tabpanel" aria-labelledby="tab-record" hidden></section>
@@ -564,7 +572,7 @@
             <path d="M 50 50 L 50 0 A 50 50 0 0 1 62.43 1.57 Z" fill="#6b7280"/>
             <!-- 중앙 텍스트 -->
             <text x="50" y="65" text-anchor="middle" dominant-baseline="middle"
-                  class="pie-label" font-weight="700" font-size="12" fill="#6b7280" style="font-size: 12px !important;">9등급제</text>
+                  class="pie-label" font-weight="700" font-size="15" fill="#6b7280" style="font-size: 13px !important;">9등급제</text>
           </svg>
 
           <div style="font-size:14px !important; color:#6b7280; font-weight:700;">상위 4%</div>
@@ -583,7 +591,7 @@
             <path d="M 50 50 L 50 0 A 50 50 0 0 1 79.39 9.55 Z" fill="#3B82F6"/>
             <!-- 중앙 텍스트 -->
             <text x="50" y="65" text-anchor="middle" dominant-baseline="middle"
-                  class="pie-label" font-weight="700" font-size="12" fill="#3B82F6" style="font-size: 12px !important;">5등급제</text>
+                  class="pie-label" font-weight="700" font-size="15" fill="#3B82F6" style="font-size: 13px !important;">5등급제</text>
           </svg>
 
           <div style="font-size:14px !important; color:#3B82F6; font-weight:700;">상위 10%</div>
@@ -770,8 +778,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -1701,8 +1709,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #3B82F6;
       font-weight: bold;
     }
@@ -2103,8 +2111,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -2479,8 +2487,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -2822,8 +2830,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -3081,8 +3089,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -3105,8 +3113,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;
@@ -3484,8 +3492,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -3756,8 +3764,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -3780,8 +3788,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;
@@ -4516,17 +4524,16 @@
       border-right: none !important;
     }
     
-    /* 출결상황 표 - 텍스트 잘림 방지 */
-    .comparison-table.curriculum-table th,
-    .comparison-table.curriculum-table td {
+    /* 출결·봉사 등: 텍스트 잘림 방지 (창의적 체험표 제외) */
+    .comparison-table.curriculum-table:not(.creative-activity-table) th,
+    .comparison-table.curriculum-table:not(.creative-activity-table) td {
       white-space: nowrap !important;
       overflow: visible !important;
       word-wrap: normal !important;
       min-width: fit-content !important;
     }
     
-    /* 출결상황 표 - table-layout을 auto로 변경하여 컬럼 너비 자동 조정 */
-    .comparison-table.curriculum-table {
+    .comparison-table.curriculum-table:not(.creative-activity-table) {
       table-layout: auto !important;
       width: auto !important;
       min-width: 100% !important;
@@ -4607,8 +4614,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -4936,8 +4943,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -4960,8 +4967,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;
@@ -5634,17 +5641,16 @@
       border-right: none !important;
     }
     
-    /* 출결상황 표 - 텍스트 잘림 방지 */
-    .comparison-table.curriculum-table th,
-    .comparison-table.curriculum-table td {
+    /* 출결·봉사 등: 텍스트 잘림 방지 (창의적 체험표 제외) */
+    .comparison-table.curriculum-table:not(.creative-activity-table) th,
+    .comparison-table.curriculum-table:not(.creative-activity-table) td {
       white-space: nowrap !important;
       overflow: visible !important;
       word-wrap: normal !important;
       min-width: fit-content !important;
     }
     
-    /* 출결상황 표 - table-layout을 auto로 변경하여 컬럼 너비 자동 조정 */
-    .comparison-table.curriculum-table {
+    .comparison-table.curriculum-table:not(.creative-activity-table) {
       table-layout: auto !important;
       width: auto !important;
       min-width: 100% !important;
@@ -5725,8 +5731,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -6054,8 +6060,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -6078,8 +6084,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;
@@ -6536,7 +6542,21 @@
 <style>body{min-height:100vh;min-height:100dvh}</style>
 <style>
     /* 교육과정 편제표 축소 스타일 */
-    .comparison-table.curriculum-table {
+    .comparison-table.curriculum-table:not(.creative-activity-table) {
+      font-size: 12px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 0 !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+      table-layout: fixed !important;
+      width: 100% !important;
+    }
+
+    /* 창의적 체험활동상황: 원본과 동일 (전체폭·fixed) */
+    .comparison-table.curriculum-table.creative-activity-table {
       font-size: 12px !important;
       line-height: 1.4 !important;
       border-collapse: separate !important;
@@ -6738,17 +6758,16 @@
       border-right: none !important;
     }
     
-    /* 출결상황 표 - 텍스트 잘림 방지 */
-    .comparison-table.curriculum-table th,
-    .comparison-table.curriculum-table td {
+    /* 출결·봉사 등: 텍스트 잘림 방지 (창의적 체험표 제외) */
+    .comparison-table.curriculum-table:not(.creative-activity-table) th,
+    .comparison-table.curriculum-table:not(.creative-activity-table) td {
       white-space: nowrap !important;
       overflow: visible !important;
       word-wrap: normal !important;
       min-width: fit-content !important;
     }
     
-    /* 출결상황 표 - table-layout을 auto로 변경하여 컬럼 너비 자동 조정 */
-    .comparison-table.curriculum-table {
+    .comparison-table.curriculum-table:not(.creative-activity-table) {
       table-layout: auto !important;
       width: auto !important;
       min-width: 100% !important;
@@ -6829,8 +6848,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -7158,8 +7177,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -7182,8 +7201,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;
@@ -7569,11 +7588,18 @@
       </div>
 
     <!-- 창의적 체험활동상황 표 -->
-    <table class="comparison-table curriculum-table" style="margin-top: 1mm; margin-bottom: 3mm; width: 100%; table-layout: fixed; box-sizing: border-box;">
+    <table class="comparison-table curriculum-table creative-activity-table" style="margin-top: 1mm; margin-bottom: 3mm; width: 100%; table-layout: fixed; box-sizing: border-box;">
+      <colgroup>
+        <col style="width: 8%" />
+        <col style="width: 15%" />
+        <col style="width: 8%" />
+        <col style="width: 15%" />
+        <col style="width: 54%" />
+      </colgroup>
       <thead>
         <tr>
           <th rowspan="2" style="width: 8% !important; padding: 1.6mm 2mm !important; height: 1.6mm !important;">학년</th>
-          <th colspan="4" style="padding: 2mm 2mm !important; height: 2.5mm !important;">창의적 체험활동상황</th>
+          <th colspan="4" style="width: 92% !important; padding: 2mm 2mm !important; height: 2.5mm !important;">창의적 체험활동상황</th>
         </tr>
         <tr>
           <th style="width: 15% !important; padding: 1.6mm 2mm !important; height: 1.6mm !important;">영역</th>
@@ -7815,8 +7841,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -8415,17 +8441,16 @@
       border-right: none !important;
     }
     
-    /* 출결상황 표 - 텍스트 잘림 방지 */
-    .comparison-table.curriculum-table th,
-    .comparison-table.curriculum-table td {
+    /* 출결·봉사 등: 텍스트 잘림 방지 (창의적 체험표 제외) */
+    .comparison-table.curriculum-table:not(.creative-activity-table) th,
+    .comparison-table.curriculum-table:not(.creative-activity-table) td {
       white-space: nowrap !important;
       overflow: visible !important;
       word-wrap: normal !important;
       min-width: fit-content !important;
     }
     
-    /* 출결상황 표 - table-layout을 auto로 변경하여 컬럼 너비 자동 조정 */
-    .comparison-table.curriculum-table {
+    .comparison-table.curriculum-table:not(.creative-activity-table) {
       table-layout: auto !important;
       width: auto !important;
       min-width: 100% !important;
@@ -8534,8 +8559,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -8863,8 +8888,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -8887,8 +8912,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;
@@ -9503,8 +9528,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -10052,8 +10077,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -10908,8 +10933,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -11422,8 +11447,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -11730,7 +11755,7 @@
     </div>
 
     <div class="text-body" style="margin-top: -0.5mm; margin-bottom: 2mm;">
-        <국어·수학·영어·탐구(1) 중 2개 영역 등급 합 5 이내>
+        <국·수·영·탐(1) 중 2개 영역 등급 합 5 이내>
     </div>
 
     <!-- 수능 최저학력기준 예시 표 -->
@@ -11907,8 +11932,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -12454,8 +12479,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -13367,8 +13392,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -13390,8 +13415,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -13813,8 +13838,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -13836,8 +13861,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -14278,8 +14303,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -14301,8 +14326,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -14810,8 +14835,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -14822,8 +14847,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -14846,8 +14871,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;
@@ -14869,8 +14894,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -15482,8 +15507,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -15494,8 +15519,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -15518,8 +15543,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;
@@ -15541,8 +15566,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -16176,8 +16201,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -16188,8 +16213,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -16212,8 +16237,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;
@@ -16235,8 +16260,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -17132,8 +17157,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -17391,8 +17416,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -17414,8 +17439,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -17914,8 +17939,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -17938,8 +17963,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;
@@ -17983,8 +18008,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -18006,8 +18031,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -23130,8 +23155,8 @@
     </template>
   </div>
   <!-- page-source:end -->
-  <script src="js/web-info.js?v=83"></script>
-  <script src="js/guide.js?v=148"></script>
-  <script src="js/main.js?v=56"></script>
+  <script src="js/web-info.js?v=117"></script>
+  <script src="js/guide.js?v=150"></script>
+  <script src="js/main.js?v=59"></script>
 </body>
 </html>

@@ -170,8 +170,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -247,6 +247,10 @@
       text-align: left !important;
     }
     
+    .eval-process-table {
+      width: max-content;
+      max-width: none;
+    }
     .eval-process-table td {
       height: 12mm !important;
       padding-top: 0 !important;
@@ -258,6 +262,16 @@
     }
     .eval-process-table td * {
       font-size: 14px !important;
+    }
+    /* 3열: 가장 긴 문장 한 줄 기준으로만 너비 */
+    .eval-process-table td:nth-child(1),
+    .eval-process-table td:nth-child(2) {
+      width: auto !important;
+      white-space: nowrap !important;
+    }
+    .eval-process-table td:nth-child(3) {
+      white-space: nowrap !important;
+      width: 1% !important;
     }
 
     /* 평가 프로세스 표: 회색 셀 배경 제거 */
@@ -425,8 +439,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -449,8 +463,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;

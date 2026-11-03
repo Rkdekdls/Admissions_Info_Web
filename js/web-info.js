@@ -990,15 +990,274 @@ const WebInfo = (() => {
         if (card) card.classList.add("flow-card");
       });
     });
+
+    /* 비교 차트 화살표: PC는 →, 모바일 세로 배치 시 ↓ */
+    page.querySelectorAll(".chart-compare").forEach((compare) => {
+      [...compare.children].forEach((child) => {
+        const text = (child.textContent || "").replace(/\s+/g, "");
+        if (text === "→" || text.includes("→")) child.classList.add("chart-arrow");
+      });
+    });
+
+    /* 모바일 세로 스택용: 가로 flex 행·학년 트랙 안 3열 표시 */
+    page.querySelectorAll(".grade-track").forEach((track) => {
+      [...track.children].forEach((child) => {
+        if ((child.textContent || "").trim() === "→") child.classList.add("mobile-stack-arrow");
+      });
+      track.querySelectorAll("div").forEach((inner) => {
+        const style = inner.getAttribute("style") || "";
+        if (!/display:\s*flex/i.test(style) || /flex-direction:\s*column/i.test(style)) return;
+        const kids = [...inner.children];
+        if (kids.length < 3) return;
+        if (!kids.every((kid) => /flex:\s*1/.test(kid.getAttribute("style") || ""))) return;
+        inner.classList.add("mobile-stack-split");
+      });
+    });
+
+    page.querySelectorAll("div").forEach((node) => {
+      if (
+        node.classList.contains("flow-row") ||
+        node.classList.contains("icon-grid") ||
+        node.classList.contains("comparison-container") ||
+        node.classList.contains("grade-track") ||
+        node.classList.contains("year-plan") ||
+        node.classList.contains("year-plan-list") ||
+        node.classList.contains("chart-compare") ||
+        node.classList.contains("mobile-stack") ||
+        node.classList.contains("mobile-stack-split") ||
+        node.closest(".chart-compare") ||
+        node.closest(".flow-row") ||
+        node.closest(".year-plan") ||
+        node.querySelector("svg") ||
+        node.querySelector("table")
+      ) {
+        return;
+      }
+      const style = node.getAttribute("style") || "";
+      if (!/display:\s*flex/i.test(style) || /flex-direction:\s*column/i.test(style)) return;
+      const kids = [...node.children];
+      if (kids.length < 2) return;
+      const sideBySide = kids.filter((child) => {
+        const childStyle = child.getAttribute("style") || "";
+        return (
+          /flex:\s*1/.test(childStyle) ||
+          child.classList.contains("section-block") ||
+          child.classList.contains("comparison-card") ||
+          child.classList.contains("guide-card") ||
+          child.classList.contains("credit-card")
+        );
+      }).length;
+      if (sideBySide < 2 && kids.length < 3) return;
+      node.classList.add("mobile-stack");
+      kids.forEach((child) => {
+        if ((child.textContent || "").trim() === "→") child.classList.add("mobile-stack-arrow");
+      });
+    });
+
     if (!plainText(page)) return null;
     const sheet = document.createElement("div");
     sheet.className = "book-sheet";
     const shadow = sheet.attachShadow({ mode: "open" });
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "css/page.css?v=3";
+    link.href = "css/page.css?v=36";
     const extra = document.createElement("style");
     extra.textContent = `${[...doc.querySelectorAll("style")].map((node) => node.textContent).join("\n")}\n${bookVars}
+@media (max-width: 860px) {
+  /* 플로우(과목선택→…): 세로 배치 + 박스 양측(가로) 맞춤 */
+  .flow-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 2mm !important;
+    width: 100% !important;
+  }
+  .flow-row > .flow-item {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    justify-content: stretch !important;
+  }
+  .flow-row > .flow-arrow {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    align-self: center !important;
+    transform: rotate(90deg) !important;
+    padding: 0.5mm 0 !important;
+    font-size: 14px !important;
+  }
+  .flow-row .flow-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 56px !important;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+  }
+  .flow-row .flow-card > div:first-child {
+    font-size: 18px !important;
+    margin: 0 0 2px !important;
+  }
+  .flow-row .flow-card > div:last-child,
+  .flow-row .flow-card > *:last-child {
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+  }
+  .icon-grid {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 3mm !important;
+    width: 100% !important;
+  }
+  .icon-grid > .flow-item {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    justify-content: center !important;
+  }
+  .icon-grid .flow-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 72px !important;
+  }
+  .comparison-container,
+  .checkpoint-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4mm !important;
+  }
+  .checkpoint-container {
+    gap: 2mm !important;
+  }
+  .checkpoint-container .tip-box,
+  .checkpoint-box .tip-box {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+  }
+  .comparison-card,
+  .checkpoint-box {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+  .grade-track {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 3mm !important;
+  }
+  .grade-track > *:not(.mobile-stack-arrow) {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+  .mobile-stack-split {
+    flex-direction: column !important;
+  }
+  .mobile-stack-split > * {
+    border-left: none !important;
+  }
+  .mobile-stack-split > * + * {
+    border-top: 1px solid #E5E7EB !important;
+  }
+  .chart-compare {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    height: auto !important;
+    min-height: 0 !important;
+    gap: 3mm !important;
+    padding: 3mm 1mm !important;
+  }
+  .chart-compare > div:not(.chart-arrow) {
+    width: 22mm !important;
+    flex: 0 0 22mm !important;
+  }
+  .chart-compare svg {
+    width: 22mm !important;
+    height: 22mm !important;
+  }
+  .chart-compare > .chart-arrow {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 4mm !important;
+    flex: 0 0 4mm !important;
+    height: 22mm !important;
+    margin: 0 0 12px !important;
+    padding: 0 !important;
+    font-size: 14px !important;
+    color: #6b7280 !important;
+    transform: none !important;
+  }
+  .chart-compare > .chart-arrow::before {
+    content: none !important;
+  }
+  .chart-compare > .chart-arrow * {
+    transform: none !important;
+  }
+  .report-box > .title-3 {
+    margin-bottom: 4mm !important;
+  }
+  /* 표: 줄바꿈 없이 좌우 스크롤 (창의적 체험표 제외) */
+  .table-scroll {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .table-scroll > table:not(.creative-activity-table),
+  .table-scroll > .comparison-table:not(.creative-activity-table),
+  .table-scroll > .comparison-table.curriculum-table:not(.creative-activity-table) {
+    table-layout: auto !important;
+    width: max-content !important;
+    min-width: 190mm !important;
+    max-width: none !important;
+  }
+  .table-scroll > table:not(.creative-activity-table) th,
+  .table-scroll > table:not(.creative-activity-table) td {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+  }
+  /* 창의적 체험(모바일): PC와 동일, 스크롤만 */
+  .table-scroll:has(> .creative-activity-table) {
+    overflow-x: auto !important;
+  }
+  .table-scroll > table.creative-activity-table {
+    table-layout: fixed !important;
+    width: 720px !important;
+    min-width: 720px !important;
+    max-width: none !important;
+  }
+  .table-scroll > table.creative-activity-table th,
+  .table-scroll > table.creative-activity-table td,
+  .table-scroll > table.creative-activity-table td > div {
+    white-space: normal !important;
+    min-width: 0 !important;
+  }
+  .list-check li::before,
+  .tip-box .list-check li::before,
+  .info-box .list-check li::before,
+  .section-content li::before,
+  .section-content li:before,
+  .section-block .section-content li::before,
+  .section-block .section-content li:before,
+  .comparison-card .section-content li::before,
+  .comparison-card .section-content li:before,
+  .comparison-card .section-content ul ul li::before,
+  .credit-card-content li::before,
+  .credit-card-content li:before {
+    top: 0.25em !important;
+    transform: none !important;
+    line-height: 1 !important;
+  }
+}
+
 table:not(.mistake-table) th,
 table:not(.mistake-table) td {
   height: 12mm !important;
@@ -1057,19 +1316,29 @@ li::before {
   font-size: 13px !important;
 }
 .pie-label {
-  font-size: 12px !important;
+  font-size: 13px !important;
 }
+@media (max-width: 860px) {
+  .pie-label {
+    font-size: 15px !important;
+  }
+}
+/* 불릿·체크: 여러 줄이어도 첫 줄 왼쪽에 고정 (세로 중앙 정렬 금지) */
 .section-content li::before,
 .section-content li:before,
+.section-block .section-content li::before,
+.section-block .section-content li:before,
 .comparison-card .section-content li::before,
+.comparison-card .section-content li:before,
 .comparison-card .section-content ul ul li::before,
+.comparison-card .section-content ul ul li:before,
 .credit-card-content li::before,
 .credit-card-content li:before,
 .list-check li::before,
 .tip-box .list-check li::before,
 .info-box .list-check li::before {
-  top: 50% !important;
-  transform: translateY(-50%) !important;
+  top: 0.25em !important;
+  transform: none !important;
   line-height: 1 !important;
 }
 *, *::before, *::after {
@@ -1120,10 +1389,113 @@ li::before {
     page.querySelectorAll(".card-year, .card-subtitle").forEach((node) => {
       node.style.setProperty("font-size", "13px", "important");
     });
+    /* 표 래퍼 + 창의적 체험표 열 비율 강제 */
+    const isNarrow = window.matchMedia("(max-width: 860px)").matches;
     page.querySelectorAll(".pie-label").forEach((node) => {
-      node.style.setProperty("font-size", "12px", "important");
+      const size = isNarrow ? "15" : "13";
+      node.setAttribute("font-size", size);
+      node.style.setProperty("font-size", `${size}px`, "important");
     });
-    shadow.append(link, extra, page);
+    page.querySelectorAll("table").forEach((table) => {
+      if (table.closest(".table-scroll")) return;
+      if (table.classList.contains("mistake-table")) return;
+      const isCreative =
+        table.classList.contains("creative-activity-table") ||
+        /창의적 체험활동상황/.test(table.textContent || "");
+      if (isCreative) {
+        table.classList.add("creative-activity-table");
+        let group = table.querySelector("colgroup");
+        if (!group) {
+          group = document.createElement("colgroup");
+          table.insertBefore(group, table.firstChild);
+        }
+        group.innerHTML = "";
+        ["8%", "15%", "8%", "15%", "54%"].forEach((w) => {
+          const col = document.createElement("col");
+          col.style.setProperty("width", w, "important");
+          group.appendChild(col);
+        });
+        /* PC·모바일 동일 레이아웃. 모바일만 고정폭+스크롤 */
+        table.style.setProperty("table-layout", "fixed", "important");
+        table.style.setProperty("width", isNarrow ? "720px" : "100%", "important");
+        table.style.setProperty("min-width", isNarrow ? "720px" : "0", "important");
+        table.style.setProperty("max-width", isNarrow ? "none" : "100%", "important");
+        table.querySelectorAll("th, td, td > div").forEach((el) => {
+          el.style.setProperty("white-space", "normal", "important");
+          el.style.setProperty("min-width", "0", "important");
+          el.style.setProperty("word-wrap", "break-word", "important");
+        });
+        table.querySelectorAll("td > div").forEach((el) => {
+          el.style.setProperty("text-align", "justify", "important");
+        });
+      }
+      const wrap = document.createElement("div");
+      wrap.className = "table-scroll";
+      table.replaceWith(wrap);
+      wrap.appendChild(table);
+      if (isCreative && isNarrow) {
+        wrap.style.setProperty("overflow-x", "auto", "important");
+        wrap.style.setProperty("-webkit-overflow-scrolling", "touch", "important");
+        wrap.style.setProperty("width", "100%", "important");
+        wrap.style.setProperty("max-width", "100%", "important");
+      }
+    });
+    const tableForce = document.createElement("style");
+    tableForce.textContent = `
+/* PC·모바일 동일 레이아웃(열 비율·양측 맞춤) */
+.table-scroll > table.creative-activity-table,
+.comparison-table.curriculum-table.creative-activity-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+.table-scroll > table.creative-activity-table col:nth-child(1) { width: 8% !important; }
+.table-scroll > table.creative-activity-table col:nth-child(2) { width: 15% !important; }
+.table-scroll > table.creative-activity-table col:nth-child(3) { width: 8% !important; }
+.table-scroll > table.creative-activity-table col:nth-child(4) { width: 15% !important; }
+.table-scroll > table.creative-activity-table col:nth-child(5) { width: 54% !important; }
+.table-scroll > table.creative-activity-table th,
+.table-scroll > table.creative-activity-table td,
+.table-scroll > table.creative-activity-table td > div {
+  white-space: normal !important;
+  min-width: 0 !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+.table-scroll > table.creative-activity-table td > div {
+  text-align: justify !important;
+}
+@media (max-width: 860px) {
+  .table-scroll {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .table-scroll > table:not(.creative-activity-table),
+  .table-scroll > .comparison-table.curriculum-table:not(.creative-activity-table) {
+    table-layout: auto !important;
+    width: max-content !important;
+    min-width: 190mm !important;
+    max-width: none !important;
+  }
+  .table-scroll > table:not(.creative-activity-table) th,
+  .table-scroll > table:not(.creative-activity-table) td {
+    white-space: nowrap !important;
+  }
+  /* 창의적 체험: PC와 같은 표, 줄이지 말고 좌우 스크롤만 */
+  .table-scroll:has(> .creative-activity-table) {
+    overflow-x: auto !important;
+  }
+  .table-scroll > table.creative-activity-table {
+    table-layout: fixed !important;
+    width: 720px !important;
+    min-width: 720px !important;
+    max-width: none !important;
+  }
+}`;
+    shadow.append(link, extra, tableForce, page);
     page.querySelectorAll("*").forEach((node) => {
       if (node.matches(".pie-label")) return;
       const size = parseFloat(getComputedStyle(node).fontSize);

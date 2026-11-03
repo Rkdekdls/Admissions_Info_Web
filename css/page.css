@@ -378,8 +378,8 @@ body {
   content: '✓';
   position: absolute;
   left: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0.2em;
+  transform: none;
   color: var(--color-primary);
   font-weight: 700;
   font-size: 16px;
@@ -409,8 +409,8 @@ body {
   content: '✓';
   position: absolute;
   left: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0.25em;
+  transform: none;
   color: var(--color-primary);
   font-weight: 700;
   font-size: 16px;
@@ -419,8 +419,8 @@ body {
 
 .section-content li::before,
 .section-content li:before {
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0.25em;
+  transform: none;
   line-height: 1;
 }
 
@@ -1025,4 +1025,302 @@ body.page-title-body {
 .simple-icon-circle,
 .side-circle {
   border-radius: 50% !important;
+}
+
+/* 표: 가로 스크롤 래퍼 (모든 화면에서 좁으면 좌우 드래그) */
+.table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: var(--spacing-standard, 3mm) 0;
+}
+
+.table-scroll > table {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* 모바일: 본문 좌측 정렬 + 가로 박스 세로 스택 + 표 좌우 스크롤 */
+@media (max-width: 860px) {
+  .text-body,
+  .guide-text,
+  .info-box .text-small,
+  .tip-box .text-small,
+  .section-content,
+  .section-content li,
+  .section-content li.no-bullet {
+    text-align: left !important;
+  }
+
+  .img-caption,
+  .conclusion-box {
+    text-align: center !important;
+  }
+
+  .guide-text[style*="text-align"],
+  .guide-content .guide-text {
+    text-align: left !important;
+  }
+
+  .layout-3col {
+    grid-template-columns: 1fr !important;
+  }
+
+  .comparison-container,
+  .checkpoint-container,
+  .icon-grid,
+  .grade-track,
+  .mobile-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 4mm !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 학년별 체크포인트: tip-box 하단마진+gap 중복 제거 → 다른 tip 간격에 맞춤 */
+  .checkpoint-container {
+    gap: 2mm !important;
+  }
+  .checkpoint-container .tip-box,
+  .checkpoint-box .tip-box {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .comparison-container > *,
+  .checkpoint-container > *,
+  .checkpoint-box,
+  .icon-grid > *,
+  .grade-track > *:not(.mobile-stack-arrow),
+  .mobile-stack > *:not(.mobile-stack-arrow):not(.flow-arrow) {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .comparison-card,
+  .section-block {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* 비교 차트(파이·막대): 모바일에서도 가로 유지 + 축소 */
+  .chart-compare {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    gap: 3mm !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 3mm 1mm !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  .chart-compare > * {
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .chart-compare > div:not(.chart-arrow) {
+    width: 22mm !important;
+    flex: 0 0 22mm !important;
+  }
+
+  .chart-compare svg {
+    width: 22mm !important;
+    height: 22mm !important;
+    margin-bottom: 1.5mm !important;
+  }
+
+  .chart-compare > .chart-arrow {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 4mm !important;
+    flex: 0 0 4mm !important;
+    height: 22mm !important;
+    margin: 0 0 12px !important;
+    padding: 0 !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    color: #6b7280 !important;
+    transform: none !important;
+  }
+
+  .chart-compare > .chart-arrow * {
+    transform: none !important;
+  }
+
+  .chart-compare > .chart-arrow::before {
+    content: none !important;
+  }
+
+  .report-box > .title-3 {
+    margin-top: 2mm !important;
+    margin-bottom: 4mm !important;
+  }
+
+  .mobile-stack-arrow,
+  .grade-track > .mobile-stack-arrow {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    align-self: center !important;
+    transform: rotate(90deg) !important;
+    padding: 1mm 0 !important;
+    margin: 0 !important;
+  }
+
+  .flow-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 2mm !important;
+    width: 100% !important;
+  }
+
+  .flow-row > .flow-item {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .flow-row > .flow-arrow {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    align-self: center !important;
+    transform: rotate(90deg) !important;
+    padding: 0.5mm 0 !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+  }
+
+  .flow-row .flow-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 56px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+  }
+
+  .mobile-stack-split {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+  }
+
+  .mobile-stack-split > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    border-left: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .mobile-stack-split > * + * {
+    border-top: 1px solid #e5e7eb !important;
+  }
+
+  .table-scroll {
+    margin-left: -2mm;
+    margin-right: -2mm;
+    padding-bottom: 6px;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* 줄바꿈 없이 스크롤 (창의적 체험표 제외) */
+  .table-scroll > table:not(.creative-activity-table),
+  .table-scroll > .comparison-table:not(.creative-activity-table),
+  .table-scroll > .comparison-table.curriculum-table:not(.creative-activity-table) {
+    table-layout: auto !important;
+    width: max-content !important;
+    min-width: 190mm !important;
+    max-width: none !important;
+  }
+
+  .table-scroll > table:not(.creative-activity-table) th,
+  .table-scroll > table:not(.creative-activity-table) td {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+  }
+
+  .eval-process-table {
+    min-width: 0 !important;
+    width: max-content !important;
+  }
+
+  .eval-process-table td:nth-child(3) {
+    white-space: nowrap !important;
+    width: 1% !important;
+    min-width: 0 !important;
+  }
+
+  /* 창의적 체험: PC와 동일 레이아웃, 스크롤만 */
+  .table-scroll > table.creative-activity-table {
+    table-layout: fixed !important;
+    width: 720px !important;
+    min-width: 720px !important;
+    max-width: none !important;
+  }
+
+  .table-scroll > table.creative-activity-table col:nth-child(1) { width: 8% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(2) { width: 15% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(3) { width: 8% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(4) { width: 15% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(5) { width: 54% !important; }
+
+  .table-scroll > table.creative-activity-table th,
+  .table-scroll > table.creative-activity-table td,
+  .table-scroll > table.creative-activity-table td > div {
+    white-space: normal !important;
+    min-width: 0 !important;
+  }
+}
+
+/* PC: 창의적 체험표 원본 열 비율 */
+@media (min-width: 861px) {
+  .table-scroll:has(> .creative-activity-table) {
+    overflow: visible !important;
+  }
+  .table-scroll > table.creative-activity-table {
+    table-layout: fixed !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  .table-scroll > table.creative-activity-table col:nth-child(1) { width: 8% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(2) { width: 15% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(3) { width: 8% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(4) { width: 15% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(5) { width: 54% !important; }
+  .table-scroll > table.creative-activity-table th,
+  .table-scroll > table.creative-activity-table td,
+  .table-scroll > table.creative-activity-table td > div {
+    white-space: normal !important;
+    min-width: 0 !important;
+  }
+  .table-scroll > table.creative-activity-table td > div {
+    text-align: justify !important;
+  }
 }

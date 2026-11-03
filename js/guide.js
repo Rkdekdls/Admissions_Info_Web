@@ -877,7 +877,7 @@ const Guide = (() => {
 
     const pad = { top: 16, right: 12, bottom: 44, left: 48 };
     const plotH = 280;
-    const visibleSlots = 10; /* 한 화면에 10개 기준, 이하면 빈 칸 유지 */
+    const visibleSlots = window.matchMedia("(max-width: 860px)").matches ? 5 : 10;
     const availW = Math.max((body.clientWidth || root.clientWidth || 640) - pad.left - pad.right, 480);
     const colW = availW / visibleSlots;
     const slotCount = Math.max(series.length, visibleSlots);
@@ -1482,10 +1482,112 @@ const Guide = (() => {
     applyAdmitFilters(panel, sectionId);
   }
 
+  function closeAdmitSelect(wrap) {
+    if (!wrap) return;
+    const trigger = wrap.querySelector(".admit-select-trigger");
+    const menu = wrap.querySelector(".admit-select-menu");
+    wrap.classList.remove("is-open");
+    if (trigger) trigger.setAttribute("aria-expanded", "false");
+    if (menu) menu.hidden = true;
+  }
+
+  function closeAllAdmitSelects(except) {
+    document.querySelectorAll(".admit-select.is-open").forEach((wrap) => {
+      if (wrap !== except) closeAdmitSelect(wrap);
+    });
+  }
+
+  /* 네이티브 select 팝업은 너비 제어 불가 → 검색 박스와 같은 너비의 커스텀 목록 */
+  function enhanceAdmitSelects(root) {
+    root.querySelectorAll("select.admit-search-select").forEach((select) => {
+      if (select.closest(".admit-select")) return;
+
+      const wrap = document.createElement("div");
+      wrap.className = "admit-select";
+      select.parentNode.insertBefore(wrap, select);
+      wrap.appendChild(select);
+
+      const trigger = document.createElement("button");
+      trigger.type = "button";
+      trigger.className = "admit-select-trigger";
+      trigger.setAttribute("aria-haspopup", "listbox");
+      trigger.setAttribute("aria-expanded", "false");
+      const aria = select.getAttribute("aria-label");
+      if (aria) trigger.setAttribute("aria-label", aria);
+
+      const menu = document.createElement("ul");
+      menu.className = "admit-select-menu";
+      menu.hidden = true;
+      menu.setAttribute("role", "listbox");
+      if (aria) menu.setAttribute("aria-label", aria);
+
+      const syncFromSelect = () => {
+        const selected = select.options[select.selectedIndex];
+        trigger.textContent = selected ? selected.textContent : "";
+        [...menu.children].forEach((li) => {
+          const on = li.dataset.value === select.value;
+          li.classList.toggle("is-selected", on);
+          li.setAttribute("aria-selected", on ? "true" : "false");
+        });
+      };
+
+      const rebuildOptions = () => {
+        menu.replaceChildren();
+        [...select.options].forEach((opt) => {
+          const li = document.createElement("li");
+          li.className = "admit-select-option";
+          li.setAttribute("role", "option");
+          li.dataset.value = opt.value;
+          li.textContent = opt.textContent;
+          if (opt.disabled) {
+            li.setAttribute("aria-disabled", "true");
+            li.classList.add("is-disabled");
+          }
+          menu.appendChild(li);
+        });
+        syncFromSelect();
+      };
+
+      rebuildOptions();
+
+      trigger.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const willOpen = !wrap.classList.contains("is-open");
+        closeAllAdmitSelects(wrap);
+        if (!willOpen) {
+          closeAdmitSelect(wrap);
+          return;
+        }
+        wrap.classList.add("is-open");
+        trigger.setAttribute("aria-expanded", "true");
+        menu.hidden = false;
+      });
+
+      menu.addEventListener("click", (event) => {
+        const option = event.target.closest(".admit-select-option");
+        if (!option || !menu.contains(option)) return;
+        if (option.getAttribute("aria-disabled") === "true") return;
+        event.preventDefault();
+        event.stopPropagation();
+        select.value = option.dataset.value;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        syncFromSelect();
+        closeAdmitSelect(wrap);
+      });
+
+      select.addEventListener("change", syncFromSelect);
+      wrap.appendChild(trigger);
+      wrap.appendChild(menu);
+    });
+  }
+
   function bindAdmitSearch(panel) {
     const root = panel.querySelector("[data-admit-search]");
     if (!root || root.dataset.bound === "1") return;
     root.dataset.bound = "1";
+
+    enhanceAdmitSelects(root);
 
     const toggle = root.querySelector("[data-admit-toggle]");
     const body = root.querySelector("[data-admit-body]");
@@ -1751,11 +1853,16 @@ const Guide = (() => {
   }
 
   document.addEventListener("click", (event) => {
+    if (!event.target.closest(".admit-select")) closeAllAdmitSelects();
     const button = event.target.closest(".section-tab");
     if (!button) return;
     const panel = button.closest(".panel");
     if (!panel) return;
     activate(panel, button.dataset.section, true);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeAllAdmitSelects();
   });
 
   return { open, guides };

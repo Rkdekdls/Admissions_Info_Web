@@ -9,7 +9,7 @@
   <script src="../../../js/page.js"></script>
   <style>
     /* 교육과정 편제표 축소 스타일 */
-    .comparison-table.curriculum-table {
+    .comparison-table.curriculum-table:not(.creative-activity-table) {
       font-size: 12px !important;
       line-height: 1.4 !important;
       border-collapse: separate !important;
@@ -18,6 +18,20 @@
       border-radius: 0 !important;
       overflow: hidden !important;
       background-color: #ffffff !important;
+      table-layout: fixed !important;
+      width: 100% !important;
+    }
+
+    .comparison-table.curriculum-table.creative-activity-table {
+      font-size: 12px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 0 !important;
+      overflow: visible !important;
+      background-color: #ffffff !important;
+      /* PC: 100% 양측 맞춤 / 모바일 스크롤은 page.css @media */
       table-layout: fixed !important;
       width: 100% !important;
     }
@@ -211,17 +225,16 @@
       border-right: none !important;
     }
     
-    /* 출결상황 표 - 텍스트 잘림 방지 */
-    .comparison-table.curriculum-table th,
-    .comparison-table.curriculum-table td {
+    /* 출결·봉사 등: 텍스트 잘림 방지 (창의적 체험표 제외) */
+    .comparison-table.curriculum-table:not(.creative-activity-table) th,
+    .comparison-table.curriculum-table:not(.creative-activity-table) td {
       white-space: nowrap !important;
       overflow: visible !important;
       word-wrap: normal !important;
       min-width: fit-content !important;
     }
     
-    /* 출결상황 표 - table-layout을 auto로 변경하여 컬럼 너비 자동 조정 */
-    .comparison-table.curriculum-table {
+    .comparison-table.curriculum-table:not(.creative-activity-table) {
       table-layout: auto !important;
       width: auto !important;
       min-width: 100% !important;
@@ -298,8 +311,8 @@
       content: "•";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: bold;
     }
@@ -623,8 +636,8 @@
       content: '•';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: var(--color-primary);
       font-weight: 700;
       font-size: 18px;
@@ -647,8 +660,8 @@
       content: '-';
       position: absolute;
       left: 5.5mm;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0.25em;
+      transform: none;
       color: #6B7280;
       font-weight: 600;
       font-size: 14px;
@@ -1036,11 +1049,18 @@
       </div>
 
     <!-- 창의적 체험활동상황 표 -->
-    <table class="comparison-table curriculum-table" style="margin-top: 1mm; margin-bottom: 3mm; width: 100%; table-layout: fixed; box-sizing: border-box;">
+    <table class="comparison-table curriculum-table creative-activity-table" style="margin-top: 1mm; margin-bottom: 3mm; width: 100%; table-layout: fixed; box-sizing: border-box;">
+      <colgroup>
+        <col style="width: 8%" />
+        <col style="width: 15%" />
+        <col style="width: 8%" />
+        <col style="width: 15%" />
+        <col style="width: 54%" />
+      </colgroup>
       <thead>
         <tr>
           <th rowspan="2" style="width: 8% !important; padding: 1.6mm 2mm !important; height: 1.6mm !important;">학년</th>
-          <th colspan="4" style="padding: 2mm 2mm !important; height: 2.5mm !important;">창의적 체험활동상황</th>
+          <th colspan="4" style="width: 92% !important; padding: 2mm 2mm !important; height: 2.5mm !important;">창의적 체험활동상황</th>
         </tr>
         <tr>
           <th style="width: 15% !important; padding: 1.6mm 2mm !important; height: 1.6mm !important;">영역</th>
@@ -1053,8 +1073,8 @@
           <td rowspan="4" style="text-align: center; vertical-align: middle; border-bottom: none !important; width: 8% !important;">1</td>
           <td style="text-align: center; vertical-align: middle; width: 15% !important;">자율·자치활동</td>
           <td style="text-align: center; vertical-align: middle; width: 8% !important;">75</td>
-          <td colspan="2" style="text-align: justify !important; padding: 1mm 3mm !important; line-height: 1.5 !important; word-break: keep-all; vertical-align: top; white-space: normal !important; overflow: visible !important; word-wrap: break-word !important; width: 69% !important; border-right: none !important;">
-            <div style="text-align: justify; line-height: 1.5; font-size: 13.5px !important; padding: 1mm 0;">
+          <td colspan="2" style="text-align: left !important; padding: 1mm 3mm !important; line-height: 1.5 !important; word-break: keep-all; vertical-align: top; white-space: normal !important; overflow: visible !important; word-wrap: break-word !important; border-right: none !important;">
+            <div style="text-align: left; line-height: 1.5; font-size: 13.5px !important; padding: 1mm 0; ">
                 반도체 산업에 관심을 가지고 학교 자율탐구 주제를 '반도체 소자의 원리와 활용'으로 설정함. 자료 조사 계획을 스스로 수립하고...
             </div>
           </td>
@@ -1062,8 +1082,8 @@
         <tr>
           <td style="text-align: center; vertical-align: middle; width: 15% !important;">동아리활동</td>
           <td style="text-align: center; vertical-align: middle; width: 8% !important;">24</td>
-          <td colspan="2" style="text-align: justify !important; padding: 1mm 3mm !important; line-height: 1.5 !important; word-break: keep-all; vertical-align: top; white-space: normal !important; overflow: visible !important; word-wrap: break-word !important; width: 69% !important; border-right: none !important;">
-            <div style="text-align: justify; line-height: 1.5; font-size: 13.5px !important; padding: 1mm 0;">
+          <td colspan="2" style="text-align: left !important; padding: 1mm 3mm !important; line-height: 1.5 !important; word-break: keep-all; vertical-align: top; white-space: normal !important; overflow: visible !important; word-wrap: break-word !important; border-right: none !important;">
+            <div style="text-align: left; line-height: 1.5; font-size: 13.5px !important; padding: 1mm 0; ">
                 과학·공학 탐구 동아리에서 반도체 관련 주제를 중심으로 활동함. 팀원들과 함께 '반도체 재료에 따른 전기적 특성 비교'를 주제로 실험 설계를 논의하고...
             </div>
           </td>
@@ -1071,14 +1091,14 @@
         <tr>
           <td rowspan="2" style="text-align: center; vertical-align: middle; width: 15% !important; border-bottom: none !important;">진로활동</td>
           <td rowspan="2" style="text-align: center; vertical-align: middle; width: 8% !important; border-bottom: none !important;">36</td>
-          <td style="text-align: center; vertical-align: middle; padding: 1mm 3mm !important; font-weight: bold; width: 15% !important; border-right: 1px solid #000;">희망분야</td>
-          <td style="text-align: left !important; padding: 2mm 3mm !important; line-height: 1.5 !important; word-break: keep-all; vertical-align: middle; white-space: normal !important; overflow: visible !important; word-wrap: break-word !important; width: 54% !important; border-right: none !important;">
+          <td style="text-align: center; vertical-align: middle; padding: 1mm 3mm !important; font-weight: bold; width: 15% !important; border-right: 1px solid #000; ">희망분야</td>
+          <td style="text-align: left !important; padding: 2mm 3mm !important; line-height: 1.5 !important; word-break: keep-all; vertical-align: middle; white-space: normal !important; overflow: visible !important; word-wrap: break-word !important; border-right: none !important;">
             반도체 연구원
           </td>
         </tr>
         <tr>
-          <td colspan="2" style="text-align: justify !important; padding: 1mm 3mm !important; line-height: 1.5 !important; word-break: keep-all; vertical-align: top; white-space: normal !important; overflow: visible !important; word-wrap: break-word !important; border-top: none !important; border-right: none !important;">
-            <div style="text-align: justify; line-height: 1.5; font-size: 13.5px !important; padding: 1mm 0;">
+          <td colspan="2" style="text-align: left !important; padding: 1mm 3mm !important; line-height: 1.5 !important; word-break: keep-all; vertical-align: top; white-space: normal !important; overflow: visible !important; word-wrap: break-word !important; border-top: none !important; border-right: none !important;">
+            <div style="text-align: left; line-height: 1.5; font-size: 13.5px !important; padding: 1mm 0; ">
                 반도체 연구원을 희망 진로로 설정하고 관련 진로 탐색 활동에 적극 참여함. 반도체 산업 특강을 통해 연구원의 역할과 연구 과정에 대한 이해를 넓혔으며...
             </div>
           </td>
