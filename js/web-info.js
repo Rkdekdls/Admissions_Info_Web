@@ -920,9 +920,21 @@ const WebInfo = (() => {
     }
     .icon-grid,
     .comparison-container,
+    .checkpoint-container,
     .equal-card-row {
       align-items: stretch !important;
       gap: 18px !important;
+    }
+    .checkpoint-container .tip-box,
+    .checkpoint-box .tip-box {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+    .checkpoint-container .list-check li {
+      margin-bottom: 8px !important;
+    }
+    .checkpoint-container .list-check li:last-child {
+      margin-bottom: 0 !important;
     }
     .icon-grid .flow-card {
       border: 1px solid #E5E7EB !important;
@@ -1112,7 +1124,7 @@ const WebInfo = (() => {
     const shadow = sheet.attachShadow({ mode: "open" });
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "css/page.css?v=46";
+    link.href = "css/page.css?v=47";
     const extra = document.createElement("style");
     extra.textContent = `${[...doc.querySelectorAll("style")].map((node) => node.textContent).join("\n")}\n${bookVars}
 @media (max-width: 860px) {
@@ -1191,9 +1203,6 @@ const WebInfo = (() => {
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 18px !important;
-  }
-  .checkpoint-container {
-    gap: 6mm !important;
   }
   .checkpoint-container .tip-box,
   .checkpoint-box .tip-box {
@@ -1524,7 +1533,7 @@ li::before {
       row.classList.add("equal-card-row");
       row.style.setProperty("gap", "18px", "important");
     });
-    page.querySelectorAll(".icon-grid, .comparison-container").forEach((row) => {
+    page.querySelectorAll(".icon-grid, .comparison-container, .checkpoint-container").forEach((row) => {
       row.style.setProperty("gap", "18px", "important");
     });
     /* tip/info 박스 내부 상하 패딩 강제 통일 (인라인 !important 덮어씀) */

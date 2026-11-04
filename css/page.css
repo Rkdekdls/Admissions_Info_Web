@@ -1086,9 +1086,9 @@ body.page-title-body {
     box-sizing: border-box !important;
   }
 
-  /* 학년별 체크포인트: PC 원본 gap(6mm) 유지, tip 마진 중복만 제거 */
+  /* 학년별 체크포인트: 다른 카드행과 동일 18px */
   .checkpoint-container {
-    gap: 6mm !important;
+    gap: 18px !important;
   }
   .checkpoint-container .tip-box,
   .checkpoint-box .tip-box {
