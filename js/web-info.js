@@ -1124,7 +1124,7 @@ const WebInfo = (() => {
     const shadow = sheet.attachShadow({ mode: "open" });
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "css/page.css?v=47";
+    link.href = "css/page.css?v=51";
     const extra = document.createElement("style");
     extra.textContent = `${[...doc.querySelectorAll("style")].map((node) => node.textContent).join("\n")}\n${bookVars}
 @media (max-width: 860px) {
@@ -1294,8 +1294,9 @@ const WebInfo = (() => {
   }
   .table-scroll > table:not(.creative-activity-table) th,
   .table-scroll > table:not(.creative-activity-table) td {
-    white-space: nowrap !important;
+    white-space: normal !important;
     word-break: keep-all !important;
+    overflow-wrap: break-word !important;
   }
   /* 창의적 체험(모바일): PC와 동일, 스크롤만 */
   .table-scroll:has(> .creative-activity-table) {
@@ -1617,7 +1618,9 @@ li::before {
   }
   .table-scroll > table:not(.creative-activity-table) th,
   .table-scroll > table:not(.creative-activity-table) td {
-    white-space: nowrap !important;
+    white-space: normal !important;
+    word-break: keep-all !important;
+    overflow-wrap: break-word !important;
   }
   /* 창의적 체험: PC와 같은 표, 줄이지 말고 좌우 스크롤만 */
   .table-scroll:has(> .creative-activity-table) {
@@ -1630,6 +1633,27 @@ li::before {
     max-width: none !important;
   }
 }`;
+    /* 페이지 인라인 height 고정을 덮어 긴 셀은 줄바꿈·높이 확장 */
+    extra.textContent += `
+table:not(.mistake-table) tbody td,
+table:not(.mistake-table) tbody th,
+.comparison-table td,
+.comparison-table tbody th {
+  height: auto !important;
+  min-height: 8mm !important;
+  white-space: normal !important;
+  word-break: keep-all !important;
+  overflow-wrap: break-word !important;
+}
+.comparison-table thead th,
+table:not(.mistake-table) thead th {
+  height: auto !important;
+  min-height: 12mm !important;
+  white-space: normal !important;
+  word-break: keep-all !important;
+  overflow-wrap: break-word !important;
+}
+`;
     shadow.append(link, extra, tableForce, page);
     page.querySelectorAll("*").forEach((node) => {
       if (node.matches(".pie-label")) return;

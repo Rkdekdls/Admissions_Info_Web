@@ -723,19 +723,27 @@ body {
   font-weight: 600;
   color: #ffffff;
   text-align: center;
-  height: 12mm;
-  padding-top: 0;
-  padding-bottom: 0;
+  min-height: 12mm;
+  height: auto;
+  padding-top: 3mm;
+  padding-bottom: 3mm;
   vertical-align: middle;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 table:not(.mistake-table) th,
 table:not(.mistake-table) td {
-  height: 12mm;
-  padding-top: calc((12mm - 1lh) / 2);
-  padding-bottom: calc((12mm - 1lh) / 2);
+  min-height: 12mm;
+  height: auto;
+  padding-top: 3mm;
+  padding-bottom: 3mm;
   vertical-align: middle;
   box-sizing: border-box;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 table th,
@@ -759,11 +767,13 @@ table td * {
   border-right: none;
 }
 
-/* 첫 번째 컬럼(학년) 폭을 넓게 */
+/* 첫 번째 컬럼(학년) 폭을 넓게 — 긴 텍스트는 줄바꿈 */
 .comparison-table th:first-child,
 .comparison-table tbody td:first-child {
   width: 28mm;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* 두 번째 컬럼(설계 내용) 좌우 여백 축소 */
@@ -1265,8 +1275,9 @@ body.page-title-body {
 
   .table-scroll > table:not(.creative-activity-table) th,
   .table-scroll > table:not(.creative-activity-table) td {
-    white-space: nowrap !important;
+    white-space: normal !important;
     word-break: keep-all !important;
+    overflow-wrap: break-word !important;
   }
 
   .eval-process-table {

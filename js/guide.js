@@ -965,7 +965,7 @@ const Guide = (() => {
             <td>${item.inquiry}과목</td>
             <td class="admit-highlight-score admit-jeongsi-score">${formatJeongsiScore(item.score, item.area, item.inquiry)}</td>
             <td class="admit-highlight-score">${formatJeongsiPercentile(item.score, item.area, item.inquiry)}</td>
-            <td><button type="button" class="admit-data-view">보기</button></td>
+            <td><button type="button" class="admit-data-view is-unlinked" aria-disabled="true" title="준비 중">보기</button></td>
           </tr>`;
       })
       .join("");
@@ -1651,8 +1651,42 @@ const Guide = (() => {
 
   const ADMIT_DETAIL_YEARS = ["2027", "2026", "2025", "2024"];
   const ADMIT_RESULT_YEARS = ["2027", "2026", "2025"]; /* 입시결과 탭 연도 */
-  const ADMIT_DETAIL_DATA_YEAR = "2025"; /* 표에 넣은 수시 실데이터 기준 연도 */
+  const ADMIT_DETAIL_DATA_YEAR = "2025"; /* 목록 표 기준 연도(상세는 연도별 맵 사용) */
   const ADMIT_RESULT_TIME_SLOTS = ["D-3", "D-2", "D-1", "D-day 1차", "D-day 2차", "D-day 3차"];
+
+  function toYearMap(value, years = ADMIT_DETAIL_YEARS) {
+    if (value && typeof value === "object" && !Array.isArray(value)) return value;
+    const out = {};
+    years.forEach((year) => {
+      out[year] = value;
+    });
+    return out;
+  }
+
+  function pickSusiYearly(univ, unit, typeKey) {
+    const store = window.ADMIT_SUSI_YEARLY;
+    if (!store) return null;
+    return store[`${univ}|${unit}|${typeKey}`] || null;
+  }
+
+  function yearlyFieldMap(yearly, field, years, fallback) {
+    const out = {};
+    years.forEach((year) => {
+      const fromYear = yearly?.[year]?.[field];
+      if (fromYear != null && fromYear !== "") out[year] = fromYear;
+      else if (fallback && typeof fallback === "object" && !Array.isArray(fallback)) out[year] = fallback[year] ?? "-";
+      else out[year] = fallback ?? "-";
+    });
+    return out;
+  }
+
+  function formatRateCell(raw) {
+    if (raw == null || raw === "" || raw === "-") return "-";
+    const n = parseFloat(String(raw).replace(/[^0-9.]/g, ""));
+    if (!Number.isFinite(n)) return String(raw);
+    return `${n.toFixed(2)}:1`;
+  }
+
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -1676,6 +1710,12 @@ const Guide = (() => {
       let match;
       while ((match = re.exec(text))) {
         stages.push({ stage: match[1].trim(), detail: match[2].replace(/\/\s*$/, "").trim() });
+      }
+      /* 축약형: 서류100%→면접100% / 서류100%→서류60%+면접40% */
+      if (!stages.length && text.includes("→")) {
+        const [first, second] = text.split("→").map((part) => part.trim()).filter(Boolean);
+        if (first) stages.push({ stage: "1단계", detail: first });
+        if (second) stages.push({ stage: "2단계", detail: second });
       }
       if (!stages.length) stages.push({ stage: "1단계", detail: text });
     }
@@ -1735,15 +1775,14 @@ const Guide = (() => {
   }
 
   function yearCells(valueByYearOrSingle, years = ADMIT_DETAIL_YEARS) {
-    const map =
-      valueByYearOrSingle && typeof valueByYearOrSingle === "object" && !Array.isArray(valueByYearOrSingle)
-        ? valueByYearOrSingle
-        : null;
-    return years.map((year) => {
-      const raw = map ? map[year] : year === ADMIT_DETAIL_DATA_YEAR ? valueByYearOrSingle : "-";
-      const show = raw == null || raw === "" ? "-" : raw;
-      return `<td>${escapeHtml(show)}</td>`;
-    }).join("");
+    const map = toYearMap(valueByYearOrSingle, years);
+    return years
+      .map((year) => {
+        const raw = map[year];
+        const show = raw == null || raw === "" ? "-" : raw;
+        return `<td>${escapeHtml(show)}</td>`;
+      })
+      .join("");
   }
 
   function yearHeaderRow(extraLeft = 0, years = ADMIT_DETAIL_YEARS) {
@@ -1962,22 +2001,18 @@ const Guide = (() => {
     const cells = [...row.children];
     const textAt = (index) => (cells[index]?.textContent || "").replace(/\s+/g, " ").trim();
     const univ = textAt(0) || "대학";
-    const quotaText = textAt(3) || "-";
-    const rateText = textAt(4) || "-";
-    const fillText = textAt(5) || "-";
-    const quotaN = parseAdmitStatNumber(quotaText);
-    const rateN = parseAdmitStatNumber(rateText);
-    const fillN = parseAdmitStatNumber(fillText) || 100;
-    const applicantsN = quotaN && rateN ? Math.round(quotaN * rateN) : 0;
-    const enrolledN = quotaN ? Math.round(quotaN * (fillN / 100)) : 0;
-    const rate2026 = rateN || 0;
-    const rate2025 = rate2026 ? Math.max(0, +(rate2026 - 1.5).toFixed(1)) : 0;
-    const rate2024 = rate2026 ? Math.max(0, +(rate2026 - 3.5).toFixed(1)) : 0;
-    const chartPoints = [
-      { year: "2024", value: rate2024 },
-      { year: "2025", value: rate2025 },
-      { year: "2026", value: rate2026 },
-    ];
+    const uniExtra = (window.ADMIT_UNI_DETAIL && window.ADMIT_UNI_DETAIL[univ]) || null;
+    const yearOrder = ["2024", "2025", "2026"];
+    const latest = uniExtra?.years?.["2026"] || null;
+    const quotaText = latest ? `${latest.quota.toLocaleString("ko-KR")}명` : textAt(3) || "-";
+    const rateText = latest ? `${latest.rate}:1` : textAt(4) || "-";
+    const fillText = latest ? `${latest.fill}%` : textAt(5) || "-";
+    const applicantsN = latest?.applicants || 0;
+    const enrolledN = latest?.enrolled || 0;
+    const chartPoints = yearOrder.map((y) => {
+      const rowY = uniExtra?.years?.[y];
+      return { year: y, value: rowY ? rowY.rate : 0 };
+    });
 
     const root = ensureAdmitDetailModal();
     const crumb = root.querySelector("#admit-detail-crumb");
@@ -1987,21 +2022,22 @@ const Guide = (() => {
     const materialsPanel = root.querySelector('[data-admit-detail-panel="materials"]');
 
     setAdmitDetailTabMode(root, "university");
-    crumb.innerHTML = `${escapeHtml(univ)}<span class="admit-detail-crumb-sub">주소 정보 없음</span>`;
+    crumb.textContent = shortUnivLabel(univ);
     if (tags) {
+      /* 외부 연동 전: 클릭해도 이동하지 않음 */
       tags.innerHTML = `
-        <a class="admit-detail-link-btn" href="#" target="_blank" rel="noopener">
+        <button type="button" class="admit-detail-link-btn is-unlinked" aria-disabled="true">
           대학 홈페이지
           <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
             <path d="M14 5h5v5M19 5l-9 9M10 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-        </a>
-        <a class="admit-detail-link-btn" href="#" target="_blank" rel="noopener">
+        </button>
+        <button type="button" class="admit-detail-link-btn is-unlinked" aria-disabled="true">
           입학처
           <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
             <path d="M14 5h5v5M19 5l-9 9M10 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-        </a>`;
+        </button>`;
     }
 
     const stats = [
@@ -2022,12 +2058,12 @@ const Guide = (() => {
 
     const formatTrendCount = (n) =>
       n == null || n === "" || n === 0 ? "-" : `${Math.round(n).toLocaleString("ko-KR")}명`;
-    const trendRows = [
-      /* 기준연도, 모집인원, 입학정원, 지원자, 입학자, 충원율, 경쟁률 */
-      ["2024", Math.round(quotaN * 0.98), Math.round(quotaN * 0.98), Math.round(quotaN * rate2024), Math.round(quotaN * 0.97), "98.5%", rate2024 ? `${rate2024}:1` : "-"],
-      ["2025", Math.round(quotaN * 0.99), Math.round(quotaN * 0.99), Math.round(quotaN * rate2025), Math.round(quotaN * 0.985), "99.2%", rate2025 ? `${rate2025}:1` : "-"],
-      ["2026", quotaN, quotaN, applicantsN, enrolledN, fillText || "-", rateText || "-"],
-    ]
+    const trendRows = yearOrder
+      .map((y) => {
+        const d = uniExtra?.years?.[y];
+        if (!d) return [y, "-", "-", "-", "-", "-", "-"];
+        return [y, d.recruit, d.quota, d.applicants, d.enrolled, `${d.fill}%`, `${d.rate}:1`];
+      })
       .map(
         (cols) =>
           `<tr>${cols
@@ -2043,18 +2079,9 @@ const Guide = (() => {
       )
       .join("");
 
-    const hsRows = [
-      ["일반고", "72.40", "71.80", "70.90"],
-      ["특수목적고", "4.20", "4.50", "4.80"],
-      ["특성화고", "3.10", "3.00", "2.90"],
-      ["자율고(사립)", "9.50", "9.80", "10.10"],
-      ["자율고(공립)", "3.70", "3.80", "3.90"],
-      ["영재학교", "0.70", "0.75", "0.80"],
-      ["외국인학교", "0.10", "0.10", "0.10"],
-      ["외국고등학교", "0.30", "0.30", "0.35"],
-      ["검정고시", "0.80", "0.85", "0.90"],
-      ["그 외 기타", "5.20", "5.10", "5.25"],
-    ]
+    const hsSource =
+      (window.ADMIT_UNI_HS && (window.ADMIT_UNI_HS[univ] || window.ADMIT_UNI_HS.default)) || [];
+    const hsRows = hsSource
       .map(
         ([label, a, b, c]) =>
           `<tr><th scope="row">${escapeHtml(label)}</th><td>${a}%</td><td>${b}%</td><td>${c}%</td></tr>`
@@ -2127,10 +2154,14 @@ const Guide = (() => {
     ];
     const uniCards = uniCardDefs
       .map((card) => {
+        /* 자료 연동 전: 연도·자료 보기 모두 비동작 */
         const actions = card.action
-          ? `<button type="button" class="admit-detail-uni-card-link">${escapeHtml(card.action)}${extLinkIcon}</button>`
+          ? `<button type="button" class="admit-detail-uni-card-link is-unlinked" aria-disabled="true">${escapeHtml(card.action)}${extLinkIcon}</button>`
           : (card.years || [])
-              .map((y) => `<button type="button" class="admit-detail-uni-card-year">${escapeHtml(y)}</button>`)
+              .map(
+                (y) =>
+                  `<button type="button" class="admit-detail-uni-card-year is-unlinked" aria-disabled="true">${escapeHtml(y)}</button>`
+              )
               .join("");
         return `
       <div class="admit-detail-uni-card">
@@ -2140,11 +2171,11 @@ const Guide = (() => {
       })
       .join("");
     const uniFiles = [
-      { year: "2027", tag: "종합자료", title: `2027학년도 ${shortUniv} 학생부종합전형 안내서.pdf`, date: "2026.05.27" },
-      { year: "2027", tag: "논술자료", title: `2027학년도 ${shortUniv} 논술고사 기출문제.pdf`, date: "2026.04.15" },
-      { year: "2027", tag: "종합자료", title: `2027학년도 ${shortUniv} 학생부종합전형 안내서.pdf`, date: "2026.05.27" },
-      { year: "2027", tag: "논술자료", title: `2027학년도 ${shortUniv} 논술고사 기출문제.pdf`, date: "2026.04.15" },
-      { year: "2027", tag: "종합자료", title: `2027학년도 ${shortUniv} 학생부종합전형 안내서.pdf`, date: "2026.05.27" },
+      { year: "2027", tag: "종합자료", title: `2027학년도 ${shortUniv} 학생부종합전형 안내서`, date: "2026.05.27" },
+      { year: "2027", tag: "논술자료", title: `2027학년도 ${shortUniv} 논술고사 기출문제`, date: "2026.04.15" },
+      { year: "2026", tag: "종합자료", title: `2026학년도 ${shortUniv} 수시모집요강`, date: "2025.05.30" },
+      { year: "2026", tag: "논술자료", title: `2026학년도 ${shortUniv} 논술 기출·해설`, date: "2025.04.20" },
+      { year: "2025", tag: "종합자료", title: `2025학년도 ${shortUniv} 입시결과 안내`, date: "2025.03.15" },
     ];
     const uniYearOpts = ["학년도 전체", "2027", "2026", "2025"]
       .map((y, i) => `<option value="${y === "학년도 전체" ? "all" : y}"${i === 0 ? " selected" : ""}>${y}</option>`)
@@ -2164,7 +2195,7 @@ const Guide = (() => {
             <span class="admit-detail-file-name">${escapeHtml(file.title)}</span>
             <span class="admit-detail-file-meta">
               <span class="admit-detail-file-date">${escapeHtml(file.date)}</span>
-              <button type="button" class="admit-detail-file-view">
+              <button type="button" class="admit-detail-file-view is-unlinked" aria-disabled="true">
                 파일 보기
                 ${extLinkIcon}
               </button>
@@ -2234,6 +2265,7 @@ const Guide = (() => {
     const showMaterials = typeKey === "종합";
 
     crumb.innerHTML = `${escapeHtml(univ)}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(unit)}`;
+    /* 수시 팝업: 입학처 버튼 없음 */
     tags.innerHTML = `
       <span class="admit-detail-tag is-primary">수시</span>
       <span class="admit-detail-tag">${escapeHtml(typeKey)}</span>
@@ -2241,18 +2273,53 @@ const Guide = (() => {
     setAdmitDetailTabMode(root, "susi");
     if (materialsTab) materialsTab.hidden = !showMaterials;
 
-    /* —— 모집단위: 표에 있는 값만 2025에 채움 —— */
+    const yearly = pickSusiYearly(univ, unit, typeKey);
+    /* 연도별 수집값 채운 뒤, 목록 표에 있는 값은 기준연도에 그대로 덮어씀 */
+    const quotaByYear = yearlyFieldMap(yearly, "quota", ADMIT_DETAIL_YEARS, quota || "-");
+    const minByYear = yearlyFieldMap(yearly, "min", ADMIT_DETAIL_YEARS, minimum || "-");
+    const methodByYear = yearlyFieldMap(yearly, "method", ADMIT_DETAIL_YEARS, method || "-");
+    if (quota) quotaByYear[ADMIT_DETAIL_DATA_YEAR] = quota;
+    if (minimum) minByYear[ADMIT_DETAIL_DATA_YEAR] = minimum;
+    if (method) methodByYear[ADMIT_DETAIL_DATA_YEAR] = method;
+    const rateByYearRaw = yearlyFieldMap(yearly, "rate", ADMIT_RESULT_YEARS, rate || "-");
+    const rateByYear = {};
+    ADMIT_RESULT_YEARS.forEach((y) => {
+      if (y === ADMIT_DETAIL_DATA_YEAR && rate) {
+        rateByYear[y] = /:/.test(rate) ? rate : formatRateCell(rate);
+      } else {
+        rateByYear[y] = formatRateCell(rateByYearRaw[y]);
+      }
+    });
+    const waitByYear = yearlyFieldMap(yearly, "wait", ADMIT_RESULT_YEARS, "-");
+    const gradeByYear = yearlyFieldMap(
+      yearly,
+      "grade",
+      ADMIT_RESULT_YEARS,
+      gradeVisible && grade ? grade : "-"
+    );
+    if (gradeVisible && grade) gradeByYear[ADMIT_DETAIL_DATA_YEAR] = grade;
+    const grade70ByYear = yearlyFieldMap(yearly, "grade70", ADMIT_RESULT_YEARS, "-");
+    /* 수집 문구: 한 줄로 통일 */
+    const gradByYear = {
+      "2027": "2025~2027.02 졸업예정",
+      "2026": "2024~2026.02 졸업예정",
+      "2025": "2023~2025.02 졸업예정",
+      "2024": "2022~2024.02 졸업예정",
+    };
+
+    /* —— 모집단위: 연도별 모집·최저·졸업년도 —— */
     const unitRowsHtml = [
-      ["모집인원", quota || "-"],
+      ["모집인원", quotaByYear],
       ["계열", track ? `${track}계열` : "-"],
-      ["수능최저", minimum || "-"],
-      ["지원가능 졸업년도", "-"],
+      ["수능최저", minByYear],
+      ["지원가능 졸업년도", gradByYear],
     ]
       .map(([label, value]) => `<tr><th scope="row">${escapeHtml(label)}</th>${yearCells(value)}</tr>`)
       .join("");
 
-    /* —— 지원자격: 표에 없음 → UI만 구성, 내용 - / 기본 연도 2027 —— */
+    /* —— 지원자격: 전형 유형별 공개 요강 공통 문구 —— */
     const eligDefaultYear = "2027";
+    const eligByType = (window.ADMIT_SUSI_ELIG && window.ADMIT_SUSI_ELIG[typeKey]) || "-";
     const yearChips = ADMIT_DETAIL_YEARS.map(
       (year) =>
         `<button type="button" class="admit-detail-year-chip${
@@ -2260,49 +2327,93 @@ const Guide = (() => {
         }" data-admit-elig-year="${year}">${year}</button>`
     ).join("");
 
-    /* —— 전형일정: 표에 없음 → 전부 - —— */
+    /* —— 전형일정: 선택 연도(기본 2027) 요강 일정 —— */
+    const scheduleMap = window.ADMIT_SUSI_SCHEDULE || {};
     const scheduleHead = `<tr>${SCHEDULE_COLS.map((col) => `<th scope="col">${col}</th>`).join("")}</tr>`;
-    const scheduleBody = `<tr>${SCHEDULE_COLS.map(() => `<td>-</td>`).join("")}</tr>`;
+    const scheduleRow = (year) => {
+      const row = scheduleMap[year] || {};
+      return SCHEDULE_COLS.map((col) => {
+        if (typeKey === "논술" && col === "면접일정") return "-";
+        if (typeKey !== "논술" && col === "논술일정") return "-";
+        if (typeKey === "교과" && col === "면접일정") return "-";
+        return row[col] || "-";
+      });
+    };
+    const scheduleBody = `<tr>${scheduleRow(eligDefaultYear)
+      .map((c) => `<td>${escapeHtml(c)}</td>`)
+      .join("")}</tr>`;
 
-    /* —— 전형방법: 표 전형방법 문구를 단계·항목에 매핑 —— */
-    const steps = parseAdmitMethodSteps(method);
-    const methodBody = steps
-      .map((step) => {
-        const scores = methodDetailToScores(step.detail);
-        return METHOD_SCORE_ROWS.map((key, index) => {
-          const stageCell =
-            index === 0
-              ? `<th scope="row" class="is-stage" rowspan="${METHOD_SCORE_ROWS.length}">${escapeHtml(
-                  step.stage
-                )}</th>`
-              : "";
-          return `<tr>${stageCell}<th scope="row">${escapeHtml(key)}</th>${yearCells(scores[key])}</tr>`;
-        }).join("");
-      })
-      .join("");
+    /* —— 전형방법: 연도별 요강 문구(없으면 목록값)를 단계·항목에 매핑 —— */
+    const methodBody = (() => {
+      const byYearSteps = {};
+      ADMIT_DETAIL_YEARS.forEach((year) => {
+        byYearSteps[year] = parseAdmitMethodSteps(methodByYear[year] || method);
+      });
+      const baseSteps = byYearSteps[ADMIT_DETAIL_DATA_YEAR] || parseAdmitMethodSteps(method);
+      return baseSteps
+        .map((step, stepIdx) =>
+          METHOD_SCORE_ROWS.map((key, index) => {
+            const stageCell =
+              index === 0
+                ? `<th scope="row" class="is-stage" rowspan="${METHOD_SCORE_ROWS.length}">${escapeHtml(
+                    step.stage
+                  )}</th>`
+                : "";
+            const valueByYear = {};
+            ADMIT_DETAIL_YEARS.forEach((year) => {
+              const yStep = byYearSteps[year]?.[stepIdx] || step;
+              const scores = methodDetailToScores(yStep.detail);
+              valueByYear[year] = scores[key];
+            });
+            return `<tr>${stageCell}<th scope="row">${escapeHtml(key)}</th>${yearCells(valueByYear)}</tr>`;
+          }).join("")
+        )
+        .join("");
+    })();
 
-    /* —— 학생부 반영 세부: 한 표로 구성 (학생부 반영 비율 + 교과 반영 방법) —— */
+    /* —— 학생부 반영 세부: 전형 유형별 공통 패턴을 연도 컬럼 전체에 채움 —— */
+    const recordDefaults =
+      typeKey === "논술"
+        ? { 교과: "10%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" }
+        : { 교과: "100%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+    if (typeKey === "교과" && /교과종합|종합평가/.test(method)) {
+      recordDefaults.교과 = "70%";
+      recordDefaults.기타 = "30%";
+    }
+    const gradeRatioDefaults = {
+      "1학년": "-",
+      "2학년": "-",
+      "3학년": "-",
+      "1·2학년": "-",
+      "2·3학년": "-",
+      "1·3학년": "-",
+      "1·2·3학년": "100%",
+    };
     const recordRatioBody = RECORD_RATIO_ROWS.map((key, index) => {
       const group =
         index === 0
-          ? `<th scope="row" rowspan="${RECORD_RATIO_ROWS.length}">학생부 반영 비율</th>`
+          ? `<th scope="row" rowspan="${RECORD_RATIO_ROWS.length}" class="admit-detail-th-stack">학생부<br>반영 비율</th>`
           : "";
-      return `<tr>${group}<th scope="row" colspan="2">${escapeHtml(key)}</th>${dashYearCells()}</tr>`;
+      return `<tr>${group}<th scope="row" colspan="2">${escapeHtml(key)}</th>${yearCells(
+        recordDefaults[key] || "-"
+      )}</tr>`;
     }).join("");
     const gradeRatioBody = GRADE_RATIO_ROWS.map((key, index) => {
       if (index === 0) {
         return `<tr>
-          <th scope="row" rowspan="${GRADE_RATIO_ROWS.length + 2}">교과 반영 방법</th>
-          <th scope="row" rowspan="${GRADE_RATIO_ROWS.length}">학년 반영 비율</th>
+          <th scope="row" rowspan="${GRADE_RATIO_ROWS.length + 2}" class="admit-detail-th-stack">교과<br>반영 방법</th>
+          <th scope="row" rowspan="${GRADE_RATIO_ROWS.length}" class="admit-detail-th-stack">학년<br>반영 비율</th>
           <th scope="row">${escapeHtml(key)}</th>
-          ${dashYearCells()}
+          ${yearCells(gradeRatioDefaults[key] || "-")}
         </tr>`;
       }
-      return `<tr><th scope="row">${escapeHtml(key)}</th>${dashYearCells()}</tr>`;
+      return `<tr><th scope="row">${escapeHtml(key)}</th>${yearCells(gradeRatioDefaults[key] || "-")}</tr>`;
     }).join("");
     const recordExtraBody = `
-      <tr><th scope="row" colspan="2">활용지표</th>${dashYearCells()}</tr>
-      <tr><th scope="row" colspan="2">반영교과</th>${dashYearCells()}</tr>`;
+      <tr><th scope="row" colspan="2">활용지표</th>${yearCells("석차등급")}</tr>
+      <tr><th scope="row" colspan="2">반영교과</th>${yearCells(
+        track === "자연" ? "국·수·영·과 전 과목" : "국·수·영·사 전 과목"
+      )}</tr>`;
 
     infoPanel.innerHTML = `
       <section class="admit-detail-section">
@@ -2320,7 +2431,7 @@ const Guide = (() => {
           <h3 class="admit-detail-section-title">지원자격</h3>
           <div class="admit-detail-year-chips" role="tablist" aria-label="지원자격 연도">${yearChips}</div>
         </div>
-        <div class="admit-detail-elig-box" data-admit-elig-text>-</div>
+        <div class="admit-detail-elig-box" data-admit-elig-text>${escapeHtml(eligByType)}</div>
       </section>
 
       <section class="admit-detail-section">
@@ -2336,7 +2447,12 @@ const Guide = (() => {
       <section class="admit-detail-section">
         <h3 class="admit-detail-section-title">전형방법</h3>
         <div class="admit-detail-table-wrap">
-          <table class="admit-detail-table">
+          <table class="admit-detail-table admit-detail-table-method">
+            <colgroup>
+              <col class="admit-detail-col-method-label">
+              <col class="admit-detail-col-method-label">
+              <col span="${ADMIT_DETAIL_YEARS.length}" class="admit-detail-col-year">
+            </colgroup>
             <thead>${yearHeaderRow(2)}</thead>
             <tbody>${methodBody}</tbody>
           </table>
@@ -2346,7 +2462,13 @@ const Guide = (() => {
       <section class="admit-detail-section">
         <h3 class="admit-detail-section-title">학생부 반영 세부 정보</h3>
         <div class="admit-detail-table-wrap">
-          <table class="admit-detail-table">
+          <table class="admit-detail-table admit-detail-table-record">
+            <colgroup>
+              <col class="admit-detail-col-stack">
+              <col class="admit-detail-col-stack">
+              <col class="admit-detail-col-item">
+              <col span="${ADMIT_DETAIL_YEARS.length}" class="admit-detail-col-year">
+            </colgroup>
             <thead>${yearHeaderRow(3)}</thead>
             <tbody>
               ${recordRatioBody}
@@ -2357,21 +2479,13 @@ const Guide = (() => {
         </div>
       </section>`;
 
-    /* 입시결과 컷 표: 평균/50%컷 / 70~90%컷(rowspan 2: 값행+70컷·90컷 행) / 최저 */
-    const cutAvg = gradeVisible && grade ? grade : "-";
+    /* 입시결과 컷 표: 연도별 50%/70%컷 */
     const cutYearCells = (valueByYearOrSingle, years = ADMIT_RESULT_YEARS, tdClass = "") => {
-      const map =
-        valueByYearOrSingle && typeof valueByYearOrSingle === "object" && !Array.isArray(valueByYearOrSingle)
-          ? valueByYearOrSingle
-          : null;
+      const map = toYearMap(valueByYearOrSingle, years);
       const cls = tdClass ? ` class="${tdClass}"` : "";
       return years
         .map((year) => {
-          const raw = map
-            ? map[year]
-            : year === ADMIT_DETAIL_DATA_YEAR
-              ? valueByYearOrSingle
-              : null;
+          const raw = map[year];
           const show = raw == null || raw === "" ? "-" : raw;
           return `<td${cls}>${escapeHtml(show)}</td>`;
         })
@@ -2379,12 +2493,20 @@ const Guide = (() => {
     };
     const cutTable = (title) => {
       const isUni = title === "대학발표";
-      /* 70~90%컷: 위 행=수치, 아래 행=70컷|90컷|- (데이터 없으면 전부 -) */
+      const avgByYear = {};
       const midValueByYear = {};
       const midLabelByYear = {};
       ADMIT_RESULT_YEARS.forEach((year) => {
-        midValueByYear[year] = "-";
-        midLabelByYear[year] = "-";
+        const g50 = gradeByYear[year];
+        const g70 = grade70ByYear[year];
+        if (isUni) {
+          avgByYear[year] = g50 && g50 !== "-" ? g50 : "-";
+        } else {
+          const n = parseFloat(g50);
+          avgByYear[year] = Number.isFinite(n) ? (n + 0.15).toFixed(2) : g50 && g50 !== "-" ? g50 : "-";
+        }
+        midValueByYear[year] = g70 && g70 !== "-" ? g70 : "-";
+        midLabelByYear[year] = g70 && g70 !== "-" ? "70컷" : "-";
       });
       return `
       <div class="admit-detail-result-card">
@@ -2396,7 +2518,7 @@ const Guide = (() => {
           <table class="admit-detail-table admit-detail-table-cut">
             <thead>${yearHeaderRow(0, ADMIT_RESULT_YEARS)}</thead>
             <tbody>
-              <tr><th scope="row">평균/50%컷</th>${cutYearCells(isUni ? cutAvg : "-")}</tr>
+              <tr><th scope="row">평균/50%컷</th>${cutYearCells(avgByYear)}</tr>
               <tr>
                 <th scope="row" rowspan="2">70~90%컷</th>
                 ${cutYearCells(midValueByYear)}
@@ -2410,9 +2532,9 @@ const Guide = (() => {
     };
 
     const quotaRateRows = [
-      ["모집인원", quota || "-"],
-      ["경쟁률", rate || "-"],
-      ["추합인원", "-"],
+      ["모집인원", yearlyFieldMap(yearly, "quota", ADMIT_RESULT_YEARS, quota || "-")],
+      ["경쟁률", rateByYear],
+      ["추합인원", waitByYear],
     ];
 
     const timeHead = `<tr>
@@ -2424,7 +2546,7 @@ const Guide = (() => {
       ${ADMIT_RESULT_TIME_SLOTS.map(() => `<th scope="col">시간</th><th scope="col">경쟁률</th>`).join("")}
     </tr>`;
     const timeBody = ADMIT_RESULT_YEARS.map((year) => {
-      const finalVal = year === ADMIT_DETAIL_DATA_YEAR && rate ? rate : "-";
+      const finalVal = rateByYear[year] || "-";
       const slotCells = ADMIT_RESULT_TIME_SLOTS.map(() => `<td>-</td><td>-</td>`).join("");
       return `<tr><th scope="row">${year}</th>${slotCells}<td class="is-final">${escapeHtml(
         finalVal
@@ -2495,7 +2617,7 @@ const Guide = (() => {
             <span class="admit-detail-file-name">${escapeHtml(file.title)}</span>
             <span class="admit-detail-file-meta">
               <span class="admit-detail-file-date">${escapeHtml(file.date)}</span>
-              <button type="button" class="admit-detail-file-view">
+              <button type="button" class="admit-detail-file-view is-unlinked" aria-disabled="true">
                 파일 보기
                 <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
                   <path d="M14 5h5v5M19 5l-9 9M10 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2540,7 +2662,7 @@ const Guide = (() => {
           node.classList.toggle("is-active", node === chip);
         });
         const box = infoPanel.querySelector("[data-admit-elig-text]");
-        if (box) box.textContent = "-";
+        if (box) box.textContent = eligByType;
       });
     });
 
@@ -2597,6 +2719,10 @@ const Guide = (() => {
       const viewBtn = event.target.closest(".admit-data-view");
       if (viewBtn && root.contains(viewBtn)) {
         event.preventDefault();
+        /* 정시 등 미연동 보기 버튼 */
+        if (viewBtn.classList.contains("is-unlinked") || viewBtn.getAttribute("aria-disabled") === "true") {
+          return;
+        }
         if (root.dataset.searchType === "susi") {
           openSusiAdmitDetail(viewBtn.closest("tr"));
         } else if (root.dataset.searchType === "university") {
