@@ -117,7 +117,7 @@ input {
   display: block;
   height: 38px;
   width: auto;
-  mix-blend-mode: multiply;
+  background: transparent;
 }
 
 .app.is-collapsed .brand {
