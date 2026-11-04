@@ -255,14 +255,14 @@ body {
   letter-spacing: -0.1px;
 }
 
-/* 일반 텍스트 (본문) */
+/* 일반 텍스트 (본문) — PC·모바일·태블릿 모두 제목과 동일 좌측 정렬 */
 .text-body {
   font-size: 16px;
   line-height: 1.6;
   color: var(--color-text);
   margin-bottom: var(--spacing-standard);
   margin-top: 0;
-  text-align: justify;
+  text-align: left;
   letter-spacing: 0.1px;
 }
 
@@ -1263,89 +1263,21 @@ body.page-title-body {
     max-width: 100% !important;
   }
 
-  /* 가이드 표 전부 양끝 맞춤 (창의적 체험 포함) */
-  .table-scroll > table,
-  .page table,
-  table.comparison-table,
-  table.glossary-table,
-  table.schedule-table,
-  table.subject-table,
-  table.mistake-table,
-  .comparison-table.curriculum-table {
+  /* PC 본문 폭 유지. 더 좁으면 줄이지 않고 가로 스크롤 */
+  .page .table-scroll > table {
     width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-    table-layout: fixed !important;
-  }
-
-  .table-scroll > table th,
-  .table-scroll > table td,
-  .page table th,
-  .page table td,
-  .comparison-table.curriculum-table th,
-  .comparison-table.curriculum-table td {
-    white-space: normal !important;
-    word-break: keep-all !important;
-    overflow-wrap: break-word !important;
-    min-width: 0 !important;
+    min-width: var(--pc-table-min, 924px) !important;
     max-width: none !important;
-  }
-
-  /* 인쇄용 mm 고정 열(성적·기록 등) → 좁은 화면에서 풀어 양끝 채움 */
-  table.grade-record-table.comparison-table.curriculum-table thead th,
-  table.grade-record-table.comparison-table.curriculum-table tbody td,
-  table.grade-record-table.comparison-table.curriculum-table thead th.col-subject,
-  table.grade-record-table.comparison-table.curriculum-table tbody td.col-subject,
-  table.grade-record-table.comparison-table.curriculum-table thead th.col-note,
-  table.grade-record-table.comparison-table.curriculum-table tbody td.col-note,
-  table.grade-record-table.comparison-table.curriculum-table thead th.col-dist,
-  table.grade-record-table.comparison-table.curriculum-table tbody td.col-dist {
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: none !important;
-  }
-
-  .eval-process-table td:nth-child(3) {
-    white-space: normal !important;
-    width: auto !important;
-    min-width: 0 !important;
-  }
-
-  /* 창의적 체험: 양끝 맞춤 + 열 비율 유지 */
-  .table-scroll > table.creative-activity-table {
-    table-layout: fixed !important;
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  .table-scroll > table.creative-activity-table col:nth-child(1) { width: 8% !important; }
-  .table-scroll > table.creative-activity-table col:nth-child(2) { width: 15% !important; }
-  .table-scroll > table.creative-activity-table col:nth-child(3) { width: 8% !important; }
-  .table-scroll > table.creative-activity-table col:nth-child(4) { width: 15% !important; }
-  .table-scroll > table.creative-activity-table col:nth-child(5) { width: 54% !important; }
-
-  .table-scroll > table.creative-activity-table th,
-  .table-scroll > table.creative-activity-table td,
-  .table-scroll > table.creative-activity-table td > div {
-    white-space: normal !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    word-break: keep-all !important;
-    overflow-wrap: break-word !important;
   }
 }
 
 /* PC: 창의적 체험표 원본 열 비율 */
 @media (min-width: 861px) {
-  .table-scroll:has(> .creative-activity-table) {
-    overflow: visible !important;
-  }
   .table-scroll > table.creative-activity-table {
     table-layout: fixed !important;
     width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
+    min-width: var(--pc-table-min, 924px) !important;
+    max-width: none !important;
   }
   .table-scroll > table.creative-activity-table col:nth-child(1) { width: 8% !important; }
   .table-scroll > table.creative-activity-table col:nth-child(2) { width: 15% !important; }

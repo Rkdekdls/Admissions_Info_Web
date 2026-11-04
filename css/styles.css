@@ -16,6 +16,8 @@
   --page: #ffffff;
   --sidebar-width: 260px;
   --sidebar-rail: 76px;
+  /* 1280px 데스크톱 본문(사이드바 260 + 좌우 48px). 이보다 좁으면 표는 줄이지 않고 가로 스크롤 */
+  --pc-table-min: 924px;
 }
 
 * {
@@ -528,11 +530,15 @@ input {
   flex-direction: column;
   gap: 18px; /* 페이지(시트) 사이만 — 페이지 안 간격은 블록 margin-bottom 18px */
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .book-sheet {
   display: block;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .book-sheet.is-slice-off {
@@ -835,12 +841,16 @@ input {
 /* 표 = 콘텐츠 .comparison-table + web-info 오버라이드 그대로 */
 .admit-data-wrap {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   margin-top: 1mm;
 }
 
 .admit-data-table {
   width: 100%;
+  min-width: var(--pc-table-min);
   border-collapse: separate;
   border-spacing: 0;
   margin: 0;
@@ -1624,6 +1634,10 @@ input {
 
 .info-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   margin: 8px 0 18px;
   border: 1px solid var(--card-line);
   border-radius: 0;
@@ -1631,6 +1645,7 @@ input {
 
 .info-table {
   width: 100%;
+  min-width: var(--pc-table-min);
   border-collapse: collapse;
   font-size: 15px;
   line-height: 1.6;
@@ -2373,15 +2388,9 @@ input {
     max-width: 100%;
   }
 
-  /* 목록 표: 양끝 맞춤 */
-  .admit-data-table {
-    width: 100%;
-    min-width: 100%;
-    max-width: 100%;
-    table-layout: fixed;
-  }
-
-  /* 가이드·부록 표 전부 양끝 맞춤 (창의적 체험 포함) */
+  /* 목록·가이드 표: PC 본문 폭 유지, 화면이 더 좁으면 가로 스크롤 */
+  .admit-data-table,
+  .info-table,
   .comparison-table,
   .glossary-table,
   .schedule-table,
@@ -2389,27 +2398,7 @@ input {
   .mistake-table,
   .table-scroll > table {
     width: 100%;
-    min-width: 100%;
-    max-width: 100%;
-    table-layout: fixed;
-  }
-
-  .table-scroll > table th,
-  .table-scroll > table td,
-  .comparison-table th,
-  .comparison-table td,
-  .glossary-table th,
-  .glossary-table td,
-  .schedule-table th,
-  .schedule-table td,
-  .subject-table th,
-  .subject-table td,
-  .mistake-table th,
-  .mistake-table td {
-    white-space: normal;
-    word-break: keep-all;
-    overflow-wrap: break-word;
-    min-width: 0;
+    min-width: var(--pc-table-min);
     max-width: none;
   }
 
