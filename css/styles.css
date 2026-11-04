@@ -972,7 +972,7 @@ input {
   justify-content: center;
   box-sizing: border-box;
   min-width: 0;
-  height: 24px;
+  height: 26px;
   margin: 0;
   padding: 0 10px;
   border: 1px solid #d1d5db;
@@ -980,7 +980,7 @@ input {
   background: #fff;
   color: #1f2937;
   font-family: inherit;
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 400;
   line-height: 1;
   cursor: pointer;
@@ -994,8 +994,9 @@ input {
 }
 
 .admit-data-table .admit-data-view:hover {
-  border-color: #B5D0EF;
-  color: #1A4796;
+  border-color: #1a4796;
+  background: #eef3f9;
+  color: #1a4796;
 }
 
 .admit-search-field {
@@ -2444,4 +2445,1128 @@ input {
 .card li::before,
 .info-list li::before {
   border-radius: 50% !important;
+}
+
+/* —— 수시·교과 모집단위 상세 팝업 —— */
+.admit-detail-root[hidden] {
+  display: none !important;
+}
+
+.admit-detail-root {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+.admit-detail-backdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(15, 23, 42, 0.45);
+  cursor: pointer;
+}
+
+.admit-detail-dialog {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: min(920px, 100%);
+  height: min(88vh, 860px); /* 탭 전환 시(종합자료 등) 높이 줄어들지 않게 고정 */
+  max-height: min(88vh, 860px);
+  margin: 0;
+  padding: 0;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.18);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto; /* 헤더·탭 포함 팝업 위부터 스크롤 */
+}
+
+.admit-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex: 0 0 auto;
+  padding: 20px 22px 0;
+  box-sizing: border-box;
+}
+
+.admit-detail-title-wrap {
+  min-width: 0;
+  flex: 1;
+}
+
+.admit-detail-crumb {
+  margin: 0;
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.admit-detail-crumb-sep {
+  margin: 0 6px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.admit-detail-crumb-sub {
+  margin-left: 10px;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.admit-detail-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  box-sizing: border-box;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.admit-detail-link-btn:hover {
+  border-color: #1a4796;
+  background: #eef3f9;
+  color: #1a4796;
+}
+
+.admit-detail-link-btn svg {
+  display: block;
+  flex: 0 0 auto;
+  color: currentColor;
+}
+
+.admit-detail-section-meta {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.admit-detail-uni-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admit-detail-uni-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  min-height: 0;
+  padding: 14px 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  text-align: center;
+}
+
+.admit-detail-uni-stat-value {
+  margin: 0;
+  color: #1a4796;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.admit-detail-uni-stat-label {
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.admit-detail-uni-chart {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 12px;
+  padding: 16px 8px 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.admit-detail-uni-chart-frame {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Y축 숫자 고정 · 플롯만 좌우 스크롤 (정시 차트와 동일 패턴) */
+.admit-detail-uni-chart-y {
+  flex: 0 0 44px;
+  width: 44px;
+  background: #fff;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.admit-detail-uni-chart-y-svg {
+  display: block;
+  width: 44px;
+  height: auto;
+}
+
+.admit-detail-uni-chart-scroll {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.admit-detail-uni-chart-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.admit-detail-uni-chart-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admit-detail-uni-chart-scroll::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.admit-detail-uni-chart-svg {
+  display: block;
+  width: 796px;
+  max-width: none;
+  height: auto;
+  vertical-align: top;
+}
+
+.admit-detail-source {
+  margin: 10px 0 0;
+  color: #9ca3af;
+  font-size: 12px;
+  text-align: right;
+  line-height: 1.4;
+}
+
+.admit-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.admit-detail-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  background: #fff;
+  color: #1f2937;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+.admit-detail-tag.is-primary {
+  border-color: #1a4796;
+  background: #eef3f9;
+  color: #1a4796;
+}
+
+.admit-detail-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.admit-detail-close {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #1f2937;
+  cursor: pointer;
+}
+
+.admit-detail-close:hover {
+  color: #1a4796;
+}
+
+.admit-detail-close svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.admit-detail-tabs {
+  display: flex;
+  gap: 24px;
+  flex: 0 0 auto;
+  margin: 16px 22px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admit-detail-tab {
+  appearance: none;
+  margin: 0 0 -1px;
+  padding: 12px 0; /* 좌우 패딩 없음 → 밑줄 = 글자 너비, 왼쪽 정렬 */
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #6b7280;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.admit-detail-tab.is-active {
+  color: #1a4796;
+  font-weight: 700;
+  border-bottom-color: #1a4796;
+}
+
+.admit-detail-body {
+  /* grow만: 짧은 내용도 팝업 높이 유지 / shrink 금지: 스크롤 끝 하단 여백 유지 */
+  flex: 1 0 auto;
+  min-height: auto;
+  overflow: visible;
+  /* 하단 20 = 헤더 상단 여백과 동일하게 보이게 */
+  padding: 18px 22px 20px;
+  box-sizing: border-box;
+}
+
+.admit-detail-panel[hidden] {
+  display: none !important;
+}
+
+.admit-detail-section {
+  margin: 0;
+}
+
+.admit-detail-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 15px 0;
+  color: #1f2937;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+/* 탭 바로 아래 첫 소제목만 위 여백 없음 (원래대로) */
+.admit-detail-section:first-child > .admit-detail-section-title,
+.admit-detail-section:first-child > .admit-detail-section-head {
+  margin-top: 0;
+}
+
+.admit-detail-section-title::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: #1a4796;
+  flex: 0 0 auto;
+}
+
+/* 소제목 + 연도 칩: 여백은 제목과 동일(상하 15), 칩은 오른쪽 수직 중앙 */
+.admit-detail-section-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 26px; /* 연도 칩·필터와 동일 높이 */
+  margin: 15px 0;
+}
+
+.admit-detail-section-head .admit-detail-section-title {
+  margin: 0;
+}
+
+.admit-detail-section-head .admit-detail-year-chips {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.admit-detail-table-wrap {
+  width: 100%;
+  overflow-x: hidden;
+  /* 왼쪽·위만 래퍼 / 세로·아래는 셀 border (rowspan 헤더 last-child 이슈 방지) */
+  border: 0;
+  border-left: 1px solid #e5e7eb;
+  border-top: 2px solid #1a4796;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.admit-detail-table {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  background: #fff;
+  font-family: "Noto Sans KR", Pretendard, "Segoe UI", sans-serif;
+  font-size: 13px;
+}
+
+.admit-detail-table th,
+.admit-detail-table td {
+  box-sizing: border-box;
+  padding: 9px 6px;
+  border: 0;
+  border-bottom: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  text-align: center;
+  vertical-align: middle;
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 400; /* 흰 데이터 셀: 본문 표와 동일 */
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+/* 회색 헤더·구분 칸 */
+.admit-detail-table thead th {
+  background: #f3f6fb;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.admit-detail-table tbody th {
+  background: #fafafa;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.admit-detail-table tbody th.is-stage {
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.admit-detail-table tbody td {
+  background: #fff;
+  font-weight: 400;
+}
+
+/* 70~90%컷 아래 행(70컷/90컷 라벨): 왼쪽 구분칸과 같은 회색 */
+.admit-detail-table tbody td.is-cut-sub {
+  background: #fafafa;
+}
+
+.admit-detail-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 0;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.admit-detail-result-card {
+  min-width: 0;
+  max-width: 100%;
+  /* overflow 넣지 않음 — 연도 칩 상단이 잘림 */
+}
+
+.admit-detail-result-card-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 26px; /* 연도 칩 높이와 맞춤 — 표 상단선에 겹치지 않게 */
+  margin: 0 0 15px; /* 탭 바로 아래 — 위 여백 없음 (원래대로) */
+}
+
+.admit-detail-result-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #1f2937;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.admit-detail-result-card-title::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: #1a4796;
+  flex: 0 0 auto;
+}
+
+/* 연도 칩은 제목 상하 여백을 키우지 않고, 제목 행 기준 수직 중앙 */
+.admit-detail-result-card-head .admit-detail-year-chips {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.admit-detail-table-trend {
+  min-width: 0;
+}
+
+.admit-detail-table td.is-final {
+  font-weight: 400;
+}
+
+
+.admit-detail-year-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.admit-detail-year-chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 0;
+  height: 26px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  background: #fff;
+  color: #1f2937;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.admit-detail-year-chip.is-active {
+  border-color: #1a4796;
+  background: #1a4796;
+  color: #fff;
+}
+
+.admit-detail-year-chip:hover:not(.is-active) {
+  border-color: #1a4796;
+  background: #eef3f9;
+  color: #1a4796;
+}
+
+.admit-detail-elig-box {
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+  color: #1f2937;
+  font-size: 13px;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.admit-detail-table-schedule {
+  min-width: 0;
+}
+
+.admit-detail-note {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 18px 0 0;
+  padding: 0 0 4px;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.admit-detail-note-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  padding: 0;
+  color: #9ca3af;
+  line-height: 1;
+}
+
+.admit-detail-note-icon svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+/* 종합자료 탭 */
+.admit-detail-tab[hidden] {
+  display: none !important;
+}
+
+/* 대학 상세: 대학발표 자료 카드 그리드 */
+.admit-detail-uni-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.admit-detail-uni-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 14px;
+  box-sizing: border-box;
+  min-height: 0;
+  padding: 18px 14px 14px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  text-align: center;
+}
+
+.admit-detail-uni-card-title {
+  margin: 0;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.admit-detail-uni-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+}
+
+.admit-detail-uni-card-year,
+.admit-detail-uni-card-link {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  height: 26px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  background: #fff;
+  color: #1f2937;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admit-detail-uni-card-year:hover,
+.admit-detail-uni-card-year:active,
+.admit-detail-uni-card-year.is-active,
+.admit-detail-uni-card-link:hover,
+.admit-detail-uni-card-link:active {
+  border-color: #1a4796;
+  background: #eef3f9;
+  color: #1a4796;
+}
+
+.admit-detail-uni-card-link svg {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.admit-detail-file-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #1f2937;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.admit-detail-file-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-sizing: border-box;
+  min-height: 220px;
+  padding: 32px 16px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  text-align: center;
+}
+
+.admit-detail-file-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+.admit-detail-file-empty-text {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* 대학발표 자료 목록: 다른 소제목과 동일 상하 여백(section-head 15px) */
+
+.admit-detail-materials-filter {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+}
+
+/* 트리거: 연도 칩(2027)과 동일 높이·글자 / 목록: 바깥 필터 admit-select와 동일 */
+.admit-detail-materials-filter .admit-select.is-chip {
+  width: auto;
+  min-width: 108px;
+}
+
+.admit-detail-materials-filter .admit-select.is-chip .admit-select-trigger {
+  height: 26px;
+  padding: 0 28px 0 10px;
+  border: 1px solid #d1d5db;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-position: right 8px center;
+  background-size: 14px;
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.admit-detail-materials-filter .admit-select.is-chip.is-open .admit-select-trigger,
+.admit-detail-materials-filter .admit-select.is-chip .admit-select-trigger:focus {
+  border-color: #b5d0ef;
+}
+
+.admit-detail-materials-filter .admit-select.is-chip .admit-select-menu {
+  z-index: 60;
+  min-width: 100%;
+  width: max(100%, 140px);
+  padding: 2px 0;
+}
+
+.admit-detail-materials-filter .admit-select.is-chip .admit-select-option {
+  box-sizing: border-box;
+  height: 26px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.admit-detail-file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.admit-detail-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  box-sizing: border-box;
+  min-height: 50px;
+}
+
+.admit-detail-file:last-child {
+  border-bottom: 0;
+}
+
+.admit-detail-file[hidden] {
+  display: none !important;
+}
+
+.admit-detail-file > * {
+  align-self: center;
+}
+
+.admit-detail-file-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+  color: #6b7280;
+  line-height: 0;
+}
+
+.admit-detail-file-icon svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.admit-detail-file-year {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid #e5e7eb;
+  background: #f3f6fb;
+  color: #1f2937;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.admit-detail-file-name {
+  display: inline-flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 26px;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  word-break: keep-all;
+}
+
+.admit-detail-file-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex: 0 0 auto;
+  margin-left: auto;
+  min-height: 26px;
+}
+
+.admit-detail-file-date {
+  display: inline-flex;
+  align-items: center;
+  color: #9ca3af;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.admit-detail-file-view {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #1a4796;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admit-detail-file-view:hover {
+  text-decoration: underline;
+}
+
+.admit-detail-file-view svg {
+  display: block;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 860px) {
+  /* 모바일: 팝업이 아니라 전체 화면처럼 (PC 스타일은 유지) */
+  .admit-detail-root {
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .admit-detail-backdrop {
+    background: #fff;
+  }
+
+  .admit-detail-dialog {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .admit-detail-head,
+  .admit-detail-body {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .admit-detail-head {
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  }
+
+  .admit-detail-tabs {
+    /* margin으로 좌우 여백 → border-bottom 가로선도 여백 안쪽만 */
+    margin: 12px 16px 0;
+    padding-left: 0;
+    padding-right: 0;
+    gap: 20px;
+  }
+
+  .admit-detail-tab {
+    padding-left: 0;
+    padding-right: 0;
+    text-align: left;
+  }
+
+  .admit-detail-body {
+    /* 좌측 여백(16)과 동일하게 하단 여백 */
+    padding-top: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .admit-detail-panel > .admit-detail-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .admit-detail-crumb {
+    font-size: 16px;
+  }
+
+  /* 표 디자인은 유지 · 셀 찌그러짐 없이 가로 스크롤만 */
+  .admit-detail-body,
+  .admit-detail-panel,
+  .admit-detail-section,
+  .admit-detail-result-grid,
+  .admit-detail-result-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .admit-detail-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  .admit-detail-table {
+    width: 680px !important;
+    min-width: 680px !important;
+    max-width: none !important;
+    table-layout: fixed;
+  }
+
+  .admit-detail-table th,
+  .admit-detail-table td {
+    white-space: nowrap;
+  }
+
+  .admit-detail-table-schedule {
+    width: 720px !important;
+    min-width: 720px !important;
+  }
+
+  .admit-detail-table-trend {
+    width: 960px !important;
+    min-width: 960px !important;
+  }
+
+  .admit-detail-table-uni-trend {
+    width: 760px !important;
+    min-width: 760px !important;
+  }
+
+  /* 대학발표·어디가 컷 표: 카드별로 각자 좌우 스크롤 */
+  .admit-detail-table-cut {
+    width: 520px !important;
+    min-width: 520px !important;
+  }
+
+  .admit-detail-result-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  /* 연도 칩·학년도 필터·메타: PC와 같이 제목 오른쪽 유지 */
+  .admit-detail-section-head:has(.admit-detail-year-chips) .admit-detail-section-title,
+  .admit-detail-result-card-head:has(.admit-detail-year-chips) .admit-detail-result-card-title {
+    padding-right: 220px;
+    box-sizing: border-box;
+  }
+
+  .admit-detail-section-head:has(.admit-detail-materials-filter) .admit-detail-section-title,
+  .admit-detail-section-head:has(.admit-detail-section-meta) .admit-detail-section-title {
+    padding-right: 160px;
+    box-sizing: border-box;
+  }
+
+  /* 기준·출처 메타: 모바일에서도 제목 오른쪽 고정 */
+  .admit-detail-section-meta {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .admit-detail-file {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .admit-detail-file > * {
+    align-self: center;
+  }
+
+  /* 사이 검정 파일명: 상하 중앙 */
+  .admit-detail-file-name {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    min-height: 26px;
+    margin: 0;
+    padding: 4px 0;
+    box-sizing: border-box;
+  }
+
+  /* 날짜·파일 보기: 아이콘과 같은 왼쪽부터 시작 */
+  .admit-detail-file-meta {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 !important;
+    padding-left: 0;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .admit-detail-uni-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .admit-detail-uni-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .admit-detail-uni-stat {
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .admit-detail-source {
+    text-align: left;
+  }
 }
