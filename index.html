@@ -16,7 +16,7 @@
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=418">
+  <link rel="stylesheet" href="css/styles.css?v=423">
 </head>
 <body>
   <div class="app" id="app">
@@ -4549,9 +4549,10 @@
     }
     
     .comparison-table.curriculum-table:not(.creative-activity-table) {
-      table-layout: auto !important;
-      width: auto !important;
+      table-layout: fixed !important;
+      width: 100% !important;
       min-width: 100% !important;
+      max-width: 100% !important;
     }
     
     /* 출결상황 표 - 첫 번째 셀을 다른 셀과 동일한 스타일로 */
@@ -5666,9 +5667,10 @@
     }
     
     .comparison-table.curriculum-table:not(.creative-activity-table) {
-      table-layout: auto !important;
-      width: auto !important;
+      table-layout: fixed !important;
+      width: 100% !important;
       min-width: 100% !important;
+      max-width: 100% !important;
     }
     
     /* 출결상황 표 - 첫 번째 셀을 다른 셀과 동일한 스타일로 */
@@ -6783,9 +6785,10 @@
     }
     
     .comparison-table.curriculum-table:not(.creative-activity-table) {
-      table-layout: auto !important;
-      width: auto !important;
+      table-layout: fixed !important;
+      width: 100% !important;
       min-width: 100% !important;
+      max-width: 100% !important;
     }
     
     /* 출결상황 표 - 첫 번째 셀을 다른 셀과 동일한 스타일로 */
@@ -8165,7 +8168,7 @@
     </div>
 
     <!-- 봉사활동실적 표 -->
-    <table class="comparison-table curriculum-table" style="margin-top: 1mm; width: 100%; table-layout: auto; box-sizing: border-box;">
+    <table class="comparison-table curriculum-table" style="margin-top: 1mm; width: 100%; table-layout: fixed; box-sizing: border-box;">
       <thead>
         <tr>
           <th rowspan="2" style="width: 8% !important; padding: 1.6mm 2mm !important; height: 1.6mm !important;">학년</th>
@@ -8466,9 +8469,10 @@
     }
     
     .comparison-table.curriculum-table:not(.creative-activity-table) {
-      table-layout: auto !important;
-      width: auto !important;
+      table-layout: fixed !important;
+      width: 100% !important;
       min-width: 100% !important;
+      max-width: 100% !important;
     }
     
     /* 출결상황 표 - 첫 번째 셀을 다른 셀과 동일한 스타일로 */
@@ -12173,7 +12177,7 @@
     
     /* ✅ 수능 성적표: 텍스트 안 잘리게 (fixed -> auto) */
     .comparison-table.curriculum-table.certification-table {
-      table-layout: auto !important;   /* 핵심: fixed 해제 */
+      table-layout: fixed !important;
     }
     
     /* ✅ 셀 내용 줄바꿈 허용 + 말줄임 제거 */
@@ -12720,7 +12724,7 @@
     
     /* ✅ 수능 성적표: 텍스트 안 잘리게 (fixed -> auto) */
     .comparison-table.curriculum-table.certification-table {
-      table-layout: auto !important;   /* 핵심: fixed 해제 */
+      table-layout: fixed !important;
     }
     
     /* ✅ 셀 내용 줄바꿈 허용 + 말줄임 제거 */
@@ -23170,7 +23174,7 @@
     </template>
   </div>
   <!-- page-source:end -->
-  <script src="js/web-info.js?v=146"></script>
+  <script src="js/web-info.js?v=150"></script>
   <script src="js/admit-uni-data.js?v=3"></script>
   <script src="js/admit-susi-yearly.js?v=2"></script>
   <script src="js/guide.js?v=208"></script>

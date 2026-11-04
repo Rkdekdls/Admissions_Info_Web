@@ -772,6 +772,51 @@ const WebInfo = (() => {
       box-shadow: none !important;
       margin: 0 !important;
     }
+    /* 좁은 화면: 모든 가이드 표 양끝 맞춤 (창의적 체험표만 스크롤 예외) */
+    @media (max-width: 860px) {
+      .table-scroll {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .table-scroll > table:not(.creative-activity-table),
+      .page table:not(.creative-activity-table),
+      table.comparison-table:not(.creative-activity-table),
+      table.glossary-table,
+      table.schedule-table,
+      table.subject-table,
+      table.mistake-table,
+      .comparison-table.curriculum-table:not(.creative-activity-table) {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        table-layout: fixed !important;
+      }
+      .table-scroll > table:not(.creative-activity-table) th,
+      .table-scroll > table:not(.creative-activity-table) td,
+      .page table:not(.creative-activity-table) th,
+      .page table:not(.creative-activity-table) td,
+      .comparison-table.curriculum-table:not(.creative-activity-table) th,
+      .comparison-table.curriculum-table:not(.creative-activity-table) td {
+        white-space: normal !important;
+        word-break: keep-all !important;
+        overflow-wrap: break-word !important;
+        min-width: 0 !important;
+        max-width: none !important;
+      }
+      table.grade-record-table.comparison-table.curriculum-table thead th,
+      table.grade-record-table.comparison-table.curriculum-table tbody td,
+      table.grade-record-table.comparison-table.curriculum-table thead th.col-subject,
+      table.grade-record-table.comparison-table.curriculum-table tbody td.col-subject,
+      table.grade-record-table.comparison-table.curriculum-table thead th.col-note,
+      table.grade-record-table.comparison-table.curriculum-table tbody td.col-note,
+      table.grade-record-table.comparison-table.curriculum-table thead th.col-dist,
+      table.grade-record-table.comparison-table.curriculum-table tbody td.col-dist {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+      }
+    }
     .page-footer,
     .main-title,
     .subtitle,
@@ -1124,7 +1169,7 @@ const WebInfo = (() => {
     const shadow = sheet.attachShadow({ mode: "open" });
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "css/page.css?v=51";
+    link.href = "css/page.css?v=55";
     const extra = document.createElement("style");
     extra.textContent = `${[...doc.querySelectorAll("style")].map((node) => node.textContent).join("\n")}\n${bookVars}
 @media (max-width: 860px) {
@@ -1285,18 +1330,41 @@ const WebInfo = (() => {
     margin-right: 0 !important;
   }
   .table-scroll > table:not(.creative-activity-table),
-  .table-scroll > .comparison-table:not(.creative-activity-table),
-  .table-scroll > .comparison-table.curriculum-table:not(.creative-activity-table) {
-    table-layout: auto !important;
-    width: max-content !important;
-    min-width: 190mm !important;
-    max-width: none !important;
+  .page table:not(.creative-activity-table),
+  table.comparison-table:not(.creative-activity-table),
+  table.glossary-table,
+  table.schedule-table,
+  table.subject-table,
+  table.mistake-table,
+  .comparison-table.curriculum-table:not(.creative-activity-table) {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
   }
   .table-scroll > table:not(.creative-activity-table) th,
-  .table-scroll > table:not(.creative-activity-table) td {
+  .table-scroll > table:not(.creative-activity-table) td,
+  .page table:not(.creative-activity-table) th,
+  .page table:not(.creative-activity-table) td,
+  .comparison-table.curriculum-table:not(.creative-activity-table) th,
+  .comparison-table.curriculum-table:not(.creative-activity-table) td {
     white-space: normal !important;
     word-break: keep-all !important;
     overflow-wrap: break-word !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  table.grade-record-table.comparison-table.curriculum-table thead th,
+  table.grade-record-table.comparison-table.curriculum-table tbody td,
+  table.grade-record-table.comparison-table.curriculum-table thead th.col-subject,
+  table.grade-record-table.comparison-table.curriculum-table tbody td.col-subject,
+  table.grade-record-table.comparison-table.curriculum-table thead th.col-note,
+  table.grade-record-table.comparison-table.curriculum-table tbody td.col-note,
+  table.grade-record-table.comparison-table.curriculum-table thead th.col-dist,
+  table.grade-record-table.comparison-table.curriculum-table tbody td.col-dist {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
   }
   /* 창의적 체험(모바일): PC와 동일, 스크롤만 */
   .table-scroll:has(> .creative-activity-table) {
@@ -1472,7 +1540,6 @@ li::before {
     });
     page.querySelectorAll("table").forEach((table) => {
       if (table.closest(".table-scroll")) return;
-      if (table.classList.contains("mistake-table")) return;
       const isCreative =
         table.classList.contains("creative-activity-table") ||
         /창의적 체험활동상황/.test(table.textContent || "");
@@ -1501,6 +1568,31 @@ li::before {
         });
         table.querySelectorAll("td > div").forEach((el) => {
           el.style.setProperty("text-align", "justify", "important");
+        });
+      } else if (isNarrow) {
+        /* 페이지별 width:auto / mm 고정열을 인라인으로 눌러 양끝 맞춤 */
+        table.style.setProperty("table-layout", "fixed", "important");
+        table.style.setProperty("width", "100%", "important");
+        table.style.setProperty("min-width", "100%", "important");
+        table.style.setProperty("max-width", "100%", "important");
+        table.querySelectorAll("th, td").forEach((el) => {
+          el.style.setProperty("white-space", "normal", "important");
+          el.style.setProperty("word-break", "keep-all", "important");
+          el.style.setProperty("overflow-wrap", "break-word", "important");
+          el.style.setProperty("min-width", "0", "important");
+          el.style.setProperty("max-width", "none", "important");
+          const w = el.style.width || "";
+          if (!String(w).includes("%")) {
+            el.style.setProperty("width", "auto", "important");
+          }
+        });
+        table.querySelectorAll("col").forEach((col) => {
+          const w = col.style.width || col.getAttribute("width") || "";
+          if (!String(w).includes("%")) {
+            col.style.setProperty("width", "auto", "important");
+            col.style.setProperty("min-width", "0", "important");
+            col.style.setProperty("max-width", "none", "important");
+          }
         });
       }
       const wrap = document.createElement("div");
@@ -1610,17 +1702,41 @@ li::before {
     margin-right: 0 !important;
   }
   .table-scroll > table:not(.creative-activity-table),
-  .table-scroll > .comparison-table.curriculum-table:not(.creative-activity-table) {
-    table-layout: auto !important;
-    width: max-content !important;
-    min-width: 190mm !important;
-    max-width: none !important;
+  .page table:not(.creative-activity-table),
+  table.comparison-table:not(.creative-activity-table),
+  table.glossary-table,
+  table.schedule-table,
+  table.subject-table,
+  table.mistake-table,
+  .comparison-table.curriculum-table:not(.creative-activity-table) {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
   }
   .table-scroll > table:not(.creative-activity-table) th,
-  .table-scroll > table:not(.creative-activity-table) td {
+  .table-scroll > table:not(.creative-activity-table) td,
+  .page table:not(.creative-activity-table) th,
+  .page table:not(.creative-activity-table) td,
+  .comparison-table.curriculum-table:not(.creative-activity-table) th,
+  .comparison-table.curriculum-table:not(.creative-activity-table) td {
     white-space: normal !important;
     word-break: keep-all !important;
     overflow-wrap: break-word !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  table.grade-record-table.comparison-table.curriculum-table thead th,
+  table.grade-record-table.comparison-table.curriculum-table tbody td,
+  table.grade-record-table.comparison-table.curriculum-table thead th.col-subject,
+  table.grade-record-table.comparison-table.curriculum-table tbody td.col-subject,
+  table.grade-record-table.comparison-table.curriculum-table thead th.col-note,
+  table.grade-record-table.comparison-table.curriculum-table tbody td.col-note,
+  table.grade-record-table.comparison-table.curriculum-table thead th.col-dist,
+  table.grade-record-table.comparison-table.curriculum-table tbody td.col-dist {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
   }
   /* 창의적 체험: PC와 같은 표, 줄이지 말고 좌우 스크롤만 */
   .table-scroll:has(> .creative-activity-table) {

@@ -2373,11 +2373,43 @@ input {
     max-width: 100%;
   }
 
-  .admit-data-table,
-  .comparison-table,
-  .table-scroll > table {
-    min-width: 640px;
-    width: max-content;
+  /* 목록 표: 양끝 맞춤 */
+  .admit-data-table {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+  }
+
+  /* 가이드·부록 표 전부 양끝 맞춤 (창의적 체험표만 예외 스크롤) */
+  .comparison-table:not(.creative-activity-table),
+  .glossary-table,
+  .schedule-table,
+  .subject-table,
+  .mistake-table,
+  .table-scroll > table:not(.creative-activity-table) {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+  }
+
+  .table-scroll > table:not(.creative-activity-table) th,
+  .table-scroll > table:not(.creative-activity-table) td,
+  .comparison-table:not(.creative-activity-table) th,
+  .comparison-table:not(.creative-activity-table) td,
+  .glossary-table th,
+  .glossary-table td,
+  .schedule-table th,
+  .schedule-table td,
+  .subject-table th,
+  .subject-table td,
+  .mistake-table th,
+  .mistake-table td {
+    white-space: normal;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    min-width: 0;
     max-width: none;
   }
 

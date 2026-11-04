@@ -1263,31 +1263,51 @@ body.page-title-body {
     max-width: 100% !important;
   }
 
-  /* 줄바꿈 없이 스크롤 (창의적 체험표 제외) */
+  /* 가이드 표 전부 양끝 맞춤 (창의적 체험만 예외) */
   .table-scroll > table:not(.creative-activity-table),
-  .table-scroll > .comparison-table:not(.creative-activity-table),
-  .table-scroll > .comparison-table.curriculum-table:not(.creative-activity-table) {
-    table-layout: auto !important;
-    width: max-content !important;
-    min-width: 190mm !important;
-    max-width: none !important;
+  .page table:not(.creative-activity-table),
+  table.comparison-table:not(.creative-activity-table),
+  table.glossary-table,
+  table.schedule-table,
+  table.subject-table,
+  table.mistake-table,
+  .comparison-table.curriculum-table:not(.creative-activity-table) {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
   }
 
   .table-scroll > table:not(.creative-activity-table) th,
-  .table-scroll > table:not(.creative-activity-table) td {
+  .table-scroll > table:not(.creative-activity-table) td,
+  .page table:not(.creative-activity-table) th,
+  .page table:not(.creative-activity-table) td,
+  .comparison-table.curriculum-table:not(.creative-activity-table) th,
+  .comparison-table.curriculum-table:not(.creative-activity-table) td {
     white-space: normal !important;
     word-break: keep-all !important;
     overflow-wrap: break-word !important;
+    min-width: 0 !important;
+    max-width: none !important;
   }
 
-  .eval-process-table {
+  /* 인쇄용 mm 고정 열(성적·기록 등) → 좁은 화면에서 풀어 양끝 채움 */
+  table.grade-record-table.comparison-table.curriculum-table thead th,
+  table.grade-record-table.comparison-table.curriculum-table tbody td,
+  table.grade-record-table.comparison-table.curriculum-table thead th.col-subject,
+  table.grade-record-table.comparison-table.curriculum-table tbody td.col-subject,
+  table.grade-record-table.comparison-table.curriculum-table thead th.col-note,
+  table.grade-record-table.comparison-table.curriculum-table tbody td.col-note,
+  table.grade-record-table.comparison-table.curriculum-table thead th.col-dist,
+  table.grade-record-table.comparison-table.curriculum-table tbody td.col-dist {
+    width: auto !important;
     min-width: 0 !important;
-    width: max-content !important;
+    max-width: none !important;
   }
 
   .eval-process-table td:nth-child(3) {
-    white-space: nowrap !important;
-    width: 1% !important;
+    white-space: normal !important;
+    width: auto !important;
     min-width: 0 !important;
   }
 
