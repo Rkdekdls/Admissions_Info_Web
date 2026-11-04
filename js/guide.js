@@ -875,10 +875,13 @@ const Guide = (() => {
       return;
     }
 
-    const pad = { top: 16, right: 12, bottom: 44, left: 48 };
+    /* Y축은 스크롤 밖 고정, 플롯만 가로 스크롤 */
+    const yAxisW = 48;
+    const pad = { top: 16, right: 12, bottom: 44, left: 8 };
     const plotH = 280;
     const visibleSlots = window.matchMedia("(max-width: 860px)").matches ? 5 : 10;
-    const availW = Math.max((body.clientWidth || root.clientWidth || 640) - pad.left - pad.right, 480);
+    const frameW = body.clientWidth || root.clientWidth || 640;
+    const availW = Math.max(frameW - yAxisW - pad.left - pad.right, 480);
     const colW = availW / visibleSlots;
     const slotCount = Math.max(series.length, visibleSlots);
     const plotW = slotCount * colW;
@@ -889,11 +892,17 @@ const Guide = (() => {
     const groupClass = { ga: "is-ga", na: "is-na", da: "is-da" };
     const yTicks = [100, 80, 60, 40, 20, 0];
 
+    const yLabels = yTicks
+      .map((v) => {
+        const y = yAt(v);
+        return `<text class="admit-jeongsi-y" x="${yAxisW - 10}" y="${y + 4}" text-anchor="end">${v}</text>`;
+      })
+      .join("");
+
     const hGrid = yTicks
       .map((v) => {
         const y = yAt(v);
-        return `<line class="admit-jeongsi-grid" x1="${pad.left}" y1="${y}" x2="${pad.left + plotW}" y2="${y}" />
-          <text class="admit-jeongsi-y" x="${pad.left - 14}" y="${y + 4}" text-anchor="end">${v}</text>`;
+        return `<line class="admit-jeongsi-grid" x1="${pad.left}" y1="${y}" x2="${pad.left + plotW}" y2="${y}" />`;
       })
       .join("");
 
@@ -905,7 +914,7 @@ const Guide = (() => {
         const cls = groupClass[item.groupKey] || "is-ga";
         const span = Math.abs(item.max - item.min);
         /* 위끝=max 고정 → 왼쪽(max↑)에서 오른쪽(max↓)으로 내려가는 모양 */
-        const barW = 20;
+        const barW = 28;
         const barTop = Math.min(yMax, yMin);
         const barH = span < 0.05 ? barW : Math.max(barW, Math.abs(yMin - yMax));
         const mark = `<rect x="${x - barW / 2}" y="${barTop}" width="${barW}" height="${barH}" rx="0" />`;
@@ -916,10 +925,19 @@ const Guide = (() => {
       })
       .join("");
 
-    body.innerHTML = `<svg class="admit-jeongsi-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" preserveAspectRatio="xMinYMid meet" role="img" aria-label="대학별 백분위 평균 분포">
-        ${hGrid}
-        ${marks}
-      </svg>`;
+    body.innerHTML = `<div class="admit-jeongsi-chart-frame">
+        <div class="admit-jeongsi-y-stick" aria-hidden="true">
+          <svg class="admit-jeongsi-y-svg" width="${yAxisW}" height="${height}" viewBox="0 0 ${yAxisW} ${height}" preserveAspectRatio="xMinYMid meet">
+            ${yLabels}
+          </svg>
+        </div>
+        <div class="admit-jeongsi-chart-scroll">
+          <svg class="admit-jeongsi-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" preserveAspectRatio="xMinYMid meet" role="img" aria-label="대학별 백분위 평균 분포">
+            ${hGrid}
+            ${marks}
+          </svg>
+        </div>
+      </div>`;
   }
 
   function jeongsiUnitTableHtml() {
@@ -1729,10 +1747,9 @@ const Guide = (() => {
           }
           .page.is-slice-view > .is-slice-off {
             display: none !important;
+            margin: 0 !important;
           }
-          .page.is-slice-view > .title-3 {
-            margin-top: 18px !important;
-            margin-bottom: 18px !important;
+          .page.is-slice-view > .title-3:not(.is-slice-off) {
             font-size: 17px !important;
             line-height: 1.4 !important;
             font-weight: 600 !important;
@@ -1774,6 +1791,30 @@ const Guide = (() => {
     const stack = block.querySelector(".book-stack");
     if (stack) stack.before(nav);
 
+    /* 보이는 블록만: 위 0 / 아래 18px / 마지막 0 — 상하 이중 여백 금지 */
+    const applySliceSpacing = (page) => {
+      const visible = [...page.children].filter(
+        (el) => el.nodeType === 1 && !el.classList.contains("is-slice-off") && el.tagName !== "STYLE"
+      );
+      visible.forEach((el, index) => {
+        el.style.removeProperty("margin");
+        el.style.removeProperty("margin-top");
+        el.style.removeProperty("margin-bottom");
+        el.style.setProperty("margin-top", "0px", "important");
+        el.style.setProperty(
+          "margin-bottom",
+          index === visible.length - 1 ? "0px" : "18px",
+          "important"
+        );
+        if (el.classList.contains("table-scroll")) {
+          el.querySelectorAll(":scope > table").forEach((table) => {
+            table.style.setProperty("margin-top", "0px", "important");
+            table.style.setProperty("margin-bottom", "0px", "important");
+          });
+        }
+      });
+    };
+
     const show = (id) => {
       nav.querySelectorAll(".slice-tab").forEach((button) => {
         const on = button.dataset.slice === id;
@@ -1790,6 +1831,7 @@ const Guide = (() => {
           if (on) any = true;
         });
         sheet.classList.toggle("is-slice-off", !any);
+        if (any) applySliceSpacing(page);
       });
     };
 

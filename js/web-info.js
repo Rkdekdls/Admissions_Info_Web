@@ -734,9 +734,9 @@ const WebInfo = (() => {
 
   const bookVars = `
     :host {
-      --color-primary: #3B82F6;
-      --color-primary-light: #60A5FA;
-      --color-primary-dark: #2563EB;
+      --color-primary: #1A4796;
+      --color-primary-light: #7AA8DB;
+      --color-primary-dark: #123A7A;
       --color-accent: #FF6B35;
       --color-accent-light: #FF8C5A;
       --color-text: #1F2937;
@@ -744,7 +744,7 @@ const WebInfo = (() => {
       --color-text-lighter: #9CA3AF;
       --color-bg: #FFFFFF;
       --color-bg-warm: #FAFAFA;
-      --color-bg-blue: #E3F2FD;
+      --color-bg-blue: #E2EBF6;
       --color-border: #E5E7EB;
       --color-border-light: #F0F0F0;
       --color-shadow: rgba(0, 0, 0, 0.06);
@@ -783,29 +783,73 @@ const WebInfo = (() => {
     .report-title {
       display: none !important;
     }
-    .page > :first-child {
+    /* 이중 여백 금지: 페이지 자식은 위쪽 마진 0 (간격은 아래 18px만) */
+    .page > * {
       margin-top: 0 !important;
     }
     .page > :last-child {
       margin-bottom: 0 !important;
     }
-    .section-heading {
-      margin-top: 18px !important;
-      margin-bottom: 18px !important;
+    .page.is-slice-view > .is-slice-off {
+      display: none !important;
+      margin: 0 !important;
     }
-    .page > .section-heading:first-child,
-    .page > :first-child > .section-heading:first-child {
+    .title-3,
+    .section-heading,
+    .item-heading,
+    .text-body,
+    .table-scroll,
+    .comparison-table,
+    .report-box,
+    .tip-box,
+    .info-box,
+    .comparison-container,
+    .checkpoint-container,
+    .icon-grid,
+    .grade-track,
+    .mobile-stack,
+    .flow-row {
       margin-top: 0 !important;
     }
-    .page > .section-heading:last-child,
-    .page > :last-child > .section-heading:last-child {
+    .table-scroll {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+    .table-scroll > table,
+    .table-scroll > .comparison-table {
+      margin-top: 0 !important;
       margin-bottom: 0 !important;
     }
-    .section-heading + * {
+    /* tip/info: 내부 상하 패딩 동일 + 실선·불투명 (반투명·blur 번짐 방지) */
+    .tip-box,
+    .info-box {
+      padding: 18px !important;
+      box-sizing: border-box !important;
+      background-color: #f5f5f5 !important;
+      border: 1px solid #e5e7eb !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      box-shadow: none !important;
+    }
+    .report-box-blue {
+      background-color: #f5f5f5 !important;
+      border: 1px solid #e5e7eb !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      box-shadow: none !important;
+    }
+    .tip-box > *:first-child,
+    .info-box > *:first-child {
       margin-top: 0 !important;
     }
-    :has(+ .section-heading) {
+    .tip-box > *:last-child,
+    .info-box > *:last-child {
       margin-bottom: 0 !important;
+    }
+    .tip-box .tip-title,
+    .info-box .info-title {
+      margin-top: 0 !important;
+      margin-bottom: 12px !important;
     }
     .flow-row,
     .icon-grid {
@@ -817,7 +861,9 @@ const WebInfo = (() => {
       box-sizing: border-box !important;
     }
     .icon-grid {
-      margin: 8px 0 16px !important;
+      /* 상하 간격은 applyBlockSpacing(18px)만 사용 */
+      margin-left: 0 !important;
+      margin-right: 0 !important;
     }
     .flow-row > .flow-item,
     .icon-grid > .flow-item {
@@ -872,13 +918,11 @@ const WebInfo = (() => {
       line-height: normal !important;
       transform: none !important;
     }
-    .icon-grid {
-      align-items: flex-start !important;
-      gap: 4mm !important;
-      margin: 1mm 0 0 !important;
-    }
-    .icon-grid + .report-box {
-      margin-top: 4mm !important;
+    .icon-grid,
+    .comparison-container,
+    .equal-card-row {
+      align-items: stretch !important;
+      gap: 18px !important;
     }
     .icon-grid .flow-card {
       border: 1px solid #E5E7EB !important;
@@ -892,7 +936,7 @@ const WebInfo = (() => {
     .icon-grid .flow-card > div:nth-child(2) {
       font-size: 15px !important;
       font-weight: 700 !important;
-      color: #3B82F6 !important;
+      color: #1A4796 !important;
       margin: 0 0 2mm !important;
     }
     .icon-grid .flow-card > div:nth-child(3) {
@@ -934,6 +978,14 @@ const WebInfo = (() => {
     page.querySelectorAll(".title-2").forEach((node) => node.remove());
     page.querySelectorAll(".title-3").forEach((node) => {
       if (/^\s*\d+\s*-\s*\d+/.test(node.textContent || "")) node.classList.add("section-heading");
+    });
+    /* ① ② … / <표제목> 소항목 라벨 → 소제목과 동일 상하 18px */
+    [...page.children].forEach((node) => {
+      if (!node.classList?.contains("text-body") && !node.classList?.contains("section-title")) return;
+      const t = (node.textContent || "").trim();
+      if (/^[①②③④⑤⑥⑦⑧⑨⑩⑪⑫]/.test(t) || /^[〈<＜].+[〉>＞]$/.test(t)) {
+        node.classList.add("item-heading");
+      }
     });
     page.querySelectorAll(".icon-grid").forEach((grid) => {
       [...grid.children].forEach((item) => {
@@ -1060,10 +1112,19 @@ const WebInfo = (() => {
     const shadow = sheet.attachShadow({ mode: "open" });
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "css/page.css?v=38";
+    link.href = "css/page.css?v=46";
     const extra = document.createElement("style");
     extra.textContent = `${[...doc.querySelectorAll("style")].map((node) => node.textContent).join("\n")}\n${bookVars}
 @media (max-width: 860px) {
+  .page.is-slice-view > .is-slice-off {
+    display: none !important;
+    margin: 0 !important;
+  }
+  .table-scroll > table,
+  .table-scroll > .comparison-table {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
   /* 플로우(과목선택→…): 세로 배치 + 박스 양측(가로) 맞춤 */
   .flow-row {
     flex-direction: column !important;
@@ -1108,7 +1169,7 @@ const WebInfo = (() => {
     flex-direction: column !important;
     align-items: stretch !important;
     justify-content: flex-start !important;
-    gap: 3mm !important;
+    gap: 18px !important;
     width: 100% !important;
   }
   .icon-grid > .flow-item {
@@ -1125,10 +1186,11 @@ const WebInfo = (() => {
     min-height: 72px !important;
   }
   .comparison-container,
-  .checkpoint-container {
+  .checkpoint-container,
+  .equal-card-row {
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 4mm !important;
+    gap: 18px !important;
   }
   .checkpoint-container {
     gap: 6mm !important;
@@ -1318,7 +1380,7 @@ li::before {
   font-size: 13px !important;
 }
 .pie-label {
-  font-size: 13px !important;
+  font-size: 12px !important;
 }
 @media (max-width: 860px) {
   .pie-label {
@@ -1394,7 +1456,7 @@ li::before {
     /* 표 래퍼 + 창의적 체험표 열 비율 강제 */
     const isNarrow = window.matchMedia("(max-width: 860px)").matches;
     page.querySelectorAll(".pie-label").forEach((node) => {
-      const size = isNarrow ? "15" : "13";
+      const size = isNarrow ? "15" : "12";
       node.setAttribute("font-size", size);
       node.style.setProperty("font-size", `${size}px`, "important");
     });
@@ -1440,6 +1502,66 @@ li::before {
         wrap.style.setProperty("-webkit-overflow-scrolling", "touch", "important");
         wrap.style.setProperty("width", "100%", "important");
         wrap.style.setProperty("max-width", "100%", "important");
+      }
+    });
+    /* 인라인 flex 카드 행: 카드 사이 gap만 18px (내부 디자인은 원본 유지) */
+    page.querySelectorAll("div").forEach((row) => {
+      if (
+        row.classList.contains("icon-grid") ||
+        row.classList.contains("comparison-container") ||
+        row.classList.contains("flow-row") ||
+        row.classList.contains("grade-track") ||
+        row.classList.contains("chart-compare") ||
+        row.closest(".chart-compare")
+      ) {
+        return;
+      }
+      const rowStyle = row.getAttribute("style") || "";
+      if (!/display:\s*flex/i.test(rowStyle) || /flex-direction:\s*column/i.test(rowStyle)) return;
+      const kids = [...row.children];
+      if (kids.length < 2 || kids.length > 6) return;
+      if (!kids.every((kid) => /flex:\s*1/.test(kid.getAttribute("style") || ""))) return;
+      row.classList.add("equal-card-row");
+      row.style.setProperty("gap", "18px", "important");
+    });
+    page.querySelectorAll(".icon-grid, .comparison-container").forEach((row) => {
+      row.style.setProperty("gap", "18px", "important");
+    });
+    /* tip/info 박스 내부 상하 패딩 강제 통일 (인라인 !important 덮어씀) */
+    page.querySelectorAll(".tip-box, .info-box").forEach((box) => {
+      box.style.removeProperty("padding");
+      box.style.removeProperty("padding-top");
+      box.style.removeProperty("padding-bottom");
+      box.style.removeProperty("padding-left");
+      box.style.removeProperty("padding-right");
+      box.style.setProperty("padding", "18px", "important");
+      box.querySelectorAll(".tip-title, .info-title").forEach((title) => {
+        title.style.removeProperty("margin");
+        title.style.removeProperty("margin-top");
+        title.style.removeProperty("margin-bottom");
+        title.style.setProperty("margin-top", "0px", "important");
+        title.style.setProperty("margin-bottom", "12px", "important");
+      });
+    });
+    /* 블록 간격 단일화: 위 0 · 아래 18px · 마지막 0 (상하 이중 여백 금지) */
+    const flowNodes = [...page.children].filter(
+      (node) => node.nodeType === 1 && node.tagName !== "STYLE"
+    );
+    flowNodes.forEach((node, index) => {
+      node.style.removeProperty("margin");
+      node.style.removeProperty("margin-top");
+      node.style.removeProperty("margin-bottom");
+      node.style.setProperty("margin-top", "0px", "important");
+      node.style.setProperty(
+        "margin-bottom",
+        index === flowNodes.length - 1 ? "0px" : "18px",
+        "important"
+      );
+      if (node.classList.contains("table-scroll")) {
+        node.querySelectorAll(":scope > table").forEach((table) => {
+          table.style.setProperty("margin-top", "0px", "important");
+          table.style.setProperty("margin-bottom", "0px", "important");
+        });
       }
     });
     const tableForce = document.createElement("style");

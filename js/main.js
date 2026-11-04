@@ -109,7 +109,11 @@ function setCrumb(tab, section) {
     crumbSection.textContent = label;
     crumbSection.hidden = !showSection;
   }
-  if (crumbSectionSep) crumbSectionSep.hidden = !showSection;
+  /* 다음 단계 없으면 화살표도 숨김 (SVG hidden 미지원 대비 display) */
+  if (crumbSectionSep) {
+    crumbSectionSep.hidden = !showSection;
+    crumbSectionSep.style.display = showSection ? "" : "none";
+  }
 }
 
 window.syncGuideHash = (tab, section) => {

@@ -1,12 +1,12 @@
-:root {
-  --sidebar: #f3f6fc;
+﻿:root {
+  --sidebar: #EEF2F8;
   --sidebar-line: #e5e7eb;
   --nav-text: #1f2937;
   --nav-muted: #6b7280;
-  --nav-active: #3b82f6;
-  --mega: #3b82f6;
+  --nav-active: #1A4796;
+  --mega: #1A4796;
   --foot: #9ca3af;
-  --kicker: #3b82f6;
+  --kicker: #1A4796;
   --title: #1f2937;
   --lead: #6b7280;
   --body: #4b5563;
@@ -244,12 +244,12 @@ input {
 }
 
 .tab:hover {
-  color: #1653c9;
+  color: #0A2F6E;
 }
 
 .tab.is-active,
 .tab.is-active:hover {
-  background: #1653c9;
+  background: #0A2F6E;
   color: #fff;
   font-weight: 600;
 }
@@ -257,7 +257,7 @@ input {
 .tab:focus-visible,
 .nav-parent:focus-visible,
 .sidebar-toggle:focus-visible {
-  outline: 2px solid #93c5fd;
+  outline: 2px solid #B5D0EF;
   outline-offset: 2px;
 }
 
@@ -365,6 +365,11 @@ input {
   height: 12px;
 }
 
+/* SVG는 [hidden]이 무시되는 브라우저가 있어 강제 숨김 */
+.crumb [hidden] {
+  display: none !important;
+}
+
 .panel {
   width: 100%;
   padding-top: 30px;
@@ -465,15 +470,30 @@ input {
 
 .section-tab:hover,
 .cross-link:hover {
-  color: #3b82f6;
+  color: #1A4796;
 }
 
 .section-tab.is-active,
 .section-tab.is-active:hover {
+  position: relative;
   color: #1f2937;
   background: var(--sidebar);
   font-weight: 600;
-  box-shadow: inset 0 -2px 0 #3b82f6;
+  /* 밑줄은 의사요소 — inset shadow/두꺼운 border가 좌우로 번지지 않게 */
+  border-bottom-color: transparent;
+  box-shadow: none;
+  z-index: 1;
+}
+
+.section-tab.is-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: #1A4796;
+  pointer-events: none;
 }
 
 .guide-block[hidden] {
@@ -506,7 +526,7 @@ input {
 .book-flow {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 18px; /* 페이지(시트) 사이만 — 페이지 안 간격은 블록 margin-bottom 18px */
   width: 100%;
 }
 
@@ -524,7 +544,7 @@ input {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin: 0;
+  margin: 0 0 18px;
 }
 
 .slice-tab {
@@ -549,14 +569,14 @@ input {
 
 .slice-tab:hover {
   border-color: #d1d5db;
-  color: #3B82F6;
+  color: #1A4796;
 }
 
 .slice-tab.is-active,
 .slice-tab.is-active:hover {
   border-color: #d1d5db;
   background: #fafafa !important;
-  color: #3B82F6;
+  color: #1A4796;
   font-weight: 600;
 }
 
@@ -568,7 +588,7 @@ input {
                   .admit-search-select   14 / 500 / #1F2937 · h39
   4) 박스 제목     .admit-search-detail-title  15 / 600 / #1F2937 (선택 교과와 동일)
   5) 보조 액션     .admit-search-toggle        14 / 600 / #6B7280
-  6) 소제목       .admit-theme-label          15 / 600 / #1F2937 (+ ■ #3B82F6)
+  6) 소제목       .admit-theme-label          15 / 600 / #1F2937 (+ ■ #1A4796)
   7) 필터 칩      .admit-theme-list .slice-tab 14 / 500→600 / h39 (학생부 slice-tab 동일)
   8) 학과 유형    .admit-theme-card           아이콘 카드 3열
 */
@@ -577,7 +597,7 @@ input {
   --admit-text: #1f2937;
   --admit-muted: #6b7280;
   --admit-placeholder: #9ca3af;
-  --admit-accent: #3b82f6;
+  --admit-accent: #1A4796;
   --admit-control-h: 39px;
   margin: 0 0 24px;
   padding: 0;
@@ -699,6 +719,33 @@ input {
 
 .admit-jeongsi-chart-body {
   width: 100%;
+}
+
+.admit-jeongsi-chart-frame {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Y축 숫자: 가로 스크롤과 분리해 PC·모바일 모두 고정 */
+.admit-jeongsi-y-stick {
+  flex: 0 0 48px;
+  width: 48px;
+  background: #fff;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.admit-jeongsi-y-svg {
+  display: block;
+  width: 48px;
+  height: auto;
+}
+
+.admit-jeongsi-chart-scroll {
+  flex: 1 1 auto;
+  min-width: 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 5px;
@@ -706,20 +753,20 @@ input {
   scrollbar-color: #d1d5db transparent;
 }
 
-.admit-jeongsi-chart-body::-webkit-scrollbar {
+.admit-jeongsi-chart-scroll::-webkit-scrollbar {
   height: 6px;
 }
 
-.admit-jeongsi-chart-body::-webkit-scrollbar-track {
+.admit-jeongsi-chart-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.admit-jeongsi-chart-body::-webkit-scrollbar-thumb {
+.admit-jeongsi-chart-scroll::-webkit-scrollbar-thumb {
   background: #d1d5db;
   border-radius: 3px;
 }
 
-.admit-jeongsi-chart-body::-webkit-scrollbar-thumb:hover {
+.admit-jeongsi-chart-scroll::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
 
@@ -866,13 +913,19 @@ input {
 }
 
 .admit-data-table thead th {
-  background-color: #3b82f6;
+  background-color: #1A4796;
   color: #fff;
   font-weight: 600;
   height: 12mm !important;
   padding: 3mm 2mm !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+  border-bottom-color: #1A4796;
+  border-right-color: rgba(255, 255, 255, 0.18);
+}
+
+.admit-data-table thead th:last-child {
+  border-right: none;
 }
 
 .admit-data-table .admit-jeongsi-score {
@@ -941,8 +994,8 @@ input {
 }
 
 .admit-data-table .admit-data-view:hover {
-  border-color: #93c5fd;
-  color: #3b82f6;
+  border-color: #B5D0EF;
+  color: #1A4796;
 }
 
 .admit-search-field {
@@ -988,7 +1041,7 @@ input {
 
 .admit-search-field input:focus,
 .admit-search-select:focus {
-  border-color: #93c5fd;
+  border-color: #B5D0EF;
 }
 
 .admit-search-select {
@@ -1046,11 +1099,11 @@ input {
 }
 
 .admit-select-trigger:focus {
-  border-color: #93c5fd;
+  border-color: #B5D0EF;
 }
 
 .admit-select.is-open .admit-select-trigger {
-  border-color: #93c5fd;
+  border-color: #B5D0EF;
 }
 
 .admit-select-menu {
@@ -1096,12 +1149,12 @@ input {
 }
 
 .admit-select-option.is-selected {
-  background: #f3f6fc;
+  background: #EEF2F8;
   color: var(--admit-text);
 }
 
 .admit-select-option.is-selected:hover {
-  background: #f3f6fc;
+  background: #EEF2F8;
 }
 
 .admit-select-option.is-disabled {
@@ -1112,8 +1165,11 @@ input {
 .admit-search-detail {
   margin: 0;
   padding: 0;
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  background: rgba(245, 245, 245, 0.6);
+  border: 1px solid #e5e7eb;
+  background: #f5f5f5;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
 }
 
 .admit-search-detail-head {
@@ -1313,7 +1369,7 @@ input {
 }
 
 .admit-theme-card:hover {
-  border-color: #93c5fd;
+  border-color: #B5D0EF;
 }
 
 /* 학과 유형별: 클릭 선택 표시 없음 (호버만) */
@@ -1337,7 +1393,7 @@ input {
 
 .admit-theme-list .slice-tab:hover {
   border-color: #e5e7eb;
-  color: #3b82f6;
+  color: #1A4796;
   font-weight: 500;
 }
 
@@ -1364,21 +1420,21 @@ input {
 
 .slice-tab.is-dashed {
   border-style: dashed;
-  border-color: #93c5fd;
+  border-color: #B5D0EF;
   color: #4b5563;
 }
 
 .slice-tab.is-dashed:hover {
-  border-color: #60a5fa;
-  color: #3b82f6;
+  border-color: #7AA8DB;
+  color: #1A4796;
 }
 
 .slice-tab.is-dashed.is-active,
 .slice-tab.is-dashed.is-active:hover {
   border-style: solid;
-  border-color: #3b82f6;
-  background: #eff6ff !important;
-  color: #1d4ed8;
+  border-color: #1A4796;
+  background: #E8EFF6 !important;
+  color: #123A7A;
 }
 
 @media (max-width: 1100px) {
@@ -2214,6 +2270,7 @@ input {
     width: 100%;
     max-width: 100%;
     gap: 8px;
+    margin: 0 0 18px;
   }
 
   .slice-tab {
@@ -2328,7 +2385,7 @@ input {
     position: sticky;
     left: 0;
     z-index: 2;
-    background: #3b82f6;
+    background: #1A4796;
   }
 
   .admit-data-table tbody tr.is-alt .admit-data-name {
