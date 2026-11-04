@@ -1263,27 +1263,27 @@ body.page-title-body {
     max-width: 100% !important;
   }
 
-  /* 가이드 표 전부 양끝 맞춤 (창의적 체험만 예외) */
-  .table-scroll > table:not(.creative-activity-table),
-  .page table:not(.creative-activity-table),
-  table.comparison-table:not(.creative-activity-table),
+  /* 가이드 표 전부 양끝 맞춤 (창의적 체험 포함) */
+  .table-scroll > table,
+  .page table,
+  table.comparison-table,
   table.glossary-table,
   table.schedule-table,
   table.subject-table,
   table.mistake-table,
-  .comparison-table.curriculum-table:not(.creative-activity-table) {
+  .comparison-table.curriculum-table {
     width: 100% !important;
     min-width: 100% !important;
     max-width: 100% !important;
     table-layout: fixed !important;
   }
 
-  .table-scroll > table:not(.creative-activity-table) th,
-  .table-scroll > table:not(.creative-activity-table) td,
-  .page table:not(.creative-activity-table) th,
-  .page table:not(.creative-activity-table) td,
-  .comparison-table.curriculum-table:not(.creative-activity-table) th,
-  .comparison-table.curriculum-table:not(.creative-activity-table) td {
+  .table-scroll > table th,
+  .table-scroll > table td,
+  .page table th,
+  .page table td,
+  .comparison-table.curriculum-table th,
+  .comparison-table.curriculum-table td {
     white-space: normal !important;
     word-break: keep-all !important;
     overflow-wrap: break-word !important;
@@ -1311,12 +1311,12 @@ body.page-title-body {
     min-width: 0 !important;
   }
 
-  /* 창의적 체험: PC와 동일 레이아웃, 스크롤만 */
+  /* 창의적 체험: 양끝 맞춤 + 열 비율 유지 */
   .table-scroll > table.creative-activity-table {
     table-layout: fixed !important;
-    width: 720px !important;
-    min-width: 720px !important;
-    max-width: none !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
   }
 
   .table-scroll > table.creative-activity-table col:nth-child(1) { width: 8% !important; }
@@ -1330,6 +1330,9 @@ body.page-title-body {
   .table-scroll > table.creative-activity-table td > div {
     white-space: normal !important;
     min-width: 0 !important;
+    max-width: none !important;
+    word-break: keep-all !important;
+    overflow-wrap: break-word !important;
   }
 }
 

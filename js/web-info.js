@@ -772,38 +772,43 @@ const WebInfo = (() => {
       box-shadow: none !important;
       margin: 0 !important;
     }
-    /* 좁은 화면: 모든 가이드 표 양끝 맞춤 (창의적 체험표만 스크롤 예외) */
+    /* 좁은 화면: 모든 가이드 표 양끝 맞춤 (창의적 체험 포함) */
     @media (max-width: 860px) {
       .table-scroll {
         display: block !important;
         width: 100% !important;
         max-width: 100% !important;
       }
-      .table-scroll > table:not(.creative-activity-table),
-      .page table:not(.creative-activity-table),
-      table.comparison-table:not(.creative-activity-table),
+      .table-scroll > table,
+      .page table,
+      table.comparison-table,
       table.glossary-table,
       table.schedule-table,
       table.subject-table,
       table.mistake-table,
-      .comparison-table.curriculum-table:not(.creative-activity-table) {
+      .comparison-table.curriculum-table {
         width: 100% !important;
         min-width: 100% !important;
         max-width: 100% !important;
         table-layout: fixed !important;
       }
-      .table-scroll > table:not(.creative-activity-table) th,
-      .table-scroll > table:not(.creative-activity-table) td,
-      .page table:not(.creative-activity-table) th,
-      .page table:not(.creative-activity-table) td,
-      .comparison-table.curriculum-table:not(.creative-activity-table) th,
-      .comparison-table.curriculum-table:not(.creative-activity-table) td {
+      .table-scroll > table th,
+      .table-scroll > table td,
+      .page table th,
+      .page table td,
+      .comparison-table.curriculum-table th,
+      .comparison-table.curriculum-table td {
         white-space: normal !important;
         word-break: keep-all !important;
         overflow-wrap: break-word !important;
         min-width: 0 !important;
         max-width: none !important;
       }
+      .table-scroll > table.creative-activity-table col:nth-child(1) { width: 8% !important; }
+      .table-scroll > table.creative-activity-table col:nth-child(2) { width: 15% !important; }
+      .table-scroll > table.creative-activity-table col:nth-child(3) { width: 8% !important; }
+      .table-scroll > table.creative-activity-table col:nth-child(4) { width: 15% !important; }
+      .table-scroll > table.creative-activity-table col:nth-child(5) { width: 54% !important; }
       table.grade-record-table.comparison-table.curriculum-table thead th,
       table.grade-record-table.comparison-table.curriculum-table tbody td,
       table.grade-record-table.comparison-table.curriculum-table thead th.col-subject,
@@ -1169,7 +1174,7 @@ const WebInfo = (() => {
     const shadow = sheet.attachShadow({ mode: "open" });
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "css/page.css?v=55";
+    link.href = "css/page.css?v=56";
     const extra = document.createElement("style");
     extra.textContent = `${[...doc.querySelectorAll("style")].map((node) => node.textContent).join("\n")}\n${bookVars}
 @media (max-width: 860px) {
@@ -1329,25 +1334,25 @@ const WebInfo = (() => {
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
-  .table-scroll > table:not(.creative-activity-table),
-  .page table:not(.creative-activity-table),
-  table.comparison-table:not(.creative-activity-table),
+  .table-scroll > table,
+  .page table,
+  table.comparison-table,
   table.glossary-table,
   table.schedule-table,
   table.subject-table,
   table.mistake-table,
-  .comparison-table.curriculum-table:not(.creative-activity-table) {
+  .comparison-table.curriculum-table {
     width: 100% !important;
     min-width: 100% !important;
     max-width: 100% !important;
     table-layout: fixed !important;
   }
-  .table-scroll > table:not(.creative-activity-table) th,
-  .table-scroll > table:not(.creative-activity-table) td,
-  .page table:not(.creative-activity-table) th,
-  .page table:not(.creative-activity-table) td,
-  .comparison-table.curriculum-table:not(.creative-activity-table) th,
-  .comparison-table.curriculum-table:not(.creative-activity-table) td {
+  .table-scroll > table th,
+  .table-scroll > table td,
+  .page table th,
+  .page table td,
+  .comparison-table.curriculum-table th,
+  .comparison-table.curriculum-table td {
     white-space: normal !important;
     word-break: keep-all !important;
     overflow-wrap: break-word !important;
@@ -1366,22 +1371,11 @@ const WebInfo = (() => {
     min-width: 0 !important;
     max-width: none !important;
   }
-  /* 창의적 체험(모바일): PC와 동일, 스크롤만 */
-  .table-scroll:has(> .creative-activity-table) {
-    overflow-x: auto !important;
-  }
-  .table-scroll > table.creative-activity-table {
-    table-layout: fixed !important;
-    width: 720px !important;
-    min-width: 720px !important;
-    max-width: none !important;
-  }
-  .table-scroll > table.creative-activity-table th,
-  .table-scroll > table.creative-activity-table td,
-  .table-scroll > table.creative-activity-table td > div {
-    white-space: normal !important;
-    min-width: 0 !important;
-  }
+  .table-scroll > table.creative-activity-table col:nth-child(1) { width: 8% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(2) { width: 15% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(3) { width: 8% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(4) { width: 15% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(5) { width: 54% !important; }
   .list-check li::before,
   .tip-box .list-check li::before,
   .info-box .list-check li::before,
@@ -1556,15 +1550,17 @@ li::before {
           col.style.setProperty("width", w, "important");
           group.appendChild(col);
         });
-        /* PC·모바일 동일 레이아웃. 모바일만 고정폭+스크롤 */
+        /* PC·모바일·태블릿 모두 양끝 맞춤 (열 비율 유지) */
         table.style.setProperty("table-layout", "fixed", "important");
-        table.style.setProperty("width", isNarrow ? "720px" : "100%", "important");
-        table.style.setProperty("min-width", isNarrow ? "720px" : "0", "important");
-        table.style.setProperty("max-width", isNarrow ? "none" : "100%", "important");
+        table.style.setProperty("width", "100%", "important");
+        table.style.setProperty("min-width", isNarrow ? "100%" : "0", "important");
+        table.style.setProperty("max-width", "100%", "important");
         table.querySelectorAll("th, td, td > div").forEach((el) => {
           el.style.setProperty("white-space", "normal", "important");
           el.style.setProperty("min-width", "0", "important");
+          el.style.setProperty("max-width", "none", "important");
           el.style.setProperty("word-wrap", "break-word", "important");
+          el.style.setProperty("overflow-wrap", "break-word", "important");
         });
         table.querySelectorAll("td > div").forEach((el) => {
           el.style.setProperty("text-align", "justify", "important");
@@ -1599,12 +1595,6 @@ li::before {
       wrap.className = "table-scroll";
       table.replaceWith(wrap);
       wrap.appendChild(table);
-      if (isCreative && isNarrow) {
-        wrap.style.setProperty("overflow-x", "auto", "important");
-        wrap.style.setProperty("-webkit-overflow-scrolling", "touch", "important");
-        wrap.style.setProperty("width", "100%", "important");
-        wrap.style.setProperty("max-width", "100%", "important");
-      }
     });
     /* 인라인 flex 카드 행: 카드 사이 gap만 18px (내부 디자인은 원본 유지) */
     page.querySelectorAll("div").forEach((row) => {
@@ -1686,6 +1676,7 @@ li::before {
 .table-scroll > table.creative-activity-table td > div {
   white-space: normal !important;
   min-width: 0 !important;
+  max-width: none !important;
   word-wrap: break-word !important;
   overflow-wrap: break-word !important;
 }
@@ -1701,25 +1692,25 @@ li::before {
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
-  .table-scroll > table:not(.creative-activity-table),
-  .page table:not(.creative-activity-table),
-  table.comparison-table:not(.creative-activity-table),
+  .table-scroll > table,
+  .page table,
+  table.comparison-table,
   table.glossary-table,
   table.schedule-table,
   table.subject-table,
   table.mistake-table,
-  .comparison-table.curriculum-table:not(.creative-activity-table) {
+  .comparison-table.curriculum-table {
     width: 100% !important;
     min-width: 100% !important;
     max-width: 100% !important;
     table-layout: fixed !important;
   }
-  .table-scroll > table:not(.creative-activity-table) th,
-  .table-scroll > table:not(.creative-activity-table) td,
-  .page table:not(.creative-activity-table) th,
-  .page table:not(.creative-activity-table) td,
-  .comparison-table.curriculum-table:not(.creative-activity-table) th,
-  .comparison-table.curriculum-table:not(.creative-activity-table) td {
+  .table-scroll > table th,
+  .table-scroll > table td,
+  .page table th,
+  .page table td,
+  .comparison-table.curriculum-table th,
+  .comparison-table.curriculum-table td {
     white-space: normal !important;
     word-break: keep-all !important;
     overflow-wrap: break-word !important;
@@ -1738,16 +1729,11 @@ li::before {
     min-width: 0 !important;
     max-width: none !important;
   }
-  /* 창의적 체험: PC와 같은 표, 줄이지 말고 좌우 스크롤만 */
-  .table-scroll:has(> .creative-activity-table) {
-    overflow-x: auto !important;
-  }
-  .table-scroll > table.creative-activity-table {
-    table-layout: fixed !important;
-    width: 720px !important;
-    min-width: 720px !important;
-    max-width: none !important;
-  }
+  .table-scroll > table.creative-activity-table col:nth-child(1) { width: 8% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(2) { width: 15% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(3) { width: 8% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(4) { width: 15% !important; }
+  .table-scroll > table.creative-activity-table col:nth-child(5) { width: 54% !important; }
 }`;
     /* 페이지 인라인 height 고정을 덮어 긴 셀은 줄바꿈·높이 확장 */
     extra.textContent += `

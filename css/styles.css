@@ -2381,23 +2381,23 @@ input {
     table-layout: fixed;
   }
 
-  /* 가이드·부록 표 전부 양끝 맞춤 (창의적 체험표만 예외 스크롤) */
-  .comparison-table:not(.creative-activity-table),
+  /* 가이드·부록 표 전부 양끝 맞춤 (창의적 체험 포함) */
+  .comparison-table,
   .glossary-table,
   .schedule-table,
   .subject-table,
   .mistake-table,
-  .table-scroll > table:not(.creative-activity-table) {
+  .table-scroll > table {
     width: 100%;
     min-width: 100%;
     max-width: 100%;
     table-layout: fixed;
   }
 
-  .table-scroll > table:not(.creative-activity-table) th,
-  .table-scroll > table:not(.creative-activity-table) td,
-  .comparison-table:not(.creative-activity-table) th,
-  .comparison-table:not(.creative-activity-table) td,
+  .table-scroll > table th,
+  .table-scroll > table td,
+  .comparison-table th,
+  .comparison-table td,
   .glossary-table th,
   .glossary-table td,
   .schedule-table th,
