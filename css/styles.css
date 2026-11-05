@@ -1457,6 +1457,25 @@ input {
 
 /* PC(1280px+)만 가로 배치 — 모바일·태블릿(가로·세로)은 한 줄씩 */
 @media (max-width: 1279px) {
+  /* 대탭(일정 및 원서접수 등): 한 줄씩 가로 꽉 차게 */
+  .section-nav {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  .section-tab,
+  .cross-link {
+    width: 100%;
+    justify-content: flex-start;
+    white-space: normal;
+    text-align: left;
+  }
+
   .slice-nav {
     display: flex;
     flex-direction: column;

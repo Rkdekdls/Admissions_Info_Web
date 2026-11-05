@@ -875,16 +875,13 @@ const Guide = (() => {
       return;
     }
 
-    /* Y축은 스크롤 밖 고정, 플롯만 가로 스크롤 */
+    /* Y축은 스크롤 밖 고정, 플롯만 가로 스크롤
+       칸 간격은 PC 기준 고정(화면 너비에 따라 줄이지 않음) → 태블릿·모바일도 동일 크기 + 스크롤 */
     const yAxisW = 48;
     const pad = { top: 16, right: 12, bottom: 44, left: 8 };
     const plotH = 280;
-    const visibleSlots = window.matchMedia("(max-width: 860px)").matches ? 5 : 10;
-    const frameW = body.clientWidth || root.clientWidth || 640;
-    const availW = Math.max(frameW - yAxisW - pad.left - pad.right, 480);
-    const colW = availW / visibleSlots;
-    const slotCount = Math.max(series.length, visibleSlots);
-    const plotW = slotCount * colW;
+    const colW = 84;
+    const plotW = Math.max(series.length, 1) * colW;
     const width = pad.left + plotW + pad.right;
     const height = pad.top + plotH + pad.bottom;
     const yAt = (v) => pad.top + ((100 - v) / 100) * plotH;
