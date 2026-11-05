@@ -3000,24 +3000,29 @@ input {
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  /* PC는 스크롤바 자리·선이 하단 이중 모서리처럼 보이지 않게 */
+  overflow-x: hidden;
   overscroll-behavior-x: contain;
-  /* 좌·상 + 우·하 — 위아래 전폭일 때 우측이 비어/잘려 보이지 않게 */
+  /* 왼쪽·위만 래퍼 — 오른쪽·아래는 셀 border (래퍼까지 주면 이중 모서리) */
   border: 0;
   border-left: 1px solid #e5e7eb;
-  border-right: 1px solid #e5e7eb;
   border-top: 2px solid #1a4796;
-  border-bottom: 1px solid #e5e7eb;
   box-sizing: border-box;
   background: #fff;
 }
 
+@media (max-width: 1279px) {
+  .admit-detail-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 .admit-detail-table {
-  /* 카드가 PC min보다 넓으면(위아래 전폭) 표도 전폭, 좁으면 min 유지 후 스크롤 */
-  width: max(100%, var(--admit-detail-pc-min, 876px));
-  min-width: max(100%, var(--admit-detail-pc-min, 876px));
-  max-width: none;
+  /* PC: 팝업 안에 맞춰 가로 스크롤 없음 */
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   margin: 0;
   border: 0;
   border-collapse: separate;
@@ -3026,6 +3031,15 @@ input {
   background: #fff;
   font-family: "Noto Sans KR", Pretendard, "Segoe UI", sans-serif;
   font-size: 13px;
+}
+
+/* 태블릿·모바일만 PC 최소폭 유지 + 가로 스크롤 */
+@media (max-width: 1279px) {
+  .admit-detail-table {
+    width: max(100%, var(--admit-detail-pc-min, 876px));
+    min-width: max(100%, var(--admit-detail-pc-min, 876px));
+    max-width: none;
+  }
 }
 
 table.admit-detail-table th,
@@ -3094,20 +3108,14 @@ table.admit-detail-table td {
   background: #fafafa;
 }
 
+/* 대학발표 · 어디가: PC·태블릿·모바일 모두 위아래 */
 .admit-detail-result-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 18px;
   margin: 0;
   min-width: 0;
   max-width: 100%;
-}
-
-/* PC(1280+)만 좌우 2열 — 태블릿·모바일은 대학발표 / 어디가 위아래 전폭 */
-@media (max-width: 1279px) {
-  .admit-detail-result-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .admit-detail-result-card {

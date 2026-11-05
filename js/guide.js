@@ -1926,7 +1926,7 @@ const Guide = (() => {
   }
 
   function assignAdmitDetailColWidths(table) {
-    if (table.dataset.declaredColWidths) return;
+    /* 종류별 비율은 항상 최신값으로 — 열 수 바뀌면 우측 빈 칸 방지 */
     if (table.classList.contains("admit-detail-table-method")) {
       table.dataset.declaredColWidths = "18,18,16,16,16,16";
       return;
@@ -1936,15 +1936,20 @@ const Guide = (() => {
       return;
     }
     if (table.classList.contains("admit-detail-table-schedule")) {
-      /* 일정 7열 — 헤더 길이에 맞춘 개별 비율 */
       table.dataset.declaredColWidths = "16,14,14,14,14,14,14";
       return;
     }
     if (table.classList.contains("admit-detail-table-cut")) {
-      table.dataset.declaredColWidths = "24,19,19,19,19";
+      /* 구분 + 결과 연도 3열(2027·2026·2025) */
+      table.dataset.declaredColWidths = "25,25,25,25";
       return;
     }
-    /* trend·uni-trend·기타: 내용 측정 (declared 없음) */
+    if (table.classList.contains("admit-detail-table-trend")) {
+      table.dataset.declaredColWidths = "8,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,14";
+      return;
+    }
+    if (table.dataset.declaredColWidths) return;
+    /* uni-trend·연도형 기타: 측정 후 PC는 컨테이너에 맞춤 */
   }
 
   function admitDetailContentWidth(table) {
@@ -1961,22 +1966,33 @@ const Guide = (() => {
     );
   }
 
+  function isAdmitDetailNarrow() {
+    return window.matchMedia("(max-width: 1279px)").matches;
+  }
+
   function fitAdmitDetailColumns(table) {
     const parentW = admitDetailContentWidth(table);
+    const narrow = isAdmitDetailNarrow();
     const saved = String(table.dataset.declaredColWidths || "")
       .split(",")
       .map((v) => parseFloat(v))
       .filter((v) => Number.isFinite(v) && v > 0);
-    if (saved.length >= 2 && Math.abs(saved.reduce((sum, w) => sum + w, 0) - 100) < 1) {
+    if (saved.length >= 2 && Math.abs(saved.reduce((sum, w) => sum + w, 0) - 100) < 1.5) {
       applyAdmitDetailCols(
         table,
         saved.map((w) => `${w}%`)
       );
-      /* 위아래 전폭이면 카드만큼, 아니면 PC min — 우측 빈 칸 방지 */
-      const floor = Math.max(ADMIT_DETAIL_PC_MIN, parentW);
-      table.style.setProperty("width", `${floor}px`, "important");
-      table.style.setProperty("min-width", `${floor}px`, "important");
-      table.style.setProperty("max-width", "none", "important");
+      if (narrow) {
+        const floor = Math.max(ADMIT_DETAIL_PC_MIN, parentW);
+        table.style.setProperty("width", `${floor}px`, "important");
+        table.style.setProperty("min-width", `${floor}px`, "important");
+        table.style.setProperty("max-width", "none", "important");
+      } else {
+        /* PC: 팝업 폭에 맞춤 — 가로 스크롤 없음 */
+        table.style.setProperty("width", "100%", "important");
+        table.style.setProperty("min-width", "0", "important");
+        table.style.setProperty("max-width", "100%", "important");
+      }
       return;
     }
     const pxWidths = measureAdmitDetailCols(table);
@@ -1986,10 +2002,16 @@ const Guide = (() => {
       table,
       pxWidths.map((w) => `${((w / total) * 100).toFixed(4)}%`)
     );
-    const floor = Math.max(ADMIT_DETAIL_PC_MIN, Math.ceil(total + 2), parentW);
-    table.style.setProperty("width", `${floor}px`, "important");
-    table.style.setProperty("min-width", `${floor}px`, "important");
-    table.style.setProperty("max-width", "none", "important");
+    if (narrow) {
+      const floor = Math.max(ADMIT_DETAIL_PC_MIN, Math.ceil(total + 2), parentW);
+      table.style.setProperty("width", `${floor}px`, "important");
+      table.style.setProperty("min-width", `${floor}px`, "important");
+      table.style.setProperty("max-width", "none", "important");
+    } else {
+      table.style.setProperty("width", "100%", "important");
+      table.style.setProperty("min-width", "0", "important");
+      table.style.setProperty("max-width", "100%", "important");
+    }
   }
 
   function fitAdmitDetailTables(root) {

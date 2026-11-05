@@ -1865,6 +1865,11 @@ li::before {
   max-width: none !important;
   overflow-wrap: normal !important;
 }
+/* 표 외곽선 + 마지막 행 셀 선이 겹쳐 이중 모서리로 보이지 않게 */
+.page .table-scroll > table.comparison-table tbody tr:last-child > th,
+.page .table-scroll > table.comparison-table tbody tr:last-child > td {
+  border-bottom: none !important;
+}
 
 /* 특수 표도 셀 안 가둠 — 열 비율은 내용 길이 측정 JS가 맞춤 */
 table.comparison-table.curriculum-table.attendance-status-table,
