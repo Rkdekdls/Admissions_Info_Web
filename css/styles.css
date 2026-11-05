@@ -3019,7 +3019,7 @@ input {
 }
 
 .admit-detail-table {
-  /* 카드/섹션 폭에 맞춤 — 876 강제 시 대학발표·어디가만 과스크롤·우측 여백 */
+  /* PC: 팝업 폭에 맞춤(스크롤 없음) */
   width: 100%;
   min-width: 0;
   max-width: 100%;
@@ -3031,6 +3031,15 @@ input {
   background: #fff;
   font-family: "Noto Sans KR", Pretendard, "Segoe UI", sans-serif;
   font-size: 13px;
+}
+
+/* 태블릿·모바일: PC 최소폭 유지 + 가로 스크롤 */
+@media (max-width: 1279px) {
+  .admit-detail-table {
+    width: max(100%, var(--admit-detail-pc-min, 876px));
+    min-width: max(100%, var(--admit-detail-pc-min, 876px));
+    max-width: none;
+  }
 }
 
 table.admit-detail-table th,
@@ -3711,9 +3720,9 @@ table.admit-detail-table td {
   }
 
   table.admit-detail-table {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
+    width: max(100%, var(--admit-detail-pc-min, 876px)) !important;
+    min-width: max(100%, var(--admit-detail-pc-min, 876px)) !important;
+    max-width: none !important;
     table-layout: fixed !important;
   }
 
