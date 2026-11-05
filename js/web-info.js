@@ -1147,7 +1147,7 @@ const WebInfo = (() => {
     const shadow = sheet.attachShadow({ mode: "open" });
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "css/page.css?v=58";
+    link.href = "css/page.css?v=66";
     const extra = document.createElement("style");
     extra.textContent = `${[...doc.querySelectorAll("style")].map((node) => node.textContent).join("\n")}\n${bookVars}
 @media (max-width: 860px) {
@@ -1454,44 +1454,241 @@ li::before {
       node.setAttribute("font-size", size);
       node.style.setProperty("font-size", `${size}px`, "important");
     });
+    const applyCols = (table, widths) => {
+      let group = table.querySelector("colgroup");
+      if (!group) {
+        group = document.createElement("colgroup");
+        table.insertBefore(group, table.firstChild);
+      }
+      group.innerHTML = "";
+      widths.forEach((w) => {
+        const col = document.createElement("col");
+        col.style.setProperty("width", w, "important");
+        group.appendChild(col);
+      });
+    };
+    const containCells = (table) => {
+      table.querySelectorAll("th, td").forEach((el) => {
+        el.style.setProperty("width", "auto", "important");
+        el.style.setProperty("min-width", "0", "important");
+        el.style.setProperty("max-width", "none", "important");
+        /* 분포비율·평가과정 1·2열은 한 줄 유지 */
+        const isDist = el.classList.contains("col-dist");
+        const evalTable = el.closest("table.eval-process-table");
+        const evalTight =
+          !!evalTable &&
+          el.cellIndex >= 0 &&
+          el.cellIndex < 2 &&
+          (el.colSpan || 1) === 1;
+        const nowrap = isDist || evalTight;
+        el.style.setProperty("white-space", nowrap ? "nowrap" : "normal", "important");
+        el.style.setProperty("min-width", "0", "important");
+        el.style.setProperty("word-break", "keep-all", "important");
+        el.style.setProperty("overflow-wrap", nowrap ? "normal" : "break-word", "important");
+        el.style.setProperty("overflow", "hidden", "important");
+        el.style.setProperty("box-sizing", "border-box", "important");
+      });
+      table.querySelectorAll("td > div").forEach((el) => {
+        el.style.setProperty("overflow", "hidden", "important");
+        el.style.setProperty("max-width", "100%", "important");
+        el.style.setProperty("word-break", "keep-all", "important");
+        el.style.setProperty("overflow-wrap", "break-word", "important");
+      });
+    };
+    /* 각 열에서 가장 긴 셀(줄바꿈 없이) 기준으로 열 폭 산출 */
+    const measureColumnWidths = (table) => {
+      const probe = table.cloneNode(true);
+      probe.querySelectorAll("colgroup").forEach((node) => node.remove());
+      probe.setAttribute("style", "");
+      probe.style.cssText =
+        "position:absolute;left:-99999px;top:0;visibility:hidden;table-layout:auto;width:max-content;border-collapse:collapse;margin:0;";
+      probe.querySelectorAll("th, td").forEach((cell) => {
+        cell.style.cssText = "";
+        cell.style.setProperty("white-space", "nowrap", "important");
+        cell.style.setProperty("width", "auto", "important");
+        cell.style.setProperty("min-width", "0", "important");
+        cell.style.setProperty("max-width", "none", "important");
+        cell.style.setProperty("overflow", "visible", "important");
+        cell.style.setProperty("word-break", "keep-all", "important");
+      });
+      /* 같은 Shadow Root에 붙여 페이지 폰트·패딩과 동일하게 측정 */
+      const host = table.getRootNode();
+      const mountPoint = host && host !== document ? host : document.body;
+      mountPoint.appendChild(probe);
+      const rows = [...probe.rows];
+      const colCount = Math.max(
+        0,
+        ...rows.map((row) => [...row.cells].reduce((sum, cell) => sum + (cell.colSpan || 1), 0))
+      );
+      const widths = Array(colCount).fill(0);
+      const occupied = Array.from({ length: rows.length }, () => Array(colCount).fill(false));
+      rows.forEach((row, r) => {
+        let c = 0;
+        [...row.cells].forEach((cell) => {
+          while (c < colCount && occupied[r][c]) c += 1;
+          const cs = cell.colSpan || 1;
+          const rs = cell.rowSpan || 1;
+          const w = Math.ceil(cell.getBoundingClientRect().width);
+          if (cs <= 1) widths[c] = Math.max(widths[c], w);
+          else {
+            const part = Math.ceil(w / cs);
+            for (let i = 0; i < cs; i += 1) widths[c + i] = Math.max(widths[c + i] || 0, part);
+          }
+          for (let rr = 0; rr < rs; rr += 1) {
+            if (!occupied[r + rr]) continue;
+            for (let cc = 0; cc < cs; cc += 1) occupied[r + rr][c + cc] = true;
+          }
+          c += cs;
+        });
+      });
+      probe.remove();
+      return widths.map((w) => Math.max(36, w || 36));
+    };
+    const fitColumnsToContent = (table) => {
+      /* 마크업에 적힌 % 열 비율 유지 (예: 이전/현행 교육과정 50·50) */
+      const saved = String(table.dataset.declaredColWidths || "")
+        .split(",")
+        .map((v) => parseFloat(v))
+        .filter((v) => Number.isFinite(v) && v > 0);
+      if (saved.length >= 2 && Math.abs(saved.reduce((sum, w) => sum + w, 0) - 100) < 1) {
+        applyCols(
+          table,
+          saved.map((w) => `${w}%`)
+        );
+        table.style.setProperty("width", "100%", "important");
+        table.style.setProperty("min-width", "var(--pc-table-min, 924px)", "important");
+        return;
+      }
+      /* 표별 전용 비율이 없으면 내용 길이 비율만 적용 (여분 몰아넣기 없음) */
+      const pxWidths = measureColumnWidths(table);
+      if (!pxWidths.length) return;
+      const total = pxWidths.reduce((sum, w) => sum + w, 0) || 1;
+      applyCols(
+        table,
+        pxWidths.map((w) => `${((w / total) * 100).toFixed(4)}%`)
+      );
+      table.style.setProperty("width", "100%", "important");
+      table.style.setProperty("min-width", `${Math.max(924, Math.ceil(total + 2))}px`, "important");
+    };
+
     page.querySelectorAll("table").forEach((table) => {
       if (table.closest(".table-scroll")) return;
       const isCreative =
         table.classList.contains("creative-activity-table") ||
         /창의적 체험활동상황/.test(table.textContent || "");
+      const headText = table.querySelector("thead")?.textContent || "";
       if (isCreative) {
         table.classList.add("creative-activity-table");
-        let group = table.querySelector("colgroup");
-        if (!group) {
-          group = document.createElement("colgroup");
-          table.insertBefore(group, table.firstChild);
-        }
-        group.innerHTML = "";
-        ["8%", "15%", "8%", "15%", "54%"].forEach((w) => {
-          const col = document.createElement("col");
-          col.style.setProperty("width", w, "important");
-          group.appendChild(col);
-        });
-        /* PC 폭 이상이면 양끝 맞춤, 더 좁으면 924px 유지 후 가로 스크롤 */
-        table.style.setProperty("table-layout", "fixed", "important");
-        table.style.setProperty("width", "100%", "important");
-        table.style.setProperty("min-width", "var(--pc-table-min, 924px)", "important");
-        table.style.setProperty("max-width", "none", "important");
-        table.querySelectorAll("th, td, td > div").forEach((el) => {
-          el.style.setProperty("white-space", "normal", "important");
-          el.style.setProperty("min-width", "0", "important");
-          el.style.setProperty("max-width", "none", "important");
-          el.style.setProperty("word-wrap", "break-word", "important");
-          el.style.setProperty("overflow-wrap", "break-word", "important");
-        });
+        /* 원본 열 비율 유지 (내용 측정 시 rowspan/colspan 헤더가 깨짐) */
+        table.dataset.declaredColWidths = "8,15,8,15,54";
+      }
+      if (/수상명/.test(headText) && /수여기관/.test(headText)) {
+        table.classList.add("award-career-table");
+        table.dataset.declaredColWidths = "14,26,10,14,18,18";
+      }
+      if (/수업일수/.test(headText) && /결석일수/.test(headText)) {
+        table.classList.add("attendance-status-table");
+        /* 원본: 학년·수업일수 + 질병/미인정/기타×4 + 특기사항 */
+        table.dataset.declaredColWidths = "5,7,6,6,6,6,6,6,6,6,6,6,6,6,16";
+      }
+      if (/과목 또는 영역/.test(headText) && /독서 활동 상황/.test(headText)) {
+        table.classList.add("reading-activity-table");
+        table.dataset.declaredColWidths = "8,15,77";
+      }
+      if (/등급/.test(headText) && /누적 비율/.test(headText) && /기존 9등급/.test(headText)) {
+        table.classList.add("grade5-relative-table");
+        table.dataset.declaredColWidths = "12,18,70";
+      }
+      if (/성취도/.test(headText) && /성취 기준/.test(headText) && /학습 상태/.test(headText)) {
+        table.classList.add("grade5-absolute-table");
+        table.dataset.declaredColWidths = "12,16,72";
+      }
+      if (
+        /고1·고2 학력평가/.test(headText) &&
+        /고3 학력평가/.test(headText) &&
+        /고3 모의평가/.test(headText)
+      ) {
+        table.classList.add("mock-exam-timing-table");
+        table.dataset.declaredColWidths = "14,28,28,30";
+      }
+      if (
+        table.classList.contains("grade-record-table") ||
+        (/성취도별 분포비율/.test(headText) && /석차등급/.test(headText))
+      ) {
+        table.classList.add("grade-record-table");
+        /* 분포비율 한 줄용, 비고는 과대 확장 금지 */
+        table.dataset.declaredColWidths = "5,6,9,5,12,6,34,7,8,8";
+      }
+      if (/교시/.test(headText) && /시험 영역/.test(headText) && /시험 시간/.test(headText)) {
+        table.classList.add("suneung-timetable-table");
+        table.dataset.declaredColWidths = "8,18,28,24,22";
+      }
+      if (/이전 수능 체계/.test(headText) && /현행 수능 체계/.test(headText)) {
+        table.classList.add("suneung-subject-table");
+        /* colspan=2 영역 열을 2칸으로 나눔 */
+        table.dataset.declaredColWidths = "11,11,39,39";
+      }
+      if (
+        /구분/.test(headText) &&
+        /수시/.test(headText) &&
+        /정시/.test(headText) &&
+        !/전형 유형/.test(headText) &&
+        /지원 횟수/.test(table.textContent || "")
+      ) {
+        table.classList.add("susi-jeongsi-diff-table");
+        table.dataset.declaredColWidths = "18,41,41";
+      }
+      if (/전형 유형/.test(headText) && /핵심 평가 내용/.test(headText)) {
+        table.classList.add("susi-jeongsi-type-table");
+        table.dataset.declaredColWidths = "14,28,58";
+      }
+      if (
+        table.classList.contains("eval-process-table") ||
+        (/수업참여/.test(table.textContent || "") &&
+          /수행평가/.test(table.textContent || "") &&
+          /지필고사/.test(table.textContent || ""))
+      ) {
+        table.classList.add("eval-process-table");
+        /* 1·2열은 한 줄 유지, 3열은 설명 */
+        table.dataset.declaredColWidths = "16,18,66";
+      }
+      if (
+        table.classList.contains("student-info-table") ||
+        (/학생정보/.test(table.textContent || "") &&
+          /학적사항/.test(table.textContent || "") &&
+          /특기사항/.test(table.textContent || ""))
+      ) {
+        table.classList.add("student-info-table");
+        /* 라벨 열 축소, 내용 열 확대 */
+        table.dataset.declaredColWidths = "14,86";
+      }
+
+      /* containCells가 width를 지우기 전에 헤더 % 비율 보관 */
+      const headCells = [...(table.querySelector("thead tr")?.cells || [])];
+      const declared = headCells.map((cell) => {
+        const match = String(cell.style.width || "").trim().match(/^([\d.]+)%$/);
+        return match ? parseFloat(match[1]) : null;
+      });
+      if (
+        !table.dataset.declaredColWidths &&
+        declared.length >= 2 &&
+        declared.every((w) => w != null) &&
+        Math.abs(declared.reduce((sum, w) => sum + w, 0) - 100) < 1
+      ) {
+        table.dataset.declaredColWidths = declared.join(",");
+      }
+
+      table.style.setProperty("table-layout", "fixed", "important");
+      table.style.setProperty("width", "100%", "important");
+      table.style.setProperty("max-width", "none", "important");
+      table.style.setProperty("overflow", "hidden", "important");
+      containCells(table);
+      if (isCreative) {
         table.querySelectorAll("td > div").forEach((el) => {
           el.style.setProperty("text-align", "justify", "important");
         });
-      } else {
-        table.style.setProperty("width", "100%", "important");
-        table.style.setProperty("min-width", "var(--pc-table-min, 924px)", "important");
-        table.style.setProperty("max-width", "none", "important");
       }
+
       const wrap = document.createElement("div");
       wrap.className = "table-scroll";
       table.replaceWith(wrap);
@@ -1559,7 +1756,7 @@ li::before {
     });
     const tableForce = document.createElement("style");
     tableForce.textContent = `
-/* 창의적 체험: 열 비율 유지 + PC 본문 폭 이하로 줄이지 않음 */
+/* 창의적 체험: 원본 열 비율 8/15/8/15/54 */
 .table-scroll > table.creative-activity-table,
 .comparison-table.curriculum-table.creative-activity-table {
   table-layout: fixed !important;
@@ -1576,6 +1773,7 @@ li::before {
 .table-scroll > table.creative-activity-table td,
 .table-scroll > table.creative-activity-table td > div {
   white-space: normal !important;
+  overflow: hidden !important;
   min-width: 0 !important;
   max-width: none !important;
   word-wrap: break-word !important;
@@ -1595,6 +1793,57 @@ li::before {
   width: 100% !important;
   min-width: var(--pc-table-min, 924px) !important;
   max-width: none !important;
+}
+/* 가이드 표 공통: 셀 밖으로 텍스트 돌출 금지 (페이지 nowrap/fit-content 덮어씀) */
+.page .table-scroll > table,
+.page .table-scroll > table.comparison-table,
+.page .table-scroll > table.comparison-table.curriculum-table {
+  overflow: hidden !important;
+  max-width: none !important;
+}
+.page .table-scroll > table th,
+.page .table-scroll > table td,
+.page .table-scroll > table.comparison-table th,
+.page .table-scroll > table.comparison-table td,
+.page .table-scroll > table.comparison-table.curriculum-table th,
+.page .table-scroll > table.comparison-table.curriculum-table td,
+.page .table-scroll > table.comparison-table.curriculum-table:not(.creative-activity-table) th,
+.page .table-scroll > table.comparison-table.curriculum-table:not(.creative-activity-table) td {
+  overflow: hidden !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  white-space: normal !important;
+  word-break: keep-all !important;
+  overflow-wrap: break-word !important;
+  box-sizing: border-box !important;
+}
+.page .table-scroll > table th.col-dist,
+.page .table-scroll > table td.col-dist {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  max-width: none !important;
+  overflow-wrap: normal !important;
+}
+
+/* 특수 표도 셀 안 가둠 — 열 비율은 내용 길이 측정 JS가 맞춤 */
+table.comparison-table.curriculum-table.attendance-status-table,
+table.comparison-table.curriculum-table.reading-activity-table,
+table.comparison-table.curriculum-table.award-career-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  max-width: none !important;
+  overflow: hidden !important;
+}
+table.comparison-table.curriculum-table.attendance-status-table th,
+table.comparison-table.curriculum-table.attendance-status-table td,
+table.comparison-table.curriculum-table.reading-activity-table th,
+table.comparison-table.curriculum-table.reading-activity-table td,
+table.comparison-table.curriculum-table.award-career-table th,
+table.comparison-table.curriculum-table.award-career-table td {
+  width: auto !important;
+  overflow: hidden !important;
+  white-space: normal !important;
+  min-width: 0 !important;
 }`;
     /* 페이지 인라인 height 고정을 덮어 긴 셀은 줄바꿈·높이 확장 */
     extra.textContent += `
@@ -1623,6 +1872,16 @@ table:not(.mistake-table) thead th {
       const size = parseFloat(getComputedStyle(node).fontSize);
       if (size > 0 && size < 13) node.style.setProperty("font-size", "13px", "important");
     });
+    const runContentFit = () => {
+      page.querySelectorAll(".table-scroll > table").forEach((table) => {
+        fitColumnsToContent(table);
+        containCells(table);
+      });
+    };
+    runContentFit();
+    requestAnimationFrame(() => requestAnimationFrame(runContentFit));
+    link.addEventListener("load", runContentFit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(runContentFit);
     return sheet;
   }
 

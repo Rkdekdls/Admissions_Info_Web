@@ -205,21 +205,24 @@
       border-right: none !important;
     }
     
-    /* 출결상황 표 - 텍스트 잘림 방지 */
+    /* 가이드 표: 셀 안 가둠 + 표가 넘치면 가로 스크롤 */
     .comparison-table.curriculum-table th,
     .comparison-table.curriculum-table td {
-      white-space: nowrap !important;
-      overflow: visible !important;
-      word-wrap: normal !important;
-      min-width: fit-content !important;
+      white-space: normal !important;
+      overflow: hidden !important;
+      word-break: keep-all !important;
+      overflow-wrap: break-word !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      box-sizing: border-box !important;
     }
     
-    /* 출결상황 표 - table-layout을 auto로 변경하여 컬럼 너비 자동 조정 */
     .comparison-table.curriculum-table {
       table-layout: fixed !important;
       width: 100% !important;
-      min-width: 100% !important;
-      max-width: 100% !important;
+      min-width: var(--pc-table-min, 924px) !important;
+      max-width: none !important;
+      overflow: hidden !important;
     }
     
     /* 출결상황 표 - 첫 번째 셀을 다른 셀과 동일한 스타일로 */
@@ -247,25 +250,18 @@
 
     table.grade-record-table.comparison-table.curriculum-table thead th.col-subject,
     table.grade-record-table.comparison-table.curriculum-table tbody td.col-subject {
-      width: 23mm !important;
-      min-width: 23mm !important;
-      max-width: 23mm !important;
       padding-left: 0.4mm !important;
       padding-right: 0.4mm !important;
     }
     table.grade-record-table.comparison-table.curriculum-table thead th.col-note,
     table.grade-record-table.comparison-table.curriculum-table tbody td.col-note {
-      width: 24mm !important;
-      min-width: 24mm !important;
-      max-width: none !important;
-      padding-left: 3mm !important;
-      padding-right: 3mm !important;
+      padding-left: 2mm !important;
+      padding-right: 2mm !important;
     }
     table.grade-record-table.comparison-table.curriculum-table thead th.col-dist,
     table.grade-record-table.comparison-table.curriculum-table tbody td.col-dist {
-      width: 78mm !important;
-      min-width: 78mm !important;
-      max-width: 78mm !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
     }
     
     /* section-block 스타일 */
@@ -993,16 +989,16 @@
     <!-- 교과학습발달상황 표 -->
     <table class="comparison-table curriculum-table grade-record-table" style="margin-top: 1mm; margin-bottom: 3mm; width: 100%;">
       <colgroup>
-        <col style="width: 6%;">
-        <col style="width: 6%;">
-        <col style="width: 23mm;">
         <col style="width: 5%;">
-        <col style="width: 14%;">
         <col style="width: 6%;">
-        <col style="width: 78mm;">
+        <col style="width: 9%;">
+        <col style="width: 5%;">
+        <col style="width: 12%;">
+        <col style="width: 6%;">
+        <col style="width: 34%;">
         <col style="width: 7%;">
         <col style="width: 8%;">
-        <col style="width: 24mm;">
+        <col style="width: 8%;">
       </colgroup>
       <thead>
         <tr>

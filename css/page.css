@@ -1055,6 +1055,27 @@ body.page-title-body {
   margin-bottom: 0;
 }
 
+/* 가이드 표 공통: 셀 밖으로 텍스트 돌출 금지 */
+.table-scroll > table,
+.comparison-table,
+.page table {
+  overflow: hidden;
+}
+.table-scroll > table th,
+.table-scroll > table td,
+.comparison-table th,
+.comparison-table td,
+.page table th,
+.page table td {
+  overflow: hidden;
+  min-width: 0;
+  max-width: none;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+}
+
 /* 모바일: 본문 좌측 정렬 + 가로 박스 세로 스택 + 표 좌우 스크롤 */
 @media (max-width: 860px) {
   .text-body,
@@ -1271,7 +1292,30 @@ body.page-title-body {
   }
 }
 
-/* PC: 창의적 체험표 원본 열 비율 */
+/* 출결·수상·독서 표: 셀 가둠 (열 비율은 웹 임베드 JS가 내용 길이로 산출) */
+.comparison-table.curriculum-table.attendance-status-table,
+.comparison-table.curriculum-table.award-career-table,
+.comparison-table.curriculum-table.reading-activity-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+.comparison-table.curriculum-table.attendance-status-table th,
+.comparison-table.curriculum-table.attendance-status-table td,
+.comparison-table.curriculum-table.award-career-table th,
+.comparison-table.curriculum-table.award-career-table td,
+.comparison-table.curriculum-table.reading-activity-table th,
+.comparison-table.curriculum-table.reading-activity-table td {
+  white-space: normal !important;
+  overflow: hidden !important;
+  word-break: keep-all !important;
+  overflow-wrap: break-word !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* PC: 창의적 체험표 원본 열 비율 8/15/8/15/54 */
 @media (min-width: 861px) {
   .table-scroll > table.creative-activity-table {
     table-layout: fixed !important;
@@ -1288,6 +1332,7 @@ body.page-title-body {
   .table-scroll > table.creative-activity-table td,
   .table-scroll > table.creative-activity-table td > div {
     white-space: normal !important;
+    overflow: hidden !important;
     min-width: 0 !important;
   }
   .table-scroll > table.creative-activity-table td > div {

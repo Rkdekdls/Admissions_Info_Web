@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -16,7 +16,7 @@
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=425">
+  <link rel="stylesheet" href="css/styles.css?v=428">
 </head>
 <body>
   <div class="app" id="app">
@@ -2949,17 +2949,21 @@
     /* comparison-table 컬럼별 가로 넓이 지정 */
     .comparison-table th:nth-child(1),
     .comparison-table td:nth-child(1) {
-      width: 12% !important;
+      width: 16% !important;
     }
     
     .comparison-table th:nth-child(2),
     .comparison-table td:nth-child(2) {
-      width: 12% !important;
+      width: 18% !important;
     }
     
     .comparison-table th:nth-child(3),
     .comparison-table td:nth-child(3) {
-      width: 78% !important;
+      width: 66% !important;
+    }
+    .eval-process-table td:nth-child(1),
+    .eval-process-table td:nth-child(2) {
+      white-space: nowrap !important;
     }
     
     /* 첫 번째 열(단계) 파란색 배경, 흰색 글씨 */
@@ -4539,20 +4543,24 @@
       border-right: none !important;
     }
     
-    /* 출결·봉사 등: 텍스트 잘림 방지 (창의적 체험표 제외) */
+    /* 가이드 표: 셀 안 가둠 + 표가 넘치면 가로 스크롤 */
     .comparison-table.curriculum-table:not(.creative-activity-table) th,
     .comparison-table.curriculum-table:not(.creative-activity-table) td {
-      white-space: nowrap !important;
-      overflow: visible !important;
-      word-wrap: normal !important;
-      min-width: fit-content !important;
+      white-space: normal !important;
+      overflow: hidden !important;
+      word-break: keep-all !important;
+      overflow-wrap: break-word !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      box-sizing: border-box !important;
     }
     
     .comparison-table.curriculum-table:not(.creative-activity-table) {
       table-layout: fixed !important;
       width: 100% !important;
-      min-width: 100% !important;
-      max-width: 100% !important;
+      min-width: var(--pc-table-min, 924px) !important;
+      max-width: none !important;
+      overflow: hidden !important;
     }
     
     /* 출결상황 표 - 첫 번째 셀을 다른 셀과 동일한 스타일로 */
@@ -5346,7 +5354,7 @@
     </div>
 
     <!-- 출결상황 표 -->
-    <table class="comparison-table curriculum-table" style="margin-top: 2mm;">
+    <table class="comparison-table curriculum-table attendance-status-table" style="margin-top: 2mm;">
       <thead>
         <tr>
           <th rowspan="2" style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">학년</th>
@@ -5400,7 +5408,7 @@
     </div>
      
     <!-- 수상경력 표 -->
-    <table class="comparison-table curriculum-table" style="margin-top: 1mm;">
+    <table class="comparison-table curriculum-table award-career-table" style="margin-top: 1mm;">
       <thead>
         <tr>
           <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important; white-space: nowrap;">학년 (학기)</th>
@@ -5657,20 +5665,24 @@
       border-right: none !important;
     }
     
-    /* 출결·봉사 등: 텍스트 잘림 방지 (창의적 체험표 제외) */
+    /* 가이드 표: 셀 안 가둠 + 표가 넘치면 가로 스크롤 */
     .comparison-table.curriculum-table:not(.creative-activity-table) th,
     .comparison-table.curriculum-table:not(.creative-activity-table) td {
-      white-space: nowrap !important;
-      overflow: visible !important;
-      word-wrap: normal !important;
-      min-width: fit-content !important;
+      white-space: normal !important;
+      overflow: hidden !important;
+      word-break: keep-all !important;
+      overflow-wrap: break-word !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      box-sizing: border-box !important;
     }
     
     .comparison-table.curriculum-table:not(.creative-activity-table) {
       table-layout: fixed !important;
       width: 100% !important;
-      min-width: 100% !important;
-      max-width: 100% !important;
+      min-width: var(--pc-table-min, 924px) !important;
+      max-width: none !important;
+      overflow: hidden !important;
     }
     
     /* 출결상황 표 - 첫 번째 셀을 다른 셀과 동일한 스타일로 */
@@ -6775,20 +6787,24 @@
       border-right: none !important;
     }
     
-    /* 출결·봉사 등: 텍스트 잘림 방지 (창의적 체험표 제외) */
+    /* 가이드 표: 셀 안 가둠 + 표가 넘치면 가로 스크롤 */
     .comparison-table.curriculum-table:not(.creative-activity-table) th,
     .comparison-table.curriculum-table:not(.creative-activity-table) td {
-      white-space: nowrap !important;
-      overflow: visible !important;
-      word-wrap: normal !important;
-      min-width: fit-content !important;
+      white-space: normal !important;
+      overflow: hidden !important;
+      word-break: keep-all !important;
+      overflow-wrap: break-word !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      box-sizing: border-box !important;
     }
     
     .comparison-table.curriculum-table:not(.creative-activity-table) {
       table-layout: fixed !important;
       width: 100% !important;
-      min-width: 100% !important;
-      max-width: 100% !important;
+      min-width: var(--pc-table-min, 924px) !important;
+      max-width: none !important;
+      overflow: hidden !important;
     }
     
     /* 출결상황 표 - 첫 번째 셀을 다른 셀과 동일한 스타일로 */
@@ -8208,7 +8224,7 @@
     </div>
       
     <!-- 독서활동상황 표 -->
-    <table class="comparison-table curriculum-table" style="margin-top: 4mm; margin-bottom: 4mm; table-layout: fixed;">
+    <table class="comparison-table curriculum-table reading-activity-table" style="margin-top: 4mm; margin-bottom: 4mm; table-layout: fixed;">
       <thead>
         <tr>
           <th style="width: 8% !important; text-align: center !important; padding: 2mm 2mm !important; height: 1.6mm !important;">학년</th>
@@ -8459,20 +8475,24 @@
       border-right: none !important;
     }
     
-    /* 출결·봉사 등: 텍스트 잘림 방지 (창의적 체험표 제외) */
+    /* 가이드 표: 셀 안 가둠 + 표가 넘치면 가로 스크롤 */
     .comparison-table.curriculum-table:not(.creative-activity-table) th,
     .comparison-table.curriculum-table:not(.creative-activity-table) td {
-      white-space: nowrap !important;
-      overflow: visible !important;
-      word-wrap: normal !important;
-      min-width: fit-content !important;
+      white-space: normal !important;
+      overflow: hidden !important;
+      word-break: keep-all !important;
+      overflow-wrap: break-word !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      box-sizing: border-box !important;
     }
     
     .comparison-table.curriculum-table:not(.creative-activity-table) {
       table-layout: fixed !important;
       width: 100% !important;
-      min-width: 100% !important;
-      max-width: 100% !important;
+      min-width: var(--pc-table-min, 924px) !important;
+      max-width: none !important;
+      overflow: hidden !important;
     }
     
     /* 출결상황 표 - 첫 번째 셀을 다른 셀과 동일한 스타일로 */
@@ -8500,25 +8520,18 @@
 
     table.grade-record-table.comparison-table.curriculum-table thead th.col-subject,
     table.grade-record-table.comparison-table.curriculum-table tbody td.col-subject {
-      width: 23mm !important;
-      min-width: 23mm !important;
-      max-width: 23mm !important;
       padding-left: 0.4mm !important;
       padding-right: 0.4mm !important;
     }
     table.grade-record-table.comparison-table.curriculum-table thead th.col-note,
     table.grade-record-table.comparison-table.curriculum-table tbody td.col-note {
-      width: 24mm !important;
-      min-width: 24mm !important;
-      max-width: none !important;
-      padding-left: 3mm !important;
-      padding-right: 3mm !important;
+      padding-left: 2mm !important;
+      padding-right: 2mm !important;
     }
     table.grade-record-table.comparison-table.curriculum-table thead th.col-dist,
     table.grade-record-table.comparison-table.curriculum-table tbody td.col-dist {
-      width: 78mm !important;
-      min-width: 78mm !important;
-      max-width: 78mm !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
     }
     
     /* section-block 스타일 */
@@ -9252,16 +9265,16 @@
     <!-- 교과학습발달상황 표 -->
     <table class="comparison-table curriculum-table grade-record-table" style="margin-top: 1mm; margin-bottom: 3mm; width: 100%;">
       <colgroup>
-        <col style="width: 6%;">
-        <col style="width: 6%;">
-        <col style="width: 23mm;">
         <col style="width: 5%;">
-        <col style="width: 14%;">
         <col style="width: 6%;">
-        <col style="width: 78mm;">
+        <col style="width: 9%;">
+        <col style="width: 5%;">
+        <col style="width: 12%;">
+        <col style="width: 6%;">
+        <col style="width: 34%;">
         <col style="width: 7%;">
         <col style="width: 8%;">
-        <col style="width: 24mm;">
+        <col style="width: 8%;">
       </colgroup>
       <thead>
         <tr>
@@ -23174,7 +23187,7 @@
     </template>
   </div>
   <!-- page-source:end -->
-  <script src="js/web-info.js?v=153"></script>
+  <script src="js/web-info.js?v=176"></script>
   <script src="js/admit-uni-data.js?v=3"></script>
   <script src="js/admit-susi-yearly.js?v=2"></script>
   <script src="js/guide.js?v=208"></script>
