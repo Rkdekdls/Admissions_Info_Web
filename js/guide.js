@@ -895,8 +895,8 @@ const Guide = (() => {
       return;
     }
 
-    /* Y축은 스크롤 밖 고정, 플롯만 가로 스크롤
-       칸 간격 = 라벨 실측 폭 기준(화면 너비로 줄이지 않음) → 모바일 가로에서도 겹치지 않음 */
+    /* Y축 고정 + 플롯 스크롤
+       칸 최소폭 = 라벨 안 겹침 / 남는 폭이 있으면 칸을 늘려 우측 여백 없이 채움(사이드바 접힘 등) */
     const yAxisW = 48;
     const labelFont = 13;
     const labelGap = 20;
@@ -907,10 +907,13 @@ const Guide = (() => {
         Math.max(...lab.lines.map((line) => measureJeongsiLabelWidth(line, labelFont)))
       )
     );
-    const colW = Math.max(96, Math.ceil(maxLabelW) + labelGap);
+    const minColW = Math.max(96, Math.ceil(maxLabelW) + labelGap);
     const multiLine = axisLabels.some((lab) => lab.lines.length > 1);
     const pad = { top: 16, right: 16, bottom: multiLine ? 58 : 44, left: 8 };
     const plotH = 280;
+    const availPlotW = Math.max(0, (body.clientWidth || 0) - yAxisW - pad.left - pad.right);
+    const stretchColW = series.length > 0 ? availPlotW / series.length : minColW;
+    const colW = Math.max(minColW, stretchColW);
     const plotW = Math.max(series.length, 1) * colW;
     const width = pad.left + plotW + pad.right;
     const height = pad.top + plotH + pad.bottom;
@@ -963,6 +966,11 @@ const Guide = (() => {
       })
       .join("");
 
+    body.dataset.jeongsiMinCol = String(minColW);
+    body.dataset.jeongsiPadLeft = String(pad.left);
+    body.dataset.jeongsiPadRight = String(pad.right);
+    body.dataset.jeongsiHeight = String(height);
+    body.dataset.jeongsiColW = String(colW);
     body.innerHTML = `<div class="admit-jeongsi-chart-frame">
         <div class="admit-jeongsi-y-stick" aria-hidden="true">
           <svg class="admit-jeongsi-y-svg" width="${yAxisW}" height="${height}" viewBox="0 0 ${yAxisW} ${height}" preserveAspectRatio="xMinYMid meet">
@@ -976,6 +984,75 @@ const Guide = (() => {
           </svg>
         </div>
       </div>`;
+    bindJeongsiChartLayout(root);
+  }
+
+  /* 사이드바 접힘 등: SVG 통째 재생성 없이 X 간격·폭만 갱신 */
+  function layoutJeongsiChartFast(root) {
+    const body = root.querySelector("[data-jeongsi-chart-body]");
+    const svg = body?.querySelector(".admit-jeongsi-svg");
+    const markNodes = body?.querySelectorAll(".admit-jeongsi-mark");
+    if (!body || !svg || !markNodes?.length) return false;
+
+    const yAxisW = 48;
+    const barW = 28;
+    const padLeft = Number(body.dataset.jeongsiPadLeft || 8);
+    const padRight = Number(body.dataset.jeongsiPadRight || 16);
+    const minColW = Number(body.dataset.jeongsiMinCol || 96);
+    const height = Number(body.dataset.jeongsiHeight || 340);
+    const n = markNodes.length;
+    const availPlotW = Math.max(0, (body.clientWidth || 0) - yAxisW - padLeft - padRight);
+    const colW = Math.max(minColW, n > 0 ? availPlotW / n : minColW);
+    const prev = Number(body.dataset.jeongsiColW || 0);
+    if (Math.abs(prev - colW) < 0.5) return true;
+
+    const plotW = n * colW;
+    const width = padLeft + plotW + padRight;
+    body.dataset.jeongsiColW = String(colW);
+
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    svg.setAttribute("width", String(width));
+    svg.setAttribute("height", String(height));
+    svg.style.width = `${width}px`;
+    svg.style.minWidth = `${width}px`;
+    svg.style.height = `${height}px`;
+
+    body.querySelectorAll(".admit-jeongsi-grid").forEach((line) => {
+      line.setAttribute("x1", String(padLeft));
+      line.setAttribute("x2", String(padLeft + plotW));
+    });
+
+    markNodes.forEach((g, index) => {
+      const x = padLeft + index * colW + colW / 2;
+      const rect = g.querySelector("rect");
+      const text = g.querySelector(".admit-jeongsi-x");
+      if (rect) rect.setAttribute("x", String(x - barW / 2));
+      if (text) {
+        text.setAttribute("x", String(x));
+        text.querySelectorAll("tspan").forEach((tspan) => tspan.setAttribute("x", String(x)));
+      }
+    });
+    return true;
+  }
+
+  function bindJeongsiChartLayout(root) {
+    if (!root || root.dataset.jeongsiChartLayout === "1") return;
+    root.dataset.jeongsiChartLayout = "1";
+    let raf = 0;
+    const schedule = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        if (!root.isConnected) return;
+        layoutJeongsiChartFast(root);
+      });
+    };
+    const body = root.querySelector("[data-jeongsi-chart-body]");
+    if (body && typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(schedule).observe(body);
+      return;
+    }
+    window.addEventListener("resize", schedule);
   }
 
   function jeongsiUnitTableHtml() {
