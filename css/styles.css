@@ -790,8 +790,11 @@ input {
 
 .admit-jeongsi-svg {
   display: block;
-  max-width: none;
+  max-width: none !important;
+  width: auto;
+  min-width: 0;
   height: auto;
+  flex-shrink: 0;
   vertical-align: top;
 }
 
@@ -804,9 +807,12 @@ input {
 .admit-jeongsi-x {
   fill: #6b7280;
   font-family: var(--admit-font);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   letter-spacing: -0.2px;
+  /* iOS 가로모드에서 SVG 글자만 커져 겹치는 것 방지 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .admit-jeongsi-mark.is-ga rect {
@@ -2997,18 +3003,20 @@ input {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
-  /* 왼쪽·위만 래퍼 / 세로·아래는 셀 border (rowspan 헤더 last-child 이슈 방지) */
+  /* 좌·상 + 우·하 — 위아래 전폭일 때 우측이 비어/잘려 보이지 않게 */
   border: 0;
   border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
   border-top: 2px solid #1a4796;
+  border-bottom: 1px solid #e5e7eb;
   box-sizing: border-box;
   background: #fff;
 }
 
 .admit-detail-table {
-  width: 100%;
-  /* 본문 .admit-data-table / .table-scroll 표와 동일: PC 폭 고정 + 좁으면 스크롤 */
-  min-width: var(--admit-detail-pc-min, 876px);
+  /* 카드가 PC min보다 넓으면(위아래 전폭) 표도 전폭, 좁으면 min 유지 후 스크롤 */
+  width: max(100%, var(--admit-detail-pc-min, 876px));
+  min-width: max(100%, var(--admit-detail-pc-min, 876px));
   max-width: none;
   margin: 0;
   border: 0;
@@ -3093,6 +3101,13 @@ table.admit-detail-table td {
   margin: 0;
   min-width: 0;
   max-width: 100%;
+}
+
+/* PC(1280+)만 좌우 2열 — 태블릿·모바일은 대학발표 / 어디가 위아래 전폭 */
+@media (max-width: 1279px) {
+  .admit-detail-result-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .admit-detail-result-card {
@@ -3696,10 +3711,10 @@ table.admit-detail-table td {
     overscroll-behavior-x: contain;
   }
 
-  /* 본문과 동일: PC 최소폭은 기본 CSS/JS — 여기서는 스크롤만 보장 */
+  /* 위아래 전폭 카드에서도 우측 공백 없이 채움 · 좁으면 PC min + 스크롤 */
   table.admit-detail-table {
-    width: 100% !important;
-    min-width: var(--admit-detail-pc-min, 876px) !important;
+    width: max(100%, var(--admit-detail-pc-min, 876px)) !important;
+    min-width: max(100%, var(--admit-detail-pc-min, 876px)) !important;
     max-width: none !important;
     table-layout: fixed !important;
   }

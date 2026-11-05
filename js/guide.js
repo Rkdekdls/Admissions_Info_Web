@@ -818,6 +818,26 @@ const Guide = (() => {
     return campus ? `${base}(${campus[1]})` : base;
   }
 
+  function measureJeongsiLabelWidth(text, fontSize = 13) {
+    const canvas =
+      measureJeongsiLabelWidth._canvas ||
+      (measureJeongsiLabelWidth._canvas = document.createElement("canvas"));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return String(text || "").length * fontSize;
+    ctx.font = `400 ${fontSize}px Pretendard, "Noto Sans KR", "Segoe UI", sans-serif`;
+    return ctx.measureText(String(text || "")).width;
+  }
+
+  /* X축: 캠퍼스는 둘째 줄 — 가로 겹침 줄임 */
+  function jeongsiAxisLabel(label) {
+    const text = String(label || "");
+    const matched = text.match(/^(.*?)(\([^)]+\))$/);
+    if (matched && matched[1].trim()) {
+      return { lines: [matched[1].trim(), matched[2]], full: text };
+    }
+    return { lines: [text], full: text };
+  }
+
   function jeongsiChartHtml() {
     return `<div class="admit-list-head admit-jeongsi-chart-title-head">
         <h2 class="title-3 admit-list-title">대학별 백분위 평균</h2>
@@ -876,11 +896,21 @@ const Guide = (() => {
     }
 
     /* Y축은 스크롤 밖 고정, 플롯만 가로 스크롤
-       칸 간격은 PC 기준 고정(화면 너비에 따라 줄이지 않음) → 태블릿·모바일도 동일 크기 + 스크롤 */
+       칸 간격 = 라벨 실측 폭 기준(화면 너비로 줄이지 않음) → 모바일 가로에서도 겹치지 않음 */
     const yAxisW = 48;
-    const pad = { top: 16, right: 12, bottom: 44, left: 8 };
+    const labelFont = 13;
+    const labelGap = 20;
+    const axisLabels = series.map((item) => jeongsiAxisLabel(item.label));
+    const maxLabelW = Math.max(
+      40,
+      ...axisLabels.map((lab) =>
+        Math.max(...lab.lines.map((line) => measureJeongsiLabelWidth(line, labelFont)))
+      )
+    );
+    const colW = Math.max(96, Math.ceil(maxLabelW) + labelGap);
+    const multiLine = axisLabels.some((lab) => lab.lines.length > 1);
+    const pad = { top: 16, right: 16, bottom: multiLine ? 58 : 44, left: 8 };
     const plotH = 280;
-    const colW = 84;
     const plotW = Math.max(series.length, 1) * colW;
     const width = pad.left + plotW + pad.right;
     const height = pad.top + plotH + pad.bottom;
@@ -892,7 +922,7 @@ const Guide = (() => {
     const yLabels = yTicks
       .map((v) => {
         const y = yAt(v);
-        return `<text class="admit-jeongsi-y" x="${yAxisW - 10}" y="${y + 4}" text-anchor="end">${v}</text>`;
+        return `<text class="admit-jeongsi-y" x="${yAxisW - 10}" y="${y + 4}" text-anchor="end" font-size="${labelFont}">${v}</text>`;
       })
       .join("");
 
@@ -915,9 +945,20 @@ const Guide = (() => {
         const barTop = Math.min(yMax, yMin);
         const barH = span < 0.05 ? barW : Math.max(barW, Math.abs(yMin - yMax));
         const mark = `<rect x="${x - barW / 2}" y="${barTop}" width="${barW}" height="${barH}" rx="0" />`;
+        const lab = axisLabels[index];
+        const labelY = pad.top + plotH + 22;
+        const labelText =
+          lab.lines.length > 1
+            ? lab.lines
+                .map(
+                  (line, lineIndex) =>
+                    `<tspan x="${x}" dy="${lineIndex === 0 ? 0 : 14}">${escapeHtml(line)}</tspan>`
+                )
+                .join("")
+            : escapeHtml(lab.lines[0]);
         return `<g class="admit-jeongsi-mark ${cls}">
           ${mark}
-          <text class="admit-jeongsi-x" x="${x}" y="${pad.top + plotH + 26}" text-anchor="middle">${item.label}</text>
+          <text class="admit-jeongsi-x" x="${x}" y="${labelY}" text-anchor="middle" font-size="${labelFont}">${labelText}</text>
         </g>`;
       })
       .join("");
@@ -929,7 +970,7 @@ const Guide = (() => {
           </svg>
         </div>
         <div class="admit-jeongsi-chart-scroll">
-          <svg class="admit-jeongsi-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" preserveAspectRatio="xMinYMid meet" role="img" aria-label="대학별 백분위 평균 분포">
+          <svg class="admit-jeongsi-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" style="width:${width}px;min-width:${width}px;max-width:none;height:${height}px;flex-shrink:0" preserveAspectRatio="xMinYMid meet" role="img" aria-label="대학별 백분위 평균 분포">
             ${hGrid}
             ${marks}
           </svg>
@@ -1906,7 +1947,22 @@ const Guide = (() => {
     /* trend·uni-trend·기타: 내용 측정 (declared 없음) */
   }
 
+  function admitDetailContentWidth(table) {
+    const wrap = table.closest(".admit-detail-table-wrap");
+    let w = wrap?.clientWidth || 0;
+    if (w >= 40) return w;
+    /* 입시결과 탭이 숨겨진 채 측정될 때: 본문 가용 폭 사용 */
+    const body = table.closest(".admit-detail-root")?.querySelector(".admit-detail-body");
+    if (!body) return 0;
+    const cs = getComputedStyle(body);
+    return Math.max(
+      0,
+      body.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0)
+    );
+  }
+
   function fitAdmitDetailColumns(table) {
+    const parentW = admitDetailContentWidth(table);
     const saved = String(table.dataset.declaredColWidths || "")
       .split(",")
       .map((v) => parseFloat(v))
@@ -1916,8 +1972,10 @@ const Guide = (() => {
         table,
         saved.map((w) => `${w}%`)
       );
-      table.style.setProperty("width", "100%", "important");
-      table.style.setProperty("min-width", "var(--admit-detail-pc-min, 876px)", "important");
+      /* 위아래 전폭이면 카드만큼, 아니면 PC min — 우측 빈 칸 방지 */
+      const floor = Math.max(ADMIT_DETAIL_PC_MIN, parentW);
+      table.style.setProperty("width", `${floor}px`, "important");
+      table.style.setProperty("min-width", `${floor}px`, "important");
       table.style.setProperty("max-width", "none", "important");
       return;
     }
@@ -1928,12 +1986,9 @@ const Guide = (() => {
       table,
       pxWidths.map((w) => `${((w / total) * 100).toFixed(4)}%`)
     );
-    table.style.setProperty("width", "100%", "important");
-    table.style.setProperty(
-      "min-width",
-      `${Math.max(ADMIT_DETAIL_PC_MIN, Math.ceil(total + 2))}px`,
-      "important"
-    );
+    const floor = Math.max(ADMIT_DETAIL_PC_MIN, Math.ceil(total + 2), parentW);
+    table.style.setProperty("width", `${floor}px`, "important");
+    table.style.setProperty("min-width", `${floor}px`, "important");
     table.style.setProperty("max-width", "none", "important");
   }
 
@@ -2000,6 +2055,8 @@ const Guide = (() => {
         root.querySelectorAll("[data-admit-detail-panel]").forEach((panel) => {
           panel.hidden = panel.dataset.admitDetailPanel !== key;
         });
+        /* 숨겨져 있던 탭 표도 전폭으로 다시 맞춤 */
+        requestAnimationFrame(() => fitAdmitDetailTables(root));
       });
     }
 
@@ -2361,9 +2418,10 @@ const Guide = (() => {
     }
     infoPanel.hidden = false;
     resultPanel.hidden = true;
-    fitAdmitDetailTables(root);
     root.hidden = false;
     document.body.style.overflow = "hidden";
+    /* 표시 후 측정 — hidden이면 부모 폭 0이라 우측이 비어 보임 */
+    requestAnimationFrame(() => fitAdmitDetailTables(root));
     root.querySelector("[data-admit-detail-close].admit-detail-close")?.focus();
 
     enhanceAdmitSelects(resultPanel);
@@ -2790,9 +2848,9 @@ const Guide = (() => {
     infoPanel.hidden = false;
     resultPanel.hidden = true;
     if (materialsPanel) materialsPanel.hidden = true;
-    fitAdmitDetailTables(root);
     root.hidden = false;
     document.body.style.overflow = "hidden";
+    requestAnimationFrame(() => fitAdmitDetailTables(root));
     root.querySelector("[data-admit-detail-close].admit-detail-close")?.focus();
 
     infoPanel.querySelectorAll("[data-admit-elig-year]").forEach((chip) => {
