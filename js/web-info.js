@@ -899,6 +899,8 @@ const WebInfo = (() => {
     }
     .flow-card {
       width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
       height: auto !important;
       border: 2px solid var(--color-primary) !important;
       border-radius: 0 !important;
@@ -906,6 +908,16 @@ const WebInfo = (() => {
       padding: 14px 8px !important;
       transform: none !important;
       box-sizing: border-box !important;
+      overflow: hidden !important;
+      word-break: keep-all !important;
+      overflow-wrap: break-word !important;
+    }
+    .flow-card,
+    .flow-card * {
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+      overflow-wrap: break-word !important;
+      word-break: keep-all !important;
     }
     .flow-row {
       gap: 3.5mm !important;
@@ -1147,7 +1159,7 @@ const WebInfo = (() => {
     const shadow = sheet.attachShadow({ mode: "open" });
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "css/page.css?v=68";
+    link.href = "css/page.css?v=69";
     const extra = document.createElement("style");
     extra.textContent = `${[...doc.querySelectorAll("style")].map((node) => node.textContent).join("\n")}\n${bookVars}
 @media (max-width: 860px) {
@@ -1944,6 +1956,73 @@ table:not(.mistake-table) thead th {
   white-space: normal !important;
   word-break: keep-all !important;
   overflow-wrap: break-word !important;
+}
+/* PC(1280+)만 가로 플로우 — 모바일·태블릿은 세로 + 화살표 아래 방향 */
+@media (max-width: 1279px) {
+  .flow-row,
+  .icon-grid,
+  .grade-track,
+  .mobile-stack,
+  .comparison-container,
+  .checkpoint-container,
+  .equal-card-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .flow-row {
+    gap: 2mm !important;
+  }
+  .flow-row > .flow-item,
+  .icon-grid > .flow-item,
+  .grade-track > *:not(.mobile-stack-arrow),
+  .mobile-stack > *:not(.mobile-stack-arrow):not(.flow-arrow) {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+  .flow-row > .flow-arrow,
+  .mobile-stack-arrow,
+  .grade-track > .mobile-stack-arrow {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    align-self: center !important;
+    transform: rotate(90deg) !important;
+    padding: 0.5mm 0 !important;
+    margin: 0 !important;
+  }
+  .flow-card,
+  .icon-grid .flow-card,
+  .flow-row .flow-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+  .flow-card *,
+  .comparison-card,
+  .checkpoint-box,
+  .tip-box,
+  .info-box {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-wrap: break-word !important;
+    word-break: keep-all !important;
+  }
+  .comparison-card,
+  .checkpoint-box {
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+  .mobile-stack-split {
+    flex-direction: column !important;
+  }
 }
 `;
     shadow.append(link, extra, tableForce, page);

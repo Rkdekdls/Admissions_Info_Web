@@ -1077,6 +1077,83 @@ body.page-title-body {
 }
 
 /* 모바일: 본문 좌측 정렬 + 가로 박스 세로 스택 + 표 좌우 스크롤 */
+/* PC(1280+)만 가로 플로우 — 태블릿·모바일은 세로 + 화살표 하향 */
+@media (max-width: 1279px) {
+  .flow-row,
+  .icon-grid,
+  .grade-track,
+  .mobile-stack,
+  .comparison-container,
+  .checkpoint-container,
+  .equal-card-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .flow-row {
+    gap: 2mm !important;
+  }
+
+  .flow-row > .flow-item,
+  .icon-grid > .flow-item,
+  .grade-track > *:not(.mobile-stack-arrow),
+  .mobile-stack > *:not(.mobile-stack-arrow):not(.flow-arrow) {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .flow-row > .flow-arrow,
+  .mobile-stack-arrow,
+  .grade-track > .mobile-stack-arrow {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    align-self: center !important;
+    transform: rotate(90deg) !important;
+    padding: 0.5mm 0 !important;
+    margin: 0 !important;
+  }
+
+  .flow-card,
+  .flow-row .flow-card,
+  .icon-grid .flow-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    word-break: keep-all !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .flow-card *,
+  .comparison-card,
+  .checkpoint-box,
+  .tip-box,
+  .info-box {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-wrap: break-word !important;
+    word-break: keep-all !important;
+  }
+
+  .comparison-card,
+  .checkpoint-box {
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .mobile-stack-split {
+    flex-direction: column !important;
+  }
+}
+
 @media (max-width: 860px) {
   .text-body,
   .guide-text,
