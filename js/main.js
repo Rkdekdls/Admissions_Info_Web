@@ -32,7 +32,10 @@ const DEFAULT_BY_GROUP = {
   info: { tab: "susi", section: "susi-subject" },
   admission: { tab: "curriculum", section: "" },
 };
-const MOBILE_MQ = window.matchMedia("(max-width: 860px)");
+/* 세로≤860 + 폰 가로(짧은 높이) — 큰 폰 가로에서 데스크톱 사이드바/글자가 켜지지 않게 */
+const MOBILE_MQ = window.matchMedia(
+  "(max-width: 860px), (max-width: 1279px) and (max-height: 500px) and (orientation: landscape)"
+);
 
 function isMobileNav() {
   return MOBILE_MQ.matches;

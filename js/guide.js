@@ -1808,6 +1808,146 @@ const Guide = (() => {
   const GRADE_RATIO_ROWS = ["1학년", "2학년", "3학년", "1·2학년", "2·3학년", "1·3학년", "1·2·3학년"];
   const SCHEDULE_COLS = ["접수일정", "합격발표", "면접일정", "논술일정", "실기일정", "적성일정", "기타일정"];
 
+  /* 팝업 표 = 본문 web-info 표와 동일 파이프라인(개별 비율 → contain → PC min + 스크롤) */
+  const ADMIT_DETAIL_PC_MIN = 876;
+
+  function applyAdmitDetailCols(table, widths) {
+    let group = table.querySelector("colgroup");
+    if (!group) {
+      group = document.createElement("colgroup");
+      table.insertBefore(group, table.firstChild);
+    }
+    group.innerHTML = "";
+    widths.forEach((w) => {
+      const col = document.createElement("col");
+      col.style.setProperty("width", w, "important");
+      group.appendChild(col);
+    });
+  }
+
+  function containAdmitDetailCells(table) {
+    table.querySelectorAll("th, td").forEach((el) => {
+      el.style.setProperty("width", "auto", "important");
+      el.style.setProperty("min-width", "0", "important");
+      el.style.setProperty("max-width", "none", "important");
+      el.style.setProperty("white-space", "normal", "important");
+      el.style.setProperty("word-break", "keep-all", "important");
+      el.style.setProperty("overflow-wrap", "break-word", "important");
+      el.style.setProperty("overflow", "hidden", "important");
+      el.style.setProperty("box-sizing", "border-box", "important");
+    });
+  }
+
+  function measureAdmitDetailCols(table) {
+    const probe = table.cloneNode(true);
+    probe.querySelectorAll("colgroup").forEach((node) => node.remove());
+    probe.setAttribute("style", "");
+    probe.style.cssText =
+      "position:absolute;left:-99999px;top:0;visibility:hidden;table-layout:auto;width:max-content;border-collapse:separate;border-spacing:0;margin:0;font:inherit;";
+    probe.querySelectorAll("th, td").forEach((cell) => {
+      cell.style.cssText = "";
+      cell.style.setProperty("white-space", "nowrap", "important");
+      cell.style.setProperty("width", "auto", "important");
+      cell.style.setProperty("min-width", "0", "important");
+      cell.style.setProperty("max-width", "none", "important");
+      cell.style.setProperty("overflow", "visible", "important");
+      cell.style.setProperty("word-break", "keep-all", "important");
+    });
+    document.body.appendChild(probe);
+    const rows = [...probe.rows];
+    const colCount = Math.max(
+      0,
+      ...rows.map((row) => [...row.cells].reduce((sum, cell) => sum + (cell.colSpan || 1), 0))
+    );
+    const widths = Array(colCount).fill(0);
+    const occupied = Array.from({ length: rows.length }, () => Array(colCount).fill(false));
+    rows.forEach((row, r) => {
+      let c = 0;
+      [...row.cells].forEach((cell) => {
+        while (c < colCount && occupied[r][c]) c += 1;
+        const cs = cell.colSpan || 1;
+        const rs = cell.rowSpan || 1;
+        const w = Math.ceil(cell.getBoundingClientRect().width);
+        if (cs <= 1) widths[c] = Math.max(widths[c], w);
+        else {
+          const part = Math.ceil(w / cs);
+          for (let i = 0; i < cs; i += 1) widths[c + i] = Math.max(widths[c + i] || 0, part);
+        }
+        for (let rr = 0; rr < rs; rr += 1) {
+          if (!occupied[r + rr]) continue;
+          for (let cc = 0; cc < cs; cc += 1) occupied[r + rr][c + cc] = true;
+        }
+        c += cs;
+      });
+    });
+    probe.remove();
+    return widths.map((w) => Math.max(36, w || 36));
+  }
+
+  function assignAdmitDetailColWidths(table) {
+    if (table.dataset.declaredColWidths) return;
+    if (table.classList.contains("admit-detail-table-method")) {
+      table.dataset.declaredColWidths = "18,18,16,16,16,16";
+      return;
+    }
+    if (table.classList.contains("admit-detail-table-record")) {
+      table.dataset.declaredColWidths = "12,12,14,15.5,15.5,15.5,15.5";
+      return;
+    }
+    if (table.classList.contains("admit-detail-table-schedule")) {
+      /* 일정 7열 — 헤더 길이에 맞춘 개별 비율 */
+      table.dataset.declaredColWidths = "16,14,14,14,14,14,14";
+      return;
+    }
+    if (table.classList.contains("admit-detail-table-cut")) {
+      table.dataset.declaredColWidths = "24,19,19,19,19";
+      return;
+    }
+    /* trend·uni-trend·기타: 내용 측정 (declared 없음) */
+  }
+
+  function fitAdmitDetailColumns(table) {
+    const saved = String(table.dataset.declaredColWidths || "")
+      .split(",")
+      .map((v) => parseFloat(v))
+      .filter((v) => Number.isFinite(v) && v > 0);
+    if (saved.length >= 2 && Math.abs(saved.reduce((sum, w) => sum + w, 0) - 100) < 1) {
+      applyAdmitDetailCols(
+        table,
+        saved.map((w) => `${w}%`)
+      );
+      table.style.setProperty("width", "100%", "important");
+      table.style.setProperty("min-width", "var(--admit-detail-pc-min, 876px)", "important");
+      table.style.setProperty("max-width", "none", "important");
+      return;
+    }
+    const pxWidths = measureAdmitDetailCols(table);
+    if (!pxWidths.length) return;
+    const total = pxWidths.reduce((sum, w) => sum + w, 0) || 1;
+    applyAdmitDetailCols(
+      table,
+      pxWidths.map((w) => `${((w / total) * 100).toFixed(4)}%`)
+    );
+    table.style.setProperty("width", "100%", "important");
+    table.style.setProperty(
+      "min-width",
+      `${Math.max(ADMIT_DETAIL_PC_MIN, Math.ceil(total + 2))}px`,
+      "important"
+    );
+    table.style.setProperty("max-width", "none", "important");
+  }
+
+  function fitAdmitDetailTables(root) {
+    if (!root) return;
+    root.querySelectorAll("table.admit-detail-table").forEach((table) => {
+      assignAdmitDetailColWidths(table);
+      table.style.setProperty("table-layout", "fixed", "important");
+      table.style.setProperty("overflow", "hidden", "important");
+      containAdmitDetailCells(table);
+      fitAdmitDetailColumns(table);
+    });
+  }
+
   function ensureAdmitDetailModal() {
     let root = document.getElementById("admit-detail-root");
     if (!root) {
@@ -2221,6 +2361,7 @@ const Guide = (() => {
     }
     infoPanel.hidden = false;
     resultPanel.hidden = true;
+    fitAdmitDetailTables(root);
     root.hidden = false;
     document.body.style.overflow = "hidden";
     root.querySelector("[data-admit-detail-close].admit-detail-close")?.focus();
@@ -2649,6 +2790,7 @@ const Guide = (() => {
     infoPanel.hidden = false;
     resultPanel.hidden = true;
     if (materialsPanel) materialsPanel.hidden = true;
+    fitAdmitDetailTables(root);
     root.hidden = false;
     document.body.style.overflow = "hidden";
     root.querySelector("[data-admit-detail-close].admit-detail-close")?.focus();

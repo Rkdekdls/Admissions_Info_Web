@@ -18,6 +18,8 @@
   --sidebar-rail: 76px;
   /* 1280px 데스크톱 본문(사이드바 260 + 좌우 48px). 이보다 좁으면 표는 줄이지 않고 가로 스크롤 */
   --pc-table-min: 924px;
+  /* 팝업 본문폭(920 - 좌우 22*2). 본문 표와 같이 줄이지 않고 가로 스크롤 */
+  --admit-detail-pc-min: 876px;
 }
 
 * {
@@ -29,6 +31,9 @@ body {
   margin: 0;
   height: 100%;
   overflow: hidden;
+  /* iOS 가로모드 텍스트 자동 확대 방지 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -2274,7 +2279,8 @@ input {
   margin-top: 16px;
 }
 
-@media (max-width: 860px) {
+/* 좁은 세로(≤860) + 폰 가로(짧은 높이·가로) — 큰 폰 가로에서 데스크톱 글자/사이드바가 켜지는 것 방지 */
+@media (max-width: 860px), (max-width: 1279px) and (max-height: 500px) and (orientation: landscape) {
   /* PC 사이드바·접기 토글은 숨기고 드로어로 전환 — PC(>860) 레이아웃 유지 */
   .sidebar-toggle {
     display: none !important;
@@ -2986,8 +2992,11 @@ input {
 
 .admit-detail-table-wrap {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
   /* 왼쪽·위만 래퍼 / 세로·아래는 셀 border (rowspan 헤더 last-child 이슈 방지) */
   border: 0;
   border-left: 1px solid #e5e7eb;
@@ -2998,7 +3007,9 @@ input {
 
 .admit-detail-table {
   width: 100%;
-  min-width: 0;
+  /* 본문 .admit-data-table / .table-scroll 표와 동일: PC 폭 고정 + 좁으면 스크롤 */
+  min-width: var(--admit-detail-pc-min, 876px);
+  max-width: none;
   margin: 0;
   border: 0;
   border-collapse: separate;
@@ -3022,9 +3033,12 @@ table.admit-detail-table td {
   font-size: 13px;
   font-weight: 400; /* 흰 데이터 셀: 본문 표와 동일 */
   line-height: 1.35;
-  white-space: nowrap !important;
-  word-break: keep-all !important;
-  overflow-wrap: normal !important;
+  /* 본문 표와 같이 셀 안으로 — 넘치면 줄바꿈 (열 비율은 표별로 JS 지정) */
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  overflow: hidden;
+  min-width: 0;
 }
 
 /* 회색 헤더·구분 칸 */
@@ -3050,21 +3064,7 @@ table.admit-detail-table td {
   padding-right: 4px;
 }
 
-/*
-  전형방법(왼쪽 2열) ↔ 학생부 반영 세부(왼쪽 3열) 연도열 정렬
-  공통: 연도 각 1/6 · 왼쪽 합 2/6
-*/
-.admit-detail-table-method .admit-detail-col-method-label {
-  width: calc(100% / 6);
-}
-.admit-detail-table-record .admit-detail-col-stack,
-.admit-detail-table-record .admit-detail-col-item {
-  width: calc(100% / 9);
-}
-.admit-detail-table-method .admit-detail-col-year,
-.admit-detail-table-record .admit-detail-col-year {
-  width: calc(100% / 6);
-}
+/* 열 비율은 표 종류별로 guide.js fitAdmitDetailTables가 colgroup 지정 */
 
 .admit-detail-table-record th.admit-detail-th-stack {
   width: auto;
@@ -3587,7 +3587,7 @@ table.admit-detail-table td {
   height: 14px;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 860px), (max-width: 1279px) and (max-height: 500px) and (orientation: landscape) {
   /* 모바일: 팝업이 아니라 전체 화면처럼 (PC 스타일은 유지) */
   .admit-detail-root {
     padding: 0;
@@ -3696,10 +3696,10 @@ table.admit-detail-table td {
     overscroll-behavior-x: contain;
   }
 
-  /* PC 팝업 본문폭(920 - 좌우 22*2)과 동일 · layout/패딩 유지 */
+  /* 본문과 동일: PC 최소폭은 기본 CSS/JS — 여기서는 스크롤만 보장 */
   table.admit-detail-table {
-    width: 876px !important;
-    min-width: 876px !important;
+    width: 100% !important;
+    min-width: var(--admit-detail-pc-min, 876px) !important;
     max-width: none !important;
     table-layout: fixed !important;
   }

@@ -1460,7 +1460,9 @@ li::before {
       node.style.setProperty("font-size", "13px", "important");
     });
     /* 표 래퍼 + 창의적 체험표 열 비율 강제 */
-    const isNarrow = window.matchMedia("(max-width: 860px)").matches;
+    const isNarrow = window.matchMedia(
+      "(max-width: 860px), (max-width: 1279px) and (max-height: 500px) and (orientation: landscape)"
+    ).matches;
     page.querySelectorAll(".pie-label").forEach((node) => {
       const size = isNarrow ? "15" : "12";
       node.setAttribute("font-size", size);
@@ -1919,7 +1921,7 @@ table.award-career-table tbody td:first-child > div > div {
   padding-right: 1.5mm !important;
   box-sizing: border-box !important;
 }
-@media (max-width: 860px) {
+@media (max-width: 860px), (max-width: 1279px) and (max-height: 500px) and (orientation: landscape) {
   table.award-career-table tbody td:first-child {
     min-width: 72px !important;
   }
