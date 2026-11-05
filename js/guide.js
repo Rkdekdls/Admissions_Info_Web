@@ -1849,9 +1849,7 @@ const Guide = (() => {
   const GRADE_RATIO_ROWS = ["1학년", "2학년", "3학년", "1·2학년", "2·3학년", "1·3학년", "1·2·3학년"];
   const SCHEDULE_COLS = ["접수일정", "합격발표", "면접일정", "논술일정", "실기일정", "적성일정", "기타일정"];
 
-  /* 팝업 표 = 본문 web-info 표와 동일 파이프라인(개별 비율 → contain → PC min + 스크롤) */
-  const ADMIT_DETAIL_PC_MIN = 876;
-
+  /* 팝업 표 = 개별 열 비율 → contain → 래퍼 전폭 (필요할 때만 가로 스크롤) */
   function applyAdmitDetailCols(table, widths) {
     let group = table.querySelector("colgroup");
     if (!group) {
@@ -1970,9 +1968,23 @@ const Guide = (() => {
     return window.matchMedia("(max-width: 1279px)").matches;
   }
 
-  function fitAdmitDetailColumns(table) {
+  function fitAdmitDetailToWrap(table, contentMinPx = 0) {
     const parentW = admitDetailContentWidth(table);
     const narrow = isAdmitDetailNarrow();
+    /* 기본은 래퍼 전폭. 열이 많아 내용이 래퍼보다 넓을 때만(좁은 화면) 스크롤 */
+    const needsScroll = narrow && contentMinPx > 0 && parentW > 0 && contentMinPx > parentW + 1;
+    if (needsScroll) {
+      table.style.setProperty("width", `${contentMinPx}px`, "important");
+      table.style.setProperty("min-width", `${contentMinPx}px`, "important");
+      table.style.setProperty("max-width", "none", "important");
+      return;
+    }
+    table.style.setProperty("width", "100%", "important");
+    table.style.setProperty("min-width", "0", "important");
+    table.style.setProperty("max-width", "100%", "important");
+  }
+
+  function fitAdmitDetailColumns(table) {
     const saved = String(table.dataset.declaredColWidths || "")
       .split(",")
       .map((v) => parseFloat(v))
@@ -1982,17 +1994,8 @@ const Guide = (() => {
         table,
         saved.map((w) => `${w}%`)
       );
-      if (narrow) {
-        const floor = Math.max(ADMIT_DETAIL_PC_MIN, parentW);
-        table.style.setProperty("width", `${floor}px`, "important");
-        table.style.setProperty("min-width", `${floor}px`, "important");
-        table.style.setProperty("max-width", "none", "important");
-      } else {
-        /* PC: 팝업 폭에 맞춤 — 가로 스크롤 없음 */
-        table.style.setProperty("width", "100%", "important");
-        table.style.setProperty("min-width", "0", "important");
-        table.style.setProperty("max-width", "100%", "important");
-      }
+      /* 대학발표·어디가 등 % 표는 래퍼에만 맞춤 — 876 강제 금지 */
+      fitAdmitDetailToWrap(table, 0);
       return;
     }
     const pxWidths = measureAdmitDetailCols(table);
@@ -2002,16 +2005,7 @@ const Guide = (() => {
       table,
       pxWidths.map((w) => `${((w / total) * 100).toFixed(4)}%`)
     );
-    if (narrow) {
-      const floor = Math.max(ADMIT_DETAIL_PC_MIN, Math.ceil(total + 2), parentW);
-      table.style.setProperty("width", `${floor}px`, "important");
-      table.style.setProperty("min-width", `${floor}px`, "important");
-      table.style.setProperty("max-width", "none", "important");
-    } else {
-      table.style.setProperty("width", "100%", "important");
-      table.style.setProperty("min-width", "0", "important");
-      table.style.setProperty("max-width", "100%", "important");
-    }
+    fitAdmitDetailToWrap(table, Math.ceil(total + 2));
   }
 
   function fitAdmitDetailTables(root) {
