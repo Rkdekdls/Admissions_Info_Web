@@ -1314,6 +1314,33 @@ body.page-title-body {
   max-width: none !important;
   box-sizing: border-box !important;
 }
+.comparison-table.curriculum-table.award-career-table thead th:first-child {
+  white-space: nowrap !important;
+}
+.comparison-table.curriculum-table.award-career-table tbody td:first-child {
+  overflow: visible !important;
+  min-width: 56px !important;
+  padding: 0 !important;
+}
+.comparison-table.curriculum-table.award-career-table tbody td:first-child > div {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: 1fr !important;
+  grid-auto-flow: column !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  overflow: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+.comparison-table.curriculum-table.award-career-table tbody td:first-child > div > div {
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding-left: 1.5mm !important;
+  padding-right: 1.5mm !important;
+}
 
 /* PC: 창의적 체험표 원본 열 비율 8/15/8/15/54 */
 @media (min-width: 861px) {

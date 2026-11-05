@@ -1147,7 +1147,7 @@ const WebInfo = (() => {
     const shadow = sheet.attachShadow({ mode: "open" });
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "css/page.css?v=66";
+    link.href = "css/page.css?v=68";
     const extra = document.createElement("style");
     extra.textContent = `${[...doc.querySelectorAll("style")].map((node) => node.textContent).join("\n")}\n${bookVars}
 @media (max-width: 860px) {
@@ -1489,6 +1489,32 @@ li::before {
         el.style.setProperty("box-sizing", "border-box", "important");
       });
       table.querySelectorAll("td > div").forEach((el) => {
+        const awardGrade =
+          el.closest("table.award-career-table") &&
+          el.parentElement &&
+          el.parentElement.matches("td:first-child");
+        if (awardGrade) {
+          el.classList.add("award-grade-term");
+          el.style.setProperty("overflow", "visible", "important");
+          el.style.setProperty("display", "grid", "important");
+          el.style.setProperty("grid-template-columns", "1fr 1fr", "important");
+          el.style.setProperty("grid-template-rows", "1fr", "important");
+          el.style.setProperty("flex-direction", "row", "important");
+          el.style.setProperty("flex-wrap", "nowrap", "important");
+          el.style.setProperty("align-items", "stretch", "important");
+          el.style.setProperty("width", "100%", "important");
+          el.style.setProperty("height", "100%", "important");
+          el.style.setProperty("max-width", "100%", "important");
+          el.querySelectorAll(":scope > div").forEach((half) => {
+            half.style.setProperty("display", "flex", "important");
+            half.style.setProperty("align-items", "center", "important");
+            half.style.setProperty("justify-content", "center", "important");
+            half.style.setProperty("padding-left", "1.5mm", "important");
+            half.style.setProperty("padding-right", "1.5mm", "important");
+            half.style.setProperty("min-width", "0", "important");
+          });
+          return;
+        }
         el.style.setProperty("overflow", "hidden", "important");
         el.style.setProperty("max-width", "100%", "important");
         el.style.setProperty("word-break", "keep-all", "important");
@@ -1584,7 +1610,8 @@ li::before {
       }
       if (/수상명/.test(headText) && /수여기관/.test(headText)) {
         table.classList.add("award-career-table");
-        table.dataset.declaredColWidths = "14,26,10,14,18,18";
+        /* 학년(학기) 칸이 모바일에서 안 깨지게 1열 확보 */
+        table.dataset.declaredColWidths = "18,24,10,14,17,17";
       }
       if (/수업일수/.test(headText) && /결석일수/.test(headText)) {
         table.classList.add("attendance-status-table");
@@ -1844,6 +1871,59 @@ table.comparison-table.curriculum-table.award-career-table td {
   overflow: hidden !important;
   white-space: normal !important;
   min-width: 0 !important;
+}
+/* 수상경력 학년(학기): 헤더 한 줄 + 좌우 숫자 칸 유지 */
+table.award-career-table thead th:first-child {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+}
+table.award-career-table tbody td:first-child {
+  overflow: visible !important;
+  min-width: 56px !important;
+  padding: 0 !important;
+}
+table.award-career-table tbody td:first-child > div,
+table.award-career-table tbody td:first-child > div.award-grade-term {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: 1fr !important;
+  grid-auto-flow: column !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 10mm !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+table.award-career-table tbody td:first-child > div > div {
+  flex: none !important;
+  min-width: 0 !important;
+  width: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding-left: 1.5mm !important;
+  padding-right: 1.5mm !important;
+  box-sizing: border-box !important;
+}
+@media (max-width: 860px) {
+  table.award-career-table tbody td:first-child {
+    min-width: 72px !important;
+  }
+  table.award-career-table tbody td:first-child > div,
+  table.award-career-table tbody td:first-child > div.award-grade-term {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 1fr !important;
+    grid-auto-flow: column !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+  }
+  table.award-career-table tbody td:first-child > div > div {
+    padding-left: 1mm !important;
+    padding-right: 1mm !important;
+  }
 }`;
     /* 페이지 인라인 height 고정을 덮어 긴 셀은 줄바꿈·높이 확장 */
     extra.textContent += `
