@@ -3678,21 +3678,20 @@ table.admit-detail-table td {
   align-items: center; /* 한 줄 콘텐츠 상하 여백 균등 */
 }
 
-/* 교과성적 반영: 배지 행 + 메타를 한 박스에 (정량+정성 샘플) */
+/* 교과성적 반영: 성취도 합산 박스 · 반영 교과 등 메타 박스 분리 */
 .admit-record-box-method {
   display: flex;
-  flex-direction: column;
-  padding: 14px 16px 0;
-}
-
-.admit-record-box-method .admit-record-meta {
-  margin: 14px -16px 0;
-  border: 0;
-  border-top: 1px solid #e5e7eb;
-}
-
-.admit-record-box-method .admit-record-meta-item {
+  align-items: center;
   padding: 14px 16px;
+}
+
+.admit-record-box-method + .admit-record-box-meta {
+  margin-top: 10px;
+}
+
+.admit-record-box-meta {
+  padding: 0;
+  overflow: hidden;
 }
 
 .admit-record-eval {
@@ -3799,6 +3798,12 @@ table.admit-detail-table td {
   gap: 8px 12px;
   width: 100%;
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.admit-record-box-meta .admit-record-meta-item {
+  padding: 14px 16px;
 }
 
 .admit-record-method-badge {
@@ -3830,7 +3835,7 @@ table.admit-detail-table td {
 
 .admit-record-meta {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
   box-sizing: border-box;
   margin: 0;
@@ -3848,8 +3853,12 @@ table.admit-detail-table td {
   min-width: 0;
 }
 
-.admit-record-meta-item:first-child {
+.admit-record-meta-item:nth-child(odd) {
   border-left: 0;
+}
+
+.admit-record-meta-item:nth-child(n + 3) {
+  border-top: 1px solid #e5e7eb;
 }
 
 .admit-record-meta-label {
@@ -3866,6 +3875,53 @@ table.admit-detail-table td {
   font-weight: 600;
   letter-spacing: -0.2px;
   line-height: 1.2;
+}
+
+/* 가산점·수능 최저: 제목만 두고 회색 라벨 칸 없음 */
+.admit-detail-table-bonus td.is-align-left,
+.admit-detail-table-min td.is-align-left {
+  text-align: left;
+  vertical-align: middle;
+  padding: 12px 14px;
+}
+
+.admit-record-bonus-inner {
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+  line-height: 1.55;
+  word-break: keep-all;
+  text-align: left;
+}
+
+.admit-record-bonus-note {
+  margin: 0 0 8px;
+}
+
+.admit-record-bonus-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admit-record-bonus-list li {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 12px;
+}
+
+.admit-record-bonus-list li + li {
+  margin-top: 4px;
+}
+
+.admit-record-bonus-list li::before {
+  content: "·";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #1f2937;
+  font-weight: 600;
 }
 
 .admit-record-subject-grid {

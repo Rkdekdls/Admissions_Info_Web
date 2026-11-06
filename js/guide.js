@@ -2241,7 +2241,6 @@ const Guide = (() => {
 
   const METHOD_SCORE_ROWS = ["선발비율", "학생부", "면접", "논술", "실기", "전공적성", "기타", "비고", "총점"];
   const RECORD_RATIO_ROWS = ["교과", "출결", "자격증", "활동", "봉사", "기타"];
-  const GRADE_RATIO_ROWS = ["1학년", "2학년", "3학년", "1·2학년", "2·3학년", "1·3학년", "1·2·3학년"];
   const SCHEDULE_COLS = ["접수일정", "합격발표", "면접일정", "논술일정", "실기일정", "적성일정", "기타일정"];
 
   /* 팝업 표: PC는 래퍼 맞춤(스크롤 X) / 태블릿·모바일은 PC min(876)+스크롤 */
@@ -2610,11 +2609,12 @@ const Guide = (() => {
     }
   }
 
-  function buildSusiRecordPanelHtml({ typeKey, method, track, reflect }) {
+  function buildSusiRecordPanelHtml({ typeKey, method, track, reflect, kind = "susi" }) {
     const reflectLabel = reflect || inferSusiRecordReflect(typeKey, method);
     const hasQuant = /정량/.test(reflectLabel);
     const hasQual = /정성/.test(reflectLabel);
     const none = reflectLabel === "미반영";
+    const isJeongsi = kind === "jeongsi";
     const dash = (value) => (value == null || value === "" ? "-" : value);
     /* 해당되는 평가만 체크 표시 (없으면 항목 자체를 숨김) */
     const checkHtml = (on, label) =>
@@ -2710,8 +2710,8 @@ const Guide = (() => {
     const gradeMethodHtml = `
       <section class="admit-detail-section">
         <h3 class="admit-detail-section-title">교과성적 반영 방법</h3>
-        <div class="admit-record-box admit-record-box-method">
-          ${methodTopHtml}
+        <div class="admit-record-box admit-record-box-method">${methodTopHtml}</div>
+        <div class="admit-record-box admit-record-box-meta">
           <div class="admit-record-meta">
             <div class="admit-record-meta-item">
               <span class="admit-record-meta-label">반영 교과</span>
@@ -2720,6 +2720,12 @@ const Guide = (() => {
             <div class="admit-record-meta-item">
               <span class="admit-record-meta-label">반영 과목</span>
               <span class="admit-record-meta-value">-</span>
+            </div>
+            <div class="admit-record-meta-item">
+              <span class="admit-record-meta-label">학년별 반영비율</span>
+              <span class="admit-record-meta-value">${escapeHtml(
+                hasQuant ? "1학년 30% · 2학년 40% · 3학년 30%" : "-"
+              )}</span>
             </div>
             <div class="admit-record-meta-item">
               <span class="admit-record-meta-label">활용 지표</span>
@@ -2821,7 +2827,89 @@ const Guide = (() => {
         </div>
       </section>`;
 
-    return `${evalTypeHtml}${gradeMethodHtml}${subjectTypeHtml}${scoreCalcHtml}${qualHtml}${convertHtml}`;
+    /* 교과성적 반영 방법 아래 · 수능 최저학력 기준과 동일 표 디자인 */
+    const bonusInner = (() => {
+      if (none) return "-";
+      if (isJeongsi) {
+        if (!hasQuant) {
+          return `<div class="admit-record-bonus-inner">
+              <p class="admit-record-bonus-note">※ 해당 전형은 학생부 정량 가산점을 적용하지 않습니다.</p>
+              <ul class="admit-record-bonus-list">
+                <li>수능 100% 전형: 학생부 이수 교과 가산점 없음</li>
+                <li>서류·면접 반영 전형의 가산은 정성평가에 포함하여 별도 점수화하지 않음</li>
+              </ul>
+            </div>`;
+        }
+        const scienceTrack = track === "자연";
+        return `<div class="admit-record-bonus-inner">
+              <p class="admit-record-bonus-note">※ 전 계열 수능 반영영역별 지정 과목은 없으나, ${
+                scienceTrack ? "자연" : "인문"
+              } 계열 모집단위 학생부 이수 교과 가산점을 적용합니다.</p>
+              <ul class="admit-record-bonus-list">
+                <li>수능위주일반전형(수능·학생부형): 학생부 ${
+                  scienceTrack ? "수학·과학" : "국어·사회"
+                } 교과 3학년 2학기까지 선택과목(일반+진로+융합 선택과목) 권장 최소 이수학점(단위) 수 또는 과목 수 충족 시 전형 총점에서 가점 (총 8점)</li>
+                <li>${
+                  scienceTrack
+                    ? "수학교과 18학점(단위) 또는 5과목 이상: 4점"
+                    : "국어교과 16학점(단위) 또는 4과목 이상: 4점"
+                }</li>
+                <li>${
+                  scienceTrack
+                    ? "과학교과 20학점(단위) 또는 6과목 이상: 4점"
+                    : "사회교과 18학점(단위) 또는 5과목 이상: 4점"
+                }</li>
+                <li>수능위주일반전형(수능형)은 가산점 없음</li>
+              </ul>
+            </div>`;
+      }
+      if (typeKey === "논술") {
+        return `<div class="admit-record-bonus-inner">
+              <p class="admit-record-bonus-note">※ 논술전형은 논술고사 성적이 중심이며, 학생부 교과 가산은 제한적으로 적용합니다.</p>
+              <ul class="admit-record-bonus-list">
+                <li>논술 성적 반영 후 동점자 처리 시 학생부 교과 우수자에게 가점</li>
+                <li>진로선택 과목 성취도 A 비율에 따른 가산: 최대 2점</li>
+                <li>학생부 미반영(논술 100%) 모집단위는 가산점 없음</li>
+              </ul>
+            </div>`;
+      }
+      if (typeKey === "종합" || (hasQual && !hasQuant)) {
+        return `<div class="admit-record-bonus-inner">
+              <p class="admit-record-bonus-note">※ 학생부종합전형은 정성평가에 포함하여 별도 가산점으로 분리하지 않습니다.</p>
+              <ul class="admit-record-bonus-list">
+                <li>서류·면접 평가 시 전공 관련 활동·이수 과목을 종합적으로 반영</li>
+                <li>정량 환산 가산점(학점·과목 수)은 적용하지 않음</li>
+                <li>동점자 발생 시 서류평가 점수 → 면접 점수 순으로 처리</li>
+              </ul>
+            </div>`;
+      }
+      return `<div class="admit-record-bonus-inner">
+              <p class="admit-record-bonus-note">※ 학생부교과전형에서 진로선택·융합선택 과목 이수에 따른 가산점을 적용합니다.</p>
+              <ul class="admit-record-bonus-list">
+                <li>진로선택 과목 성취도 A·B 비율에 따라 최대 5점 가산</li>
+                <li>융합선택(사회·과학) 과목 이수 시 최대 2점 가산</li>
+                <li>${
+                  track === "자연" ? "수학·과학" : "국어·사회·수학"
+                } 교과 이수단위 충족 시 전형 총점에서 가점</li>
+                <li>출결·봉사 등 비교과 가산은 해당 모집단위에 한해 적용</li>
+              </ul>
+            </div>`;
+    })();
+    const bonusHtml = `
+      <section class="admit-detail-section">
+        <h3 class="admit-detail-section-title">가산점</h3>
+        <div class="admit-detail-table-wrap">
+          <table class="admit-detail-table admit-detail-table-bonus">
+            <tbody>
+              <tr>
+                <td class="is-align-left">${bonusInner}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>`;
+
+    return `${evalTypeHtml}${gradeMethodHtml}${bonusHtml}${subjectTypeHtml}${scoreCalcHtml}${qualHtml}${convertHtml}`;
   }
 
   function parseAdmitStatNumber(value) {
@@ -3294,15 +3382,6 @@ const Guide = (() => {
       recordDefaults.교과 = "70%";
       recordDefaults.기타 = "30%";
     }
-    const gradeRatioDefaults = {
-      "1학년": "-",
-      "2학년": "-",
-      "3학년": "-",
-      "1·2학년": "-",
-      "2·3학년": "-",
-      "1·3학년": "-",
-      "1·2·3학년": "100%",
-    };
     const recordRatioBody = RECORD_RATIO_ROWS.map((key, index) => {
       const group =
         index === 0
@@ -3312,23 +3391,6 @@ const Guide = (() => {
         recordDefaults[key] || "-"
       )}</tr>`;
     }).join("");
-    const gradeRatioBody = GRADE_RATIO_ROWS.map((key, index) => {
-      if (index === 0) {
-        return `<tr>
-          <th scope="row" rowspan="${GRADE_RATIO_ROWS.length + 2}" class="admit-detail-th-stack">교과<br>반영 방법</th>
-          <th scope="row" rowspan="${GRADE_RATIO_ROWS.length}" class="admit-detail-th-stack">학년<br>반영 비율</th>
-          <th scope="row">${escapeHtml(key)}</th>
-          ${yearCells(gradeRatioDefaults[key] || "-")}
-        </tr>`;
-      }
-      return `<tr><th scope="row">${escapeHtml(key)}</th>${yearCells(gradeRatioDefaults[key] || "-")}</tr>`;
-    }).join("");
-    const recordExtraBody = `
-      <tr><th scope="row" colspan="2">활용지표</th>${yearCells("석차등급")}</tr>
-      <tr><th scope="row" colspan="2">반영교과</th>${yearCells(
-        track === "자연" ? "국·수·영·과 전 과목" : "국·수·영·사 전 과목"
-      )}</tr>`;
-
     infoPanel.innerHTML = `
       <section class="admit-detail-section">
         <h3 class="admit-detail-section-title">모집단위</h3>
@@ -3386,8 +3448,6 @@ const Guide = (() => {
             <thead>${yearHeaderRow(3)}</thead>
             <tbody>
               ${recordRatioBody}
-              ${gradeRatioBody}
-              ${recordExtraBody}
             </tbody>
           </table>
         </div>
@@ -3399,6 +3459,7 @@ const Guide = (() => {
         method,
         track,
         reflect: reflectLabel,
+        kind: "susi",
       });
     }
 
@@ -3784,6 +3845,24 @@ const Guide = (() => {
       )
       .join("");
 
+    /* —— 학생부 반영 세부 (수시와 동일 표, 전형방법 아래) —— */
+    const hasJeongsiRecord = /정량|정성/.test(reflectLabel);
+    const jeongsiRecordDefaults = hasJeongsiRecord
+      ? { 교과: "100%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" }
+      : { 교과: "-", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+    const jeongsiRecordPct = String(method || "").match(/학생부\s*(\d+)/);
+    if (hasJeongsiRecord && jeongsiRecordPct) {
+      jeongsiRecordDefaults.교과 = `${jeongsiRecordPct[1]}%`;
+    }
+    const jeongsiRecordRatioBody = RECORD_RATIO_ROWS.map((key, index) => {
+      const group =
+        index === 0
+          ? `<th scope="row" rowspan="${RECORD_RATIO_ROWS.length}" class="admit-detail-th-stack">학생부<br>반영 비율</th>`
+          : "";
+      return `<tr>${group}<th scope="row" colspan="2">${escapeHtml(key)}</th>${yearCells(
+        jeongsiRecordDefaults[key] || "-"
+      )}</tr>`;
+    }).join("");
     infoPanel.innerHTML = `
       <section class="admit-detail-section">
         <h3 class="admit-detail-section-title">모집단위</h3>
@@ -3811,13 +3890,30 @@ const Guide = (() => {
       </section>
 
       <section class="admit-detail-section">
+        <h3 class="admit-detail-section-title">학생부 반영 세부 정보</h3>
+        <div class="admit-detail-table-wrap">
+          <table class="admit-detail-table admit-detail-table-record">
+            <colgroup>
+              <col class="admit-detail-col-stack">
+              <col class="admit-detail-col-stack">
+              <col class="admit-detail-col-item">
+              <col span="${ADMIT_DETAIL_YEARS.length}" class="admit-detail-col-year">
+            </colgroup>
+            <thead>${yearHeaderRow(3)}</thead>
+            <tbody>
+              ${jeongsiRecordRatioBody}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admit-detail-section">
         <h3 class="admit-detail-section-title">수능 최저학력 기준</h3>
         <div class="admit-detail-table-wrap">
-          <table class="admit-detail-table">
+          <table class="admit-detail-table admit-detail-table-min">
             <tbody>
               <tr>
-                <th scope="row">수능 최저학력 기준</th>
-                <td class="is-align-left" colspan="${ADMIT_DETAIL_YEARS.length}">-</td>
+                <td class="is-align-left">-</td>
               </tr>
             </tbody>
           </table>
@@ -3985,6 +4081,7 @@ const Guide = (() => {
         method,
         track,
         reflect: reflectLabel,
+        kind: "jeongsi",
       });
     }
 
