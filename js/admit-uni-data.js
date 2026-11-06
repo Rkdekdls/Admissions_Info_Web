@@ -1,143 +1,1087 @@
 /* 대학 상세용 공개 데이터 (대학알리미 기준 신입생 충원 현황 · 입시톡 정리 / 각 대학 입학처) */
 window.ADMIT_UNI_DETAIL = {
   "한국외국어대학교(서울)": {
-    home: "https://www.hufs.ac.kr",
-    admit: "https://enter.hufs.ac.kr",
-    years: {
-      "2024": { quota: 3470, recruit: 3488, applicants: 42100, enrolled: 3455, fill: 99.6, rate: 12.1 },
-      "2025": { quota: 3480, recruit: 3492, applicants: 43950, enrolled: 3470, fill: 99.7, rate: 12.6 },
-      "2026": { quota: 3475, recruit: 3490, applicants: 45822, enrolled: 3484, fill: 99.8, rate: 13.1 },
-    },
+    "home": "https://www.hufs.ac.kr",
+    "admit": "https://enter.hufs.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 3470,
+        "recruit": 3488,
+        "applicants": 42100,
+        "enrolled": 3455,
+        "fill": 99.6,
+        "rate": 12.1
+      },
+      "2025": {
+        "quota": 3480,
+        "recruit": 3492,
+        "applicants": 43950,
+        "enrolled": 3470,
+        "fill": 99.7,
+        "rate": 12.6
+      },
+      "2026": {
+        "quota": 3475,
+        "recruit": 3490,
+        "applicants": 45822,
+        "enrolled": 3484,
+        "fill": 99.8,
+        "rate": 13.1
+      }
+    }
   },
   "연세대학교(서울)": {
-    home: "https://www.yonsei.ac.kr",
-    admit: "https://admission.yonsei.ac.kr",
-    years: {
-      "2024": { quota: 3420, recruit: 3435, applicants: 35200, enrolled: 3395, fill: 99.3, rate: 10.2 },
-      "2025": { quota: 3460, recruit: 3480, applicants: 36850, enrolled: 3440, fill: 99.4, rate: 10.6 },
-      "2026": { quota: 3495, recruit: 3506, applicants: 38171, enrolled: 3488, fill: 99.5, rate: 10.9 },
-    },
+    "home": "https://www.yonsei.ac.kr",
+    "admit": "https://admission.yonsei.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 3420,
+        "recruit": 3435,
+        "applicants": 35200,
+        "enrolled": 3395,
+        "fill": 99.3,
+        "rate": 10.2
+      },
+      "2025": {
+        "quota": 3460,
+        "recruit": 3480,
+        "applicants": 36850,
+        "enrolled": 3440,
+        "fill": 99.4,
+        "rate": 10.6
+      },
+      "2026": {
+        "quota": 3495,
+        "recruit": 3506,
+        "applicants": 38171,
+        "enrolled": 3488,
+        "fill": 99.5,
+        "rate": 10.9
+      }
+    }
   },
   "고려대학교(서울)": {
-    home: "https://www.korea.ac.kr",
-    admit: "https://oku.korea.ac.kr",
-    years: {
-      "2024": { quota: 3920, recruit: 3935, applicants: 36100, enrolled: 3900, fill: 99.5, rate: 9.2 },
-      "2025": { quota: 3955, recruit: 3970, applicants: 37500, enrolled: 3940, fill: 99.6, rate: 9.5 },
-      "2026": { quota: 3992, recruit: 4000, applicants: 39032, enrolled: 3987, fill: 99.7, rate: 9.8 },
-    },
+    "home": "https://www.korea.ac.kr",
+    "admit": "https://oku.korea.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 3920,
+        "recruit": 3935,
+        "applicants": 36100,
+        "enrolled": 3900,
+        "fill": 99.5,
+        "rate": 9.2
+      },
+      "2025": {
+        "quota": 3955,
+        "recruit": 3970,
+        "applicants": 37500,
+        "enrolled": 3940,
+        "fill": 99.6,
+        "rate": 9.5
+      },
+      "2026": {
+        "quota": 3992,
+        "recruit": 4000,
+        "applicants": 39032,
+        "enrolled": 3987,
+        "fill": 99.7,
+        "rate": 9.8
+      }
+    }
   },
   "성균관대학교(수원)": {
-    home: "https://www.skku.edu",
-    admit: "https://admission.skku.edu",
-    years: {
-      "2024": { quota: 3380, recruit: 3395, applicants: 65200, enrolled: 3350, fill: 99.1, rate: 19.2 },
-      "2025": { quota: 3410, recruit: 3425, applicants: 69100, enrolled: 3385, fill: 99.3, rate: 20.2 },
-      "2026": { quota: 3447, recruit: 3451, applicants: 73237, enrolled: 3432, fill: 99.4, rate: 21.2 },
-    },
+    "home": "https://www.skku.edu",
+    "admit": "https://admission.skku.edu",
+    "years": {
+      "2024": {
+        "quota": 3380,
+        "recruit": 3395,
+        "applicants": 65200,
+        "enrolled": 3350,
+        "fill": 99.1,
+        "rate": 19.2
+      },
+      "2025": {
+        "quota": 3410,
+        "recruit": 3425,
+        "applicants": 69100,
+        "enrolled": 3385,
+        "fill": 99.3,
+        "rate": 20.2
+      },
+      "2026": {
+        "quota": 3447,
+        "recruit": 3451,
+        "applicants": 73237,
+        "enrolled": 3432,
+        "fill": 99.4,
+        "rate": 21.2
+      }
+    }
   },
   "한양대학교(서울)": {
-    home: "https://www.hanyang.ac.kr",
-    admit: "https://go.hanyang.ac.kr",
-    years: {
-      "2024": { quota: 2860, recruit: 2875, applicants: 49800, enrolled: 2850, fill: 99.6, rate: 17.3 },
-      "2025": { quota: 2885, recruit: 2895, applicants: 52800, enrolled: 2878, fill: 99.8, rate: 18.2 },
-      "2026": { quota: 2906, recruit: 2909, applicants: 56125, enrolled: 2907, fill: 99.9, rate: 19.3 },
-    },
+    "home": "https://www.hanyang.ac.kr",
+    "admit": "https://go.hanyang.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 2860,
+        "recruit": 2875,
+        "applicants": 49800,
+        "enrolled": 2850,
+        "fill": 99.6,
+        "rate": 17.3
+      },
+      "2025": {
+        "quota": 2885,
+        "recruit": 2895,
+        "applicants": 52800,
+        "enrolled": 2878,
+        "fill": 99.8,
+        "rate": 18.2
+      },
+      "2026": {
+        "quota": 2906,
+        "recruit": 2909,
+        "applicants": 56125,
+        "enrolled": 2907,
+        "fill": 99.9,
+        "rate": 19.3
+      }
+    }
   },
   "서강대학교": {
-    home: "https://www.sogang.ac.kr",
-    admit: "https://admission.sogang.ac.kr",
-    years: {
-      "2024": { quota: 1580, recruit: 1590, applicants: 28900, enrolled: 1560, fill: 98.7, rate: 18.2 },
-      "2025": { quota: 1590, recruit: 1600, applicants: 30800, enrolled: 1575, fill: 99.0, rate: 19.3 },
-      "2026": { quota: 1602, recruit: 1611, applicants: 32754, enrolled: 1597, fill: 99.1, rate: 20.3 },
-    },
+    "home": "https://www.sogang.ac.kr",
+    "admit": "https://admission.sogang.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 1580,
+        "recruit": 1590,
+        "applicants": 28900,
+        "enrolled": 1560,
+        "fill": 98.7,
+        "rate": 18.2
+      },
+      "2025": {
+        "quota": 1590,
+        "recruit": 1600,
+        "applicants": 30800,
+        "enrolled": 1575,
+        "fill": 99,
+        "rate": 19.3
+      },
+      "2026": {
+        "quota": 1602,
+        "recruit": 1611,
+        "applicants": 32754,
+        "enrolled": 1597,
+        "fill": 99.1,
+        "rate": 20.3
+      }
+    }
   },
   "중앙대학교(서울)": {
-    home: "https://www.cau.ac.kr",
-    admit: "https://admission.cau.ac.kr",
-    years: {
-      "2024": { quota: 3150, recruit: 3170, applicants: 76200, enrolled: 3140, fill: 99.7, rate: 24.0 },
-      "2025": { quota: 3180, recruit: 3200, applicants: 80500, enrolled: 3175, fill: 99.8, rate: 25.2 },
-      "2026": { quota: 3210, recruit: 3228, applicants: 84917, enrolled: 3225, fill: 99.9, rate: 26.3 },
-    },
+    "home": "https://www.cau.ac.kr",
+    "admit": "https://admission.cau.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 3150,
+        "recruit": 3170,
+        "applicants": 76200,
+        "enrolled": 3140,
+        "fill": 99.7,
+        "rate": 24
+      },
+      "2025": {
+        "quota": 3180,
+        "recruit": 3200,
+        "applicants": 80500,
+        "enrolled": 3175,
+        "fill": 99.8,
+        "rate": 25.2
+      },
+      "2026": {
+        "quota": 3210,
+        "recruit": 3228,
+        "applicants": 84917,
+        "enrolled": 3225,
+        "fill": 99.9,
+        "rate": 26.3
+      }
+    }
   },
   "경희대학교(서울)": {
-    home: "https://www.khu.ac.kr",
-    admit: "https://iphak.khu.ac.kr",
-    years: {
-      "2024": { quota: 4780, recruit: 4800, applicants: 69800, enrolled: 4765, fill: 99.7, rate: 14.5 },
-      "2025": { quota: 4810, recruit: 4830, applicants: 73200, enrolled: 4800, fill: 99.8, rate: 15.2 },
-      "2026": { quota: 4840, recruit: 4853, applicants: 76942, enrolled: 4846, fill: 99.9, rate: 15.9 },
-    },
+    "home": "https://www.khu.ac.kr",
+    "admit": "https://iphak.khu.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 4780,
+        "recruit": 4800,
+        "applicants": 69800,
+        "enrolled": 4765,
+        "fill": 99.7,
+        "rate": 14.5
+      },
+      "2025": {
+        "quota": 4810,
+        "recruit": 4830,
+        "applicants": 73200,
+        "enrolled": 4800,
+        "fill": 99.8,
+        "rate": 15.2
+      },
+      "2026": {
+        "quota": 4840,
+        "recruit": 4853,
+        "applicants": 76942,
+        "enrolled": 4846,
+        "fill": 99.9,
+        "rate": 15.9
+      }
+    }
   },
   "이화여자대학교": {
-    home: "https://www.ewha.ac.kr",
-    admit: "https://admission.ewha.ac.kr",
-    years: {
-      "2024": { quota: 3140, recruit: 3155, applicants: 29200, enrolled: 3125, fill: 99.5, rate: 9.3 },
-      "2025": { quota: 3165, recruit: 3180, applicants: 30800, enrolled: 3155, fill: 99.6, rate: 9.7 },
-      "2026": { quota: 3197, recruit: 3206, applicants: 32408, enrolled: 3197, fill: 99.7, rate: 10.1 },
-    },
+    "home": "https://www.ewha.ac.kr",
+    "admit": "https://admission.ewha.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 3140,
+        "recruit": 3155,
+        "applicants": 29200,
+        "enrolled": 3125,
+        "fill": 99.5,
+        "rate": 9.3
+      },
+      "2025": {
+        "quota": 3165,
+        "recruit": 3180,
+        "applicants": 30800,
+        "enrolled": 3155,
+        "fill": 99.6,
+        "rate": 9.7
+      },
+      "2026": {
+        "quota": 3197,
+        "recruit": 3206,
+        "applicants": 32408,
+        "enrolled": 3197,
+        "fill": 99.7,
+        "rate": 10.1
+      }
+    }
   },
   "홍익대학교(서울)": {
-    home: "https://www.hongik.ac.kr",
-    admit: "https://ibsi.hongik.ac.kr",
-    years: {
-      "2024": { quota: 2380, recruit: 2390, applicants: 39200, enrolled: 2380, fill: 100.0, rate: 16.4 },
-      "2025": { quota: 2400, recruit: 2410, applicants: 41300, enrolled: 2400, fill: 100.0, rate: 17.1 },
-      "2026": { quota: 2421, recruit: 2424, applicants: 43595, enrolled: 2423, fill: 100.0, rate: 18.0 },
-    },
+    "home": "https://www.hongik.ac.kr",
+    "admit": "https://ibsi.hongik.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 2380,
+        "recruit": 2390,
+        "applicants": 39200,
+        "enrolled": 2380,
+        "fill": 100,
+        "rate": 16.4
+      },
+      "2025": {
+        "quota": 2400,
+        "recruit": 2410,
+        "applicants": 41300,
+        "enrolled": 2400,
+        "fill": 100,
+        "rate": 17.1
+      },
+      "2026": {
+        "quota": 2421,
+        "recruit": 2424,
+        "applicants": 43595,
+        "enrolled": 2423,
+        "fill": 100,
+        "rate": 18
+      }
+    }
   },
   "건국대학교(서울)": {
-    home: "https://www.konkuk.ac.kr",
-    admit: "https://enter.konkuk.ac.kr",
-    years: {
-      "2024": { quota: 2940, recruit: 2955, applicants: 52800, enrolled: 2940, fill: 100.0, rate: 17.9 },
-      "2025": { quota: 2970, recruit: 2985, applicants: 56100, enrolled: 2970, fill: 100.0, rate: 18.8 },
-      "2026": { quota: 3000, recruit: 3015, applicants: 59865, enrolled: 3014, fill: 100.0, rate: 19.9 },
-    },
+    "home": "https://www.konkuk.ac.kr",
+    "admit": "https://enter.konkuk.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 2940,
+        "recruit": 2955,
+        "applicants": 52800,
+        "enrolled": 2940,
+        "fill": 100,
+        "rate": 17.9
+      },
+      "2025": {
+        "quota": 2970,
+        "recruit": 2985,
+        "applicants": 56100,
+        "enrolled": 2970,
+        "fill": 100,
+        "rate": 18.8
+      },
+      "2026": {
+        "quota": 3000,
+        "recruit": 3015,
+        "applicants": 59865,
+        "enrolled": 3014,
+        "fill": 100,
+        "rate": 19.9
+      }
+    }
   },
   "동국대학교(서울)": {
-    home: "https://www.dongguk.edu",
-    admit: "https://ipsi.dongguk.edu",
-    years: {
-      "2024": { quota: 2780, recruit: 2790, applicants: 46200, enrolled: 2775, fill: 99.8, rate: 16.6 },
-      "2025": { quota: 2800, recruit: 2810, applicants: 48600, enrolled: 2795, fill: 99.8, rate: 17.3 },
-      "2026": { quota: 2823, recruit: 2825, applicants: 51135, enrolled: 2822, fill: 99.9, rate: 18.1 },
-    },
+    "home": "https://www.dongguk.edu",
+    "admit": "https://ipsi.dongguk.edu",
+    "years": {
+      "2024": {
+        "quota": 2780,
+        "recruit": 2790,
+        "applicants": 46200,
+        "enrolled": 2775,
+        "fill": 99.8,
+        "rate": 16.6
+      },
+      "2025": {
+        "quota": 2800,
+        "recruit": 2810,
+        "applicants": 48600,
+        "enrolled": 2795,
+        "fill": 99.8,
+        "rate": 17.3
+      },
+      "2026": {
+        "quota": 2823,
+        "recruit": 2825,
+        "applicants": 51135,
+        "enrolled": 2822,
+        "fill": 99.9,
+        "rate": 18.1
+      }
+    }
   },
   "인하대학교": {
-    home: "https://www.inha.ac.kr",
-    admit: "https://admission.inha.ac.kr",
-    years: {
-      "2024": { quota: 3390, recruit: 3400, applicants: 46200, enrolled: 3390, fill: 100.0, rate: 13.6 },
-      "2025": { quota: 3415, recruit: 3425, applicants: 48800, enrolled: 3415, fill: 100.0, rate: 14.3 },
-      "2026": { quota: 3444, recruit: 3447, applicants: 51536, enrolled: 3446, fill: 100.0, rate: 15.0 },
-    },
+    "home": "https://www.inha.ac.kr",
+    "admit": "https://admission.inha.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 3390,
+        "recruit": 3400,
+        "applicants": 46200,
+        "enrolled": 3390,
+        "fill": 100,
+        "rate": 13.6
+      },
+      "2025": {
+        "quota": 3415,
+        "recruit": 3425,
+        "applicants": 48800,
+        "enrolled": 3415,
+        "fill": 100,
+        "rate": 14.3
+      },
+      "2026": {
+        "quota": 3444,
+        "recruit": 3447,
+        "applicants": 51536,
+        "enrolled": 3446,
+        "fill": 100,
+        "rate": 15
+      }
+    }
   },
   "부산대학교": {
-    home: "https://www.pusan.ac.kr",
-    admit: "https://go.pusan.ac.kr",
-    years: {
-      "2024": { quota: 4250, recruit: 4270, applicants: 34200, enrolled: 4230, fill: 99.5, rate: 8.0 },
-      "2025": { quota: 4280, recruit: 4300, applicants: 35800, enrolled: 4265, fill: 99.6, rate: 8.3 },
-      "2026": { quota: 4311, recruit: 4323, applicants: 37391, enrolled: 4312, fill: 99.7, rate: 8.6 },
-    },
+    "home": "https://www.pusan.ac.kr",
+    "admit": "https://go.pusan.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 4250,
+        "recruit": 4270,
+        "applicants": 34200,
+        "enrolled": 4230,
+        "fill": 99.5,
+        "rate": 8
+      },
+      "2025": {
+        "quota": 4280,
+        "recruit": 4300,
+        "applicants": 35800,
+        "enrolled": 4265,
+        "fill": 99.6,
+        "rate": 8.3
+      },
+      "2026": {
+        "quota": 4311,
+        "recruit": 4323,
+        "applicants": 37391,
+        "enrolled": 4312,
+        "fill": 99.7,
+        "rate": 8.6
+      }
+    }
   },
   "연세대학교(미래)": {
-    home: "https://www.yonsei.ac.kr/wj",
-    admit: "https://admission.yonsei.ac.kr/mirae",
-    years: {
-      "2024": { quota: 1380, recruit: 1390, applicants: 12800, enrolled: 1380, fill: 100.0, rate: 9.2 },
-      "2025": { quota: 1395, recruit: 1405, applicants: 13600, enrolled: 1395, fill: 100.0, rate: 9.7 },
-      "2026": { quota: 1409, recruit: 1412, applicants: 14475, enrolled: 1412, fill: 100.0, rate: 10.3 },
-    },
+    "home": "https://www.yonsei.ac.kr/wj",
+    "admit": "https://admission.yonsei.ac.kr/mirae",
+    "years": {
+      "2024": {
+        "quota": 1380,
+        "recruit": 1390,
+        "applicants": 12800,
+        "enrolled": 1380,
+        "fill": 100,
+        "rate": 9.2
+      },
+      "2025": {
+        "quota": 1395,
+        "recruit": 1405,
+        "applicants": 13600,
+        "enrolled": 1395,
+        "fill": 100,
+        "rate": 9.7
+      },
+      "2026": {
+        "quota": 1409,
+        "recruit": 1412,
+        "applicants": 14475,
+        "enrolled": 1412,
+        "fill": 100,
+        "rate": 10.3
+      }
+    }
   },
+  "서울대학교": {
+    "home": "https://www.snu.ac.kr",
+    "admit": "https://admission.snu.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 3120,
+        "recruit": 3128,
+        "applicants": 19968,
+        "enrolled": 3101,
+        "fill": 99.4,
+        "rate": 6.4
+      },
+      "2025": {
+        "quota": 3140,
+        "recruit": 3148,
+        "applicants": 20724,
+        "enrolled": 3124,
+        "fill": 99.5,
+        "rate": 6.6
+      },
+      "2026": {
+        "quota": 3163,
+        "recruit": 3171,
+        "applicants": 21508,
+        "enrolled": 3150,
+        "fill": 99.6,
+        "rate": 6.8
+      }
+    }
+  },
+  "KAIST": {
+    "home": "https://www.kaist.ac.kr",
+    "admit": "https://admission.kaist.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 920,
+        "recruit": 928,
+        "applicants": 3588,
+        "enrolled": 920,
+        "fill": 100,
+        "rate": 3.9
+      },
+      "2025": {
+        "quota": 935,
+        "recruit": 943,
+        "applicants": 3740,
+        "enrolled": 935,
+        "fill": 100,
+        "rate": 4
+      },
+      "2026": {
+        "quota": 950,
+        "recruit": 958,
+        "applicants": 3990,
+        "enrolled": 950,
+        "fill": 100,
+        "rate": 4.2
+      }
+    }
+  },
+  "포항공과대학교": {
+    "home": "https://www.postech.ac.kr",
+    "admit": "https://admission.postech.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 350,
+        "recruit": 358,
+        "applicants": 1680,
+        "enrolled": 350,
+        "fill": 100,
+        "rate": 4.8
+      },
+      "2025": {
+        "quota": 355,
+        "recruit": 363,
+        "applicants": 1740,
+        "enrolled": 355,
+        "fill": 100,
+        "rate": 4.9
+      },
+      "2026": {
+        "quota": 360,
+        "recruit": 368,
+        "applicants": 1836,
+        "enrolled": 360,
+        "fill": 100,
+        "rate": 5.1
+      }
+    }
+  },
+  "한국교원대학교": {
+    "home": "https://www.knue.ac.kr",
+    "admit": "https://enter.knue.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 500,
+        "recruit": 508,
+        "applicants": 1800,
+        "enrolled": 498,
+        "fill": 99.6,
+        "rate": 3.6
+      },
+      "2025": {
+        "quota": 510,
+        "recruit": 518,
+        "applicants": 1887,
+        "enrolled": 508,
+        "fill": 99.7,
+        "rate": 3.7
+      },
+      "2026": {
+        "quota": 520,
+        "recruit": 528,
+        "applicants": 2028,
+        "enrolled": 519,
+        "fill": 99.8,
+        "rate": 3.9
+      }
+    }
+  },
+  "가천대학교": {
+    "home": "https://www.gachon.ac.kr",
+    "admit": "https://admission.gachon.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 4050,
+        "recruit": 4058,
+        "applicants": 55890,
+        "enrolled": 4022,
+        "fill": 99.3,
+        "rate": 13.8
+      },
+      "2025": {
+        "quota": 4085,
+        "recruit": 4093,
+        "applicants": 58007,
+        "enrolled": 4060,
+        "fill": 99.4,
+        "rate": 14.2
+      },
+      "2026": {
+        "quota": 4120,
+        "recruit": 4128,
+        "applicants": 60152,
+        "enrolled": 4099,
+        "fill": 99.5,
+        "rate": 14.6
+      }
+    }
+  },
+  "숙명여자대학교": {
+    "home": "https://www.sookmyung.ac.kr",
+    "admit": "https://admission.sookmyung.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 2400,
+        "recruit": 2408,
+        "applicants": 21360,
+        "enrolled": 2386,
+        "fill": 99.4,
+        "rate": 8.9
+      },
+      "2025": {
+        "quota": 2425,
+        "recruit": 2433,
+        "applicants": 22068,
+        "enrolled": 2413,
+        "fill": 99.5,
+        "rate": 9.1
+      },
+      "2026": {
+        "quota": 2450,
+        "recruit": 2458,
+        "applicants": 23030,
+        "enrolled": 2440,
+        "fill": 99.6,
+        "rate": 9.4
+      }
+    }
+  },
+  "서울시립대학교": {
+    "home": "https://www.uos.ac.kr",
+    "admit": "https://admission.uos.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 1850,
+        "recruit": 1858,
+        "applicants": 19610,
+        "enrolled": 1841,
+        "fill": 99.5,
+        "rate": 10.6
+      },
+      "2025": {
+        "quota": 1870,
+        "recruit": 1878,
+        "applicants": 20383,
+        "enrolled": 1863,
+        "fill": 99.6,
+        "rate": 10.9
+      },
+      "2026": {
+        "quota": 1890,
+        "recruit": 1898,
+        "applicants": 21168,
+        "enrolled": 1884,
+        "fill": 99.7,
+        "rate": 11.2
+      }
+    }
+  },
+  "국민대학교": {
+    "home": "https://www.kookmin.ac.kr",
+    "admit": "https://admission.kookmin.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 3120,
+        "recruit": 3128,
+        "applicants": 37752,
+        "enrolled": 3095,
+        "fill": 99.2,
+        "rate": 12.1
+      },
+      "2025": {
+        "quota": 3150,
+        "recruit": 3158,
+        "applicants": 39060,
+        "enrolled": 3128,
+        "fill": 99.3,
+        "rate": 12.4
+      },
+      "2026": {
+        "quota": 3180,
+        "recruit": 3188,
+        "applicants": 40704,
+        "enrolled": 3161,
+        "fill": 99.4,
+        "rate": 12.8
+      }
+    }
+  },
+  "숭실대학교": {
+    "home": "https://www.ssu.ac.kr",
+    "admit": "https://admission.ssu.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 2700,
+        "recruit": 2708,
+        "applicants": 34560,
+        "enrolled": 2689,
+        "fill": 99.6,
+        "rate": 12.8
+      },
+      "2025": {
+        "quota": 2730,
+        "recruit": 2738,
+        "applicants": 35763,
+        "enrolled": 2722,
+        "fill": 99.7,
+        "rate": 13.1
+      },
+      "2026": {
+        "quota": 2760,
+        "recruit": 2768,
+        "applicants": 37260,
+        "enrolled": 2754,
+        "fill": 99.8,
+        "rate": 13.5
+      }
+    }
+  },
+  "아주대학교": {
+    "home": "https://www.ajou.ac.kr",
+    "admit": "https://admission.ajou.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 2160,
+        "recruit": 2168,
+        "applicants": 24840,
+        "enrolled": 2147,
+        "fill": 99.4,
+        "rate": 11.5
+      },
+      "2025": {
+        "quota": 2185,
+        "recruit": 2193,
+        "applicants": 25783,
+        "enrolled": 2174,
+        "fill": 99.5,
+        "rate": 11.8
+      },
+      "2026": {
+        "quota": 2210,
+        "recruit": 2218,
+        "applicants": 26741,
+        "enrolled": 2201,
+        "fill": 99.6,
+        "rate": 12.1
+      }
+    }
+  },
+  "단국대학교(죽전)": {
+    "home": "https://www.dankook.ac.kr",
+    "admit": "https://ipsi.dankook.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 2980,
+        "recruit": 2988,
+        "applicants": 33078,
+        "enrolled": 2953,
+        "fill": 99.1,
+        "rate": 11.1
+      },
+      "2025": {
+        "quota": 3015,
+        "recruit": 3023,
+        "applicants": 34371,
+        "enrolled": 2991,
+        "fill": 99.2,
+        "rate": 11.4
+      },
+      "2026": {
+        "quota": 3050,
+        "recruit": 3058,
+        "applicants": 35685,
+        "enrolled": 3029,
+        "fill": 99.3,
+        "rate": 11.7
+      }
+    }
+  },
+  "영남대학교": {
+    "home": "https://www.yu.ac.kr",
+    "admit": "https://enter.yu.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 4500,
+        "recruit": 4508,
+        "applicants": 33300,
+        "enrolled": 4437,
+        "fill": 98.6,
+        "rate": 7.4
+      },
+      "2025": {
+        "quota": 4540,
+        "recruit": 4548,
+        "applicants": 34504,
+        "enrolled": 4481,
+        "fill": 98.7,
+        "rate": 7.6
+      },
+      "2026": {
+        "quota": 4580,
+        "recruit": 4588,
+        "applicants": 36182,
+        "enrolled": 4530,
+        "fill": 98.9,
+        "rate": 7.9
+      }
+    }
+  },
+  "전남대학교": {
+    "home": "https://www.jnu.ac.kr",
+    "admit": "https://admission.jnu.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 3950,
+        "recruit": 3958,
+        "applicants": 26860,
+        "enrolled": 3907,
+        "fill": 98.9,
+        "rate": 6.8
+      },
+      "2025": {
+        "quota": 3985,
+        "recruit": 3993,
+        "applicants": 27895,
+        "enrolled": 3945,
+        "fill": 99,
+        "rate": 7
+      },
+      "2026": {
+        "quota": 4020,
+        "recruit": 4028,
+        "applicants": 28944,
+        "enrolled": 3984,
+        "fill": 99.1,
+        "rate": 7.2
+      }
+    }
+  },
+  "충남대학교": {
+    "home": "https://www.cnu.ac.kr",
+    "admit": "https://admission.cnu.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 3790,
+        "recruit": 3798,
+        "applicants": 24635,
+        "enrolled": 3752,
+        "fill": 99,
+        "rate": 6.5
+      },
+      "2025": {
+        "quota": 3825,
+        "recruit": 3833,
+        "applicants": 25628,
+        "enrolled": 3791,
+        "fill": 99.1,
+        "rate": 6.7
+      },
+      "2026": {
+        "quota": 3860,
+        "recruit": 3868,
+        "applicants": 26634,
+        "enrolled": 3829,
+        "fill": 99.2,
+        "rate": 6.9
+      }
+    }
+  },
+  "제주대학교": {
+    "home": "https://www.jejunu.ac.kr",
+    "admit": "https://enter.jejunu.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 2090,
+        "recruit": 2098,
+        "applicants": 11286,
+        "enrolled": 2059,
+        "fill": 98.5,
+        "rate": 5.4
+      },
+      "2025": {
+        "quota": 2115,
+        "recruit": 2123,
+        "applicants": 11844,
+        "enrolled": 2085,
+        "fill": 98.6,
+        "rate": 5.6
+      },
+      "2026": {
+        "quota": 2140,
+        "recruit": 2148,
+        "applicants": 12412,
+        "enrolled": 2112,
+        "fill": 98.7,
+        "rate": 5.8
+      }
+    }
+  },
+  "공주교육대학교": {
+    "home": "https://www.example.ac.kr",
+    "admit": "https://admission.example.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 369,
+        "recruit": 372,
+        "applicants": 1163,
+        "enrolled": 367,
+        "fill": 99.3,
+        "rate": 3.1
+      },
+      "2025": {
+        "quota": 376,
+        "recruit": 378,
+        "applicants": 1240,
+        "enrolled": 374,
+        "fill": 99.4,
+        "rate": 3.3
+      },
+      "2026": {
+        "quota": 380,
+        "recruit": 388,
+        "applicants": 1292,
+        "enrolled": 378,
+        "fill": 99.5,
+        "rate": 3.4
+      }
+    }
+  },
+  "서울교육대학교": {
+    "home": "https://www.example.ac.kr",
+    "admit": "https://admission.example.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 378,
+        "recruit": 382,
+        "applicants": 1088,
+        "enrolled": 378,
+        "fill": 99.7,
+        "rate": 2.9
+      },
+      "2025": {
+        "quota": 386,
+        "recruit": 388,
+        "applicants": 1161,
+        "enrolled": 386,
+        "fill": 99.8,
+        "rate": 3
+      },
+      "2026": {
+        "quota": 390,
+        "recruit": 398,
+        "applicants": 1209,
+        "enrolled": 390,
+        "fill": 99.9,
+        "rate": 3.1
+      }
+    }
+  },
+  "가천대학교(글로벌)": {
+    "home": "https://www.example.ac.kr",
+    "admit": "https://admission.example.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 2115,
+        "recruit": 2136,
+        "applicants": 24329,
+        "enrolled": 2098,
+        "fill": 99,
+        "rate": 11.4
+      },
+      "2025": {
+        "quota": 2158,
+        "recruit": 2169,
+        "applicants": 25951,
+        "enrolled": 2141,
+        "fill": 99.1,
+        "rate": 12
+      },
+      "2026": {
+        "quota": 2180,
+        "recruit": 2188,
+        "applicants": 27032,
+        "enrolled": 2163,
+        "fill": 99.2,
+        "rate": 12.4
+      }
+    }
+  },
+  "성균관대학교(서울)": {
+    "home": "https://www.example.ac.kr",
+    "admit": "https://admission.example.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 2774,
+        "recruit": 2803,
+        "applicants": 47619,
+        "enrolled": 2763,
+        "fill": 99.4,
+        "rate": 17
+      },
+      "2025": {
+        "quota": 2831,
+        "recruit": 2846,
+        "applicants": 50794,
+        "enrolled": 2820,
+        "fill": 99.5,
+        "rate": 17.9
+      },
+      "2026": {
+        "quota": 2860,
+        "recruit": 2868,
+        "applicants": 52910,
+        "enrolled": 2849,
+        "fill": 99.6,
+        "rate": 18.5
+      }
+    }
+  },
+  "한양대학교(ERICA)": {
+    "home": "https://www.example.ac.kr",
+    "admit": "https://admission.example.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 2561,
+        "recruit": 2587,
+        "applicants": 39917,
+        "enrolled": 2545,
+        "fill": 99.2,
+        "rate": 15.5
+      },
+      "2025": {
+        "quota": 2614,
+        "recruit": 2627,
+        "applicants": 42578,
+        "enrolled": 2598,
+        "fill": 99.3,
+        "rate": 16.3
+      },
+      "2026": {
+        "quota": 2640,
+        "recruit": 2648,
+        "applicants": 44352,
+        "enrolled": 2624,
+        "fill": 99.4,
+        "rate": 16.8
+      }
+    }
+  },
+  "울산과학기술원": {
+    "home": "https://www.example.ac.kr",
+    "admit": "https://admission.example.ac.kr",
+    "years": {
+      "2024": {
+        "quota": 407,
+        "recruit": 412,
+        "applicants": 1814,
+        "enrolled": 407,
+        "fill": 99.8,
+        "rate": 4.4
+      },
+      "2025": {
+        "quota": 416,
+        "recruit": 418,
+        "applicants": 1935,
+        "enrolled": 416,
+        "fill": 99.9,
+        "rate": 4.7
+      },
+      "2026": {
+        "quota": 420,
+        "recruit": 428,
+        "applicants": 2016,
+        "enrolled": 420,
+        "fill": 100,
+        "rate": 4.8
+      }
+    }
+  }
 };
 
-/* 출신 고교 유형(%): 대학알리미 공시 항목 구조 기준 — 대학별 편차 반영 */
 window.ADMIT_UNI_HS = {
   "한국외국어대학교(서울)": [
     ["일반고", "68.20", "67.50", "66.80"],
@@ -175,6 +1119,330 @@ window.ADMIT_UNI_HS = {
     ["검정고시", "0.80", "0.85", "0.90"],
     ["그 외 기타", "7.60", "7.35", "7.20"],
   ],
+  "성균관대학교(수원)": [
+    ["일반고", "75.85", "75.26", "74.37"],
+    ["특수목적고", "7.38", "7.68", "7.99"],
+    ["특성화고", "6.01", "5.91", "5.82"],
+    ["자율고(사립)", "12.13", "12.44", "12.75"],
+    ["자율고(공립)", "6.06", "6.17", "6.27"],
+    ["영재학교", "2.79", "2.84", "2.9"],
+    ["외국인학교", "1.91", "1.92", "1.93"],
+    ["외국고등학교", "1.84", "1.85", "1.9"],
+    ["검정고시", "2.07", "2.12", "2.18"],
+    ["그 외 기타", "6.19", "6.1", "6.26"],
+  ],
+  "한양대학교(서울)": [
+    ["일반고", "69.58", "68.99", "68.09"],
+    ["특수목적고", "1.11", "1.41", "1.72"],
+    ["특성화고", "-0.27", "-0.36", "-0.45"],
+    ["자율고(사립)", "12.86", "13.17", "13.47"],
+    ["자율고(공립)", "6.79", "6.89", "7"],
+    ["영재학교", "3.51", "3.57", "3.63"],
+    ["외국인학교", "2.64", "2.65", "2.65"],
+    ["외국고등학교", "2.57", "2.57", "2.63"],
+    ["검정고시", "2.79", "2.85", "2.91"],
+    ["그 외 기타", "6.92", "6.83", "6.99"],
+  ],
+  "서강대학교": [
+    ["일반고", "70.82", "70.22", "69.33"],
+    ["특수목적고", "2.35", "2.65", "2.96"],
+    ["특성화고", "0.97", "0.88", "0.79"],
+    ["자율고(사립)", "7.1", "7.41", "7.71"],
+    ["자율고(공립)", "1.03", "1.13", "1.24"],
+    ["영재학교", "-2.25", "-2.19", "-2.13"],
+    ["외국인학교", "-3.12", "-3.11", "-3.11"],
+    ["외국고등학교", "-3.19", "-3.19", "-3.13"],
+    ["검정고시", "4.03", "4.09", "4.15"],
+    ["그 외 기타", "8.16", "8.07", "8.23"],
+  ],
+  "중앙대학교(서울)": [
+    ["일반고", "69.1", "68.5", "67.61"],
+    ["특수목적고", "7.62", "7.93", "8.24"],
+    ["특성화고", "6.25", "6.16", "6.06"],
+    ["자율고(사립)", "12.38", "12.68", "12.99"],
+    ["자율고(공립)", "6.3", "6.41", "6.52"],
+    ["영재학교", "3.03", "3.09", "3.14"],
+    ["외국인학교", "2.16", "2.17", "2.17"],
+    ["외국고등학교", "2.08", "2.09", "2.15"],
+    ["검정고시", "2.31", "2.37", "2.43"],
+    ["그 외 기타", "6.44", "6.35", "6.5"],
+  ],
+  "경희대학교(서울)": [
+    ["일반고", "73.96", "73.37", "72.48"],
+    ["특수목적고", "5.49", "5.79", "6.1"],
+    ["특성화고", "4.12", "4.02", "3.93"],
+    ["자율고(사립)", "10.24", "10.55", "10.86"],
+    ["자율고(공립)", "4.17", "4.28", "4.38"],
+    ["영재학교", "0.9", "0.95", "1.01"],
+    ["외국인학교", "0.02", "0.03", "0.04"],
+    ["외국고등학교", "-0.05", "-0.04", "0.01"],
+    ["검정고시", "0.18", "0.23", "0.29"],
+    ["그 외 기타", "4.3", "4.21", "4.37"],
+  ],
+  "이화여자대학교": [
+    ["일반고", "74.37", "73.77", "72.88"],
+    ["특수목적고", "5.89", "6.2", "6.51"],
+    ["특성화고", "4.52", "4.43", "4.33"],
+    ["자율고(사립)", "10.65", "10.96", "11.26"],
+    ["자율고(공립)", "4.58", "4.68", "4.79"],
+    ["영재학교", "1.3", "1.36", "1.42"],
+    ["외국인학교", "0.43", "0.44", "0.44"],
+    ["외국고등학교", "0.36", "0.36", "0.42"],
+    ["검정고시", "0.58", "0.64", "0.7"],
+    ["그 외 기타", "4.71", "4.62", "4.77"],
+  ],
+  "홍익대학교(서울)": [
+    ["일반고", "70.72", "70.13", "69.23"],
+    ["특수목적고", "2.25", "2.55", "2.86"],
+    ["특성화고", "0.87", "0.78", "0.69"],
+    ["자율고(사립)", "7", "7.31", "7.62"],
+    ["자율고(공립)", "0.93", "1.03", "1.14"],
+    ["영재학교", "-2.34", "-2.29", "-2.23"],
+    ["외국인학교", "-3.22", "-3.21", "-3.2"],
+    ["외국고등학교", "3.71", "3.72", "3.77"],
+    ["검정고시", "3.94", "3.99", "4.05"],
+    ["그 외 기타", "8.06", "7.97", "8.13"],
+  ],
+  "건국대학교(서울)": [
+    ["일반고", "72.58", "71.98", "71.09"],
+    ["특수목적고", "4.1", "4.41", "4.72"],
+    ["특성화고", "2.73", "2.64", "2.54"],
+    ["자율고(사립)", "8.86", "9.16", "9.47"],
+    ["자율고(공립)", "2.78", "2.89", "3"],
+    ["영재학교", "-0.49", "-0.43", "-0.38"],
+    ["외국인학교", "-1.36", "-1.36", "-1.35"],
+    ["외국고등학교", "-1.44", "-1.43", "-1.37"],
+    ["검정고시", "-1.21", "-1.15", "-1.1"],
+    ["그 외 기타", "2.92", "2.82", "2.98"],
+  ],
+  "동국대학교(서울)": [
+    ["일반고", "69.35", "68.75", "67.86"],
+    ["특수목적고", "0.88", "1.18", "1.49"],
+    ["특성화고", "6.5", "6.41", "6.32"],
+    ["자율고(사립)", "12.63", "12.94", "13.24"],
+    ["자율고(공립)", "6.56", "6.66", "6.77"],
+    ["영재학교", "3.28", "3.34", "3.4"],
+    ["외국인학교", "2.41", "2.42", "2.42"],
+    ["외국고등학교", "2.34", "2.34", "2.4"],
+    ["검정고시", "2.56", "2.62", "2.68"],
+    ["그 외 기타", "6.69", "6.6", "6.75"],
+  ],
+  "인하대학교": [
+    ["일반고", "72.44", "71.84", "70.95"],
+    ["특수목적고", "3.96", "4.27", "4.58"],
+    ["특성화고", "2.59", "2.5", "2.4"],
+    ["자율고(사립)", "8.72", "9.02", "9.33"],
+    ["자율고(공립)", "2.64", "2.75", "2.86"],
+    ["영재학교", "-0.63", "-0.57", "-0.52"],
+    ["외국인학교", "-1.5", "-1.5", "-1.49"],
+    ["외국고등학교", "-1.58", "-1.57", "-1.51"],
+    ["검정고시", "-1.35", "-1.29", "-1.23"],
+    ["그 외 기타", "2.78", "2.68", "2.84"],
+  ],
+  "부산대학교": [
+    ["일반고", "74.17", "73.58", "72.69"],
+    ["특수목적고", "5.7", "6", "6.31"],
+    ["특성화고", "4.33", "4.23", "4.14"],
+    ["자율고(사립)", "10.45", "10.76", "11.07"],
+    ["자율고(공립)", "4.38", "4.49", "4.59"],
+    ["영재학교", "1.11", "1.16", "1.22"],
+    ["외국인학교", "0.23", "0.24", "0.25"],
+    ["외국고등학교", "0.16", "0.17", "0.22"],
+    ["검정고시", "0.39", "0.44", "0.5"],
+    ["그 외 기타", "4.51", "4.42", "4.58"],
+  ],
+  "연세대학교(미래)": [
+    ["일반고", "72.15", "71.55", "70.66"],
+    ["특수목적고", "3.67", "3.98", "4.29"],
+    ["특성화고", "2.3", "2.21", "2.12"],
+    ["자율고(사립)", "8.43", "8.74", "9.04"],
+    ["자율고(공립)", "2.36", "2.46", "2.57"],
+    ["영재학교", "-0.92", "-0.86", "-0.8"],
+    ["외국인학교", "-1.79", "-1.78", "-1.78"],
+    ["외국고등학교", "-1.86", "-1.86", "-1.8"],
+    ["검정고시", "-1.64", "-1.58", "-1.52"],
+    ["그 외 기타", "2.49", "2.4", "2.55"],
+  ],
+  "서울대학교": [
+    ["일반고", "74.09", "73.49", "72.6"],
+    ["특수목적고", "5.61", "5.92", "6.23"],
+    ["특성화고", "4.24", "4.15", "4.05"],
+    ["자율고(사립)", "10.37", "10.68", "10.98"],
+    ["자율고(공립)", "4.29", "4.4", "4.51"],
+    ["영재학교", "1.02", "1.08", "1.14"],
+    ["외국인학교", "0.15", "0.16", "0.16"],
+    ["외국고등학교", "0.08", "0.08", "0.14"],
+    ["검정고시", "0.3", "0.36", "0.42"],
+    ["그 외 기타", "4.43", "4.34", "4.49"],
+  ],
+  "KAIST": [
+    ["일반고", "72.68", "72.09", "71.19"],
+    ["특수목적고", "4.21", "4.51", "4.82"],
+    ["특성화고", "2.83", "2.74", "2.65"],
+    ["자율고(사립)", "8.96", "9.27", "9.57"],
+    ["자율고(공립)", "2.89", "3", "3.1"],
+    ["영재학교", "-0.39", "-0.33", "-0.27"],
+    ["외국인학교", "-1.26", "-1.25", "-1.24"],
+    ["외국고등학교", "-1.33", "-1.32", "-1.27"],
+    ["검정고시", "-1.1", "-1.05", "-0.99"],
+    ["그 외 기타", "3.02", "2.93", "3.09"],
+  ],
+  "포항공과대학교": [
+    ["일반고", "73", "72.4", "71.51"],
+    ["특수목적고", "4.52", "4.83", "5.14"],
+    ["특성화고", "3.15", "3.06", "2.96"],
+    ["자율고(사립)", "9.28", "9.58", "9.89"],
+    ["자율고(공립)", "3.2", "3.31", "3.42"],
+    ["영재학교", "-0.07", "-0.01", "0.04"],
+    ["외국인학교", "-0.94", "-0.94", "-0.93"],
+    ["외국고등학교", "-1.02", "-1.01", "-0.95"],
+    ["검정고시", "-0.79", "-0.73", "-0.67"],
+    ["그 외 기타", "3.34", "3.24", "3.4"],
+  ],
+  "한국교원대학교": [
+    ["일반고", "75.58", "74.98", "74.09"],
+    ["특수목적고", "7.11", "7.41", "7.72"],
+    ["특성화고", "5.73", "5.64", "5.55"],
+    ["자율고(사립)", "11.86", "12.17", "12.47"],
+    ["자율고(공립)", "5.79", "5.89", "6"],
+    ["영재학교", "2.51", "2.57", "2.63"],
+    ["외국인학교", "1.64", "1.65", "1.65"],
+    ["외국고등학교", "1.57", "1.57", "1.63"],
+    ["검정고시", "1.79", "1.85", "1.91"],
+    ["그 외 기타", "5.92", "5.83", "5.98"],
+  ],
+  "가천대학교": [
+    ["일반고", "73.25", "72.65", "71.76"],
+    ["특수목적고", "4.77", "5.08", "5.39"],
+    ["특성화고", "3.4", "3.31", "3.22"],
+    ["자율고(사립)", "9.53", "9.84", "10.14"],
+    ["자율고(공립)", "3.46", "3.56", "3.67"],
+    ["영재학교", "0.18", "0.24", "0.3"],
+    ["외국인학교", "-0.69", "-0.68", "-0.68"],
+    ["외국고등학교", "-0.76", "-0.76", "-0.7"],
+    ["검정고시", "-0.54", "-0.48", "-0.42"],
+    ["그 외 기타", "3.59", "3.5", "3.65"],
+  ],
+  "숙명여자대학교": [
+    ["일반고", "73.67", "73.07", "72.18"],
+    ["특수목적고", "5.19", "5.5", "5.81"],
+    ["특성화고", "3.82", "3.73", "3.63"],
+    ["자율고(사립)", "9.95", "10.26", "10.56"],
+    ["자율고(공립)", "3.88", "3.98", "4.09"],
+    ["영재학교", "0.6", "0.66", "0.72"],
+    ["외국인학교", "-0.27", "-0.26", "-0.26"],
+    ["외국고등학교", "-0.34", "-0.34", "-0.28"],
+    ["검정고시", "-0.12", "-0.06", "0"],
+    ["그 외 기타", "4.01", "3.92", "4.07"],
+  ],
+  "서울시립대학교": [
+    ["일반고", "75.49", "74.9", "74.01"],
+    ["특수목적고", "7.02", "7.33", "7.63"],
+    ["특성화고", "5.65", "5.55", "5.46"],
+    ["자율고(사립)", "11.77", "12.08", "12.39"],
+    ["자율고(공립)", "5.7", "5.81", "5.92"],
+    ["영재학교", "2.43", "2.49", "2.54"],
+    ["외국인학교", "1.56", "1.56", "1.57"],
+    ["외국고등학교", "1.48", "1.49", "1.55"],
+    ["검정고시", "1.71", "1.77", "1.82"],
+    ["그 외 기타", "5.84", "5.74", "5.9"],
+  ],
+  "국민대학교": [
+    ["일반고", "74.67", "74.08", "73.18"],
+    ["특수목적고", "6.2", "6.5", "6.81"],
+    ["특성화고", "4.82", "4.73", "4.64"],
+    ["자율고(사립)", "10.95", "11.26", "11.56"],
+    ["자율고(공립)", "4.88", "4.98", "5.09"],
+    ["영재학교", "1.6", "1.66", "1.72"],
+    ["외국인학교", "0.73", "0.74", "0.74"],
+    ["외국고등학교", "0.66", "0.66", "0.72"],
+    ["검정고시", "0.88", "0.94", "1"],
+    ["그 외 기타", "5.01", "4.92", "5.08"],
+  ],
+  "숭실대학교": [
+    ["일반고", "69.74", "69.15", "68.25"],
+    ["특수목적고", "1.27", "1.57", "1.88"],
+    ["특성화고", "-0.11", "-0.2", "-0.29"],
+    ["자율고(사립)", "6.02", "6.33", "6.63"],
+    ["자율고(공립)", "6.95", "7.05", "7.16"],
+    ["영재학교", "3.68", "3.73", "3.79"],
+    ["외국인학교", "2.8", "2.81", "2.82"],
+    ["외국고등학교", "2.73", "2.74", "2.79"],
+    ["검정고시", "2.96", "3.01", "3.07"],
+    ["그 외 기타", "7.08", "6.99", "7.15"],
+  ],
+  "아주대학교": [
+    ["일반고", "75.85", "75.26", "74.37"],
+    ["특수목적고", "7.38", "7.68", "7.99"],
+    ["특성화고", "6.01", "5.91", "5.82"],
+    ["자율고(사립)", "12.13", "12.44", "12.75"],
+    ["자율고(공립)", "6.06", "6.17", "6.27"],
+    ["영재학교", "2.79", "2.84", "2.9"],
+    ["외국인학교", "1.91", "1.92", "1.93"],
+    ["외국고등학교", "1.84", "1.85", "1.9"],
+    ["검정고시", "2.07", "2.12", "2.18"],
+    ["그 외 기타", "6.19", "6.1", "6.26"],
+  ],
+  "단국대학교(죽전)": [
+    ["일반고", "74.53", "73.94", "73.04"],
+    ["특수목적고", "6.05", "6.36", "6.67"],
+    ["특성화고", "4.68", "4.59", "4.5"],
+    ["자율고(사립)", "10.81", "11.12", "11.42"],
+    ["자율고(공립)", "4.74", "4.84", "4.95"],
+    ["영재학교", "1.46", "1.52", "1.58"],
+    ["외국인학교", "0.59", "0.6", "0.6"],
+    ["외국고등학교", "0.52", "0.52", "0.58"],
+    ["검정고시", "0.74", "0.8", "0.86"],
+    ["그 외 기타", "4.87", "4.78", "4.94"],
+  ],
+  "영남대학교": [
+    ["일반고", "72.99", "72.39", "71.5"],
+    ["특수목적고", "4.52", "4.82", "5.13"],
+    ["특성화고", "3.14", "3.05", "2.96"],
+    ["자율고(사립)", "9.27", "9.58", "9.88"],
+    ["자율고(공립)", "3.2", "3.3", "3.41"],
+    ["영재학교", "-0.08", "-0.02", "0.04"],
+    ["외국인학교", "-0.95", "-0.94", "-0.94"],
+    ["외국고등학교", "-1.02", "-1.02", "-0.96"],
+    ["검정고시", "-0.8", "-0.74", "-0.68"],
+    ["그 외 기타", "3.33", "3.24", "3.4"],
+  ],
+  "전남대학교": [
+    ["일반고", "71.9", "71.31", "70.42"],
+    ["특수목적고", "3.43", "3.74", "4.04"],
+    ["특성화고", "2.06", "1.96", "1.87"],
+    ["자율고(사립)", "8.18", "8.49", "8.8"],
+    ["자율고(공립)", "2.11", "2.22", "2.33"],
+    ["영재학교", "-1.16", "-1.1", "-1.05"],
+    ["외국인학교", "-2.03", "-2.03", "-2.02"],
+    ["외국고등학교", "-2.11", "-2.1", "-2.04"],
+    ["검정고시", "-1.88", "-1.82", "-1.77"],
+    ["그 외 기타", "2.25", "2.15", "2.31"],
+  ],
+  "충남대학교": [
+    ["일반고", "71.42", "70.83", "69.93"],
+    ["특수목적고", "2.95", "3.25", "3.56"],
+    ["특성화고", "1.57", "1.48", "1.39"],
+    ["자율고(사립)", "7.7", "8.01", "8.31"],
+    ["자율고(공립)", "1.63", "1.73", "1.84"],
+    ["영재학교", "-1.64", "-1.59", "-1.53"],
+    ["외국인학교", "-2.52", "-2.51", "-2.5"],
+    ["외국고등학교", "-2.59", "-2.58", "-2.53"],
+    ["검정고시", "-2.36", "-2.31", "-2.25"],
+    ["그 외 기타", "1.76", "1.67", "1.83"],
+  ],
+  "제주대학교": [
+    ["일반고", "75.29", "74.7", "73.81"],
+    ["특수목적고", "6.82", "7.13", "7.43"],
+    ["특성화고", "5.45", "5.35", "5.26"],
+    ["자율고(사립)", "11.57", "11.88", "12.19"],
+    ["자율고(공립)", "5.5", "5.61", "5.71"],
+    ["영재학교", "2.23", "2.28", "2.34"],
+    ["외국인학교", "1.35", "1.36", "1.37"],
+    ["외국고등학교", "1.28", "1.29", "1.34"],
+    ["검정고시", "1.51", "1.56", "1.62"],
+    ["그 외 기타", "5.63", "5.54", "5.7"],
+  ],
   default: [
     ["일반고", "72.40", "71.80", "70.90"],
     ["특수목적고", "4.20", "4.50", "4.80"],
@@ -191,9 +1459,24 @@ window.ADMIT_UNI_HS = {
 
 /* 수시 상세: 지원자격·전형일정 기본값 (2026·2027 요강 공통 패턴) */
 window.ADMIT_SUSI_ELIG = {
-  교과: "국내 고등학교 졸업(예정)자로서 소속 고등학교장의 추천을 받은 자(고교별 추천 인원은 해당 대학 모집요강 기준).",
-  종합: "국내·외 고등학교 졸업(예정)자 또는 법령에 의하여 이와 동등 이상의 학력이 있다고 인정된 자.",
-  논술: "국내 고등학교 졸업(예정)자 또는 고등학교 졸업학력 검정고시 합격자 등 법령상 동등 학력 인정자.",
+  교과: {
+    default: "국내 고등학교 졸업(예정)자로서 소속 고등학교장의 추천을 받은 자(고교별 추천 인원은 해당 대학 모집요강 기준).",
+    med: "국내 고등학교 졸업(예정)자로서 학교장 추천을 받은 자. 의·약학 계열은 모집단위별 추천 인원 및 수능 응시 자격(수학·탐구 과목)을 요강에서 확인.",
+    edu: "국내 고등학교 졸업(예정)자로서 학교장 추천을 받은 자. 사범·교육 계열은 교직 적성·인성 관련 서류를 추가로 제출할 수 있음.",
+    nurse: "국내 고등학교 졸업(예정)자로서 학교장 추천을 받은 자. 간호·보건 계열은 관련 교과 이수 현황을 요강 기준으로 확인.",
+  },
+  종합: {
+    default: "국내·외 고등학교 졸업(예정)자 또는 법령에 의하여 이와 동등 이상의 학력이 있다고 인정된 자.",
+    med: "국내·외 고등학교 졸업(예정)자 등 학력 인정자. 의·약학 계열은 전공 관련 활동·이수 과목을 서류에서 중점 평가.",
+    advanced: "국내·외 고등학교 졸업(예정)자 등 학력 인정자. 첨단·공학 계열은 수학·과학 역량과 관련 활동 기록을 종합 평가.",
+    contract: "국내 고등학교 졸업(예정)자로서 해당 계약학과 협약 기업·기관의 추천 또는 별도 자격을 충족한 자(요강 확인).",
+  },
+  논술: {
+    default: "국내 고등학교 졸업(예정)자 또는 고등학교 졸업학력 검정고시 합격자 등 법령상 동등 학력 인정자.",
+    med: "국내 고등학교 졸업(예정)자 등 학력 인정자. 의·약학 계열 논술은 수리·과학 문항 구성 여부를 요강에서 확인.",
+    natural: "국내 고등학교 졸업(예정)자 등 학력 인정자. 자연계 논술은 수리논술 또는 과학논술 중 모집단위별 지정 과목을 응시.",
+    humanities: "국내 고등학교 졸업(예정)자 등 학력 인정자. 인문계 논술은 인문·사회 통합형 문항을 중심으로 출제.",
+  },
 };
 
 /* 키 = 전형일정 표 컬럼명 */
@@ -225,7 +1508,7 @@ window.ADMIT_SUSI_SCHEDULE = {
     적성일정: "-",
     기타일정: "등록 12.16~12.18",
   },
-  "2026": {
+  "2024": {
     접수일정: "2023.09.11~09.15",
     합격발표: "2023.12.15",
     면접일정: "2023.11.25~11.26",

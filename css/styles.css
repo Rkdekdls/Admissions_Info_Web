@@ -1393,23 +1393,31 @@ input {
   text-overflow: ellipsis;
 }
 
-/* 학과 유형별(red/orange/green/purple/yellow/teal)과 다른 톤 */
-.admit-grade-method-card[data-tone="sky"] .admit-grade-method-badge {
+/* 성적 반영 방식 뱃지 — 필터 카드·상세보기 공통 색 */
+.admit-grade-method-card[data-tone="sky"] .admit-grade-method-badge,
+.admit-record-method-badge[data-tone="sky"],
+.admit-record-method-badge.is-tone-sky {
   background: #e0f2fe;
   color: #0284c7;
 }
 
-.admit-grade-method-card[data-tone="indigo"] .admit-grade-method-badge {
+.admit-grade-method-card[data-tone="indigo"] .admit-grade-method-badge,
+.admit-record-method-badge[data-tone="indigo"],
+.admit-record-method-badge.is-tone-indigo {
   background: #e0e7ff;
   color: #4f46e5;
 }
 
-.admit-grade-method-card[data-tone="pink"] .admit-grade-method-badge {
-  background: #fdf2f8;
+.admit-grade-method-card[data-tone="pink"] .admit-grade-method-badge,
+.admit-record-method-badge[data-tone="pink"],
+.admit-record-method-badge.is-tone-pink {
+  background: #fce7f3;
   color: #db2777;
 }
 
-.admit-grade-method-card[data-tone="slate"] .admit-grade-method-badge {
+.admit-grade-method-card[data-tone="slate"] .admit-grade-method-badge,
+.admit-record-method-badge[data-tone="slate"],
+.admit-record-method-badge.is-tone-slate {
   background: #f1f5f9;
   color: #475569;
 }
@@ -3238,10 +3246,12 @@ input {
 
 .admit-detail-uni-chart-svg {
   display: block;
-  width: 796px;
+  width: 100%;
+  min-width: 100%;
   max-width: none;
   height: auto;
   vertical-align: top;
+  flex-shrink: 0;
 }
 
 .admit-detail-source {
@@ -3821,8 +3831,8 @@ table.admit-detail-table td {
   height: 26px;
   padding: 0 10px;
   border: 0;
-  background: #e8eff6;
-  color: #1a4796;
+  background: #e0f2fe;
+  color: #0284c7;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: -0.2px;
