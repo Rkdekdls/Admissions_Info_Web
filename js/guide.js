@@ -2827,85 +2827,62 @@ const Guide = (() => {
         </div>
       </section>`;
 
-    /* 교과성적 반영 방법 아래 · 수능 최저학력 기준과 동일 표 디자인 */
-    const bonusInner = (() => {
-      if (none) return "-";
+    /* 교과성적 반영 방법 아래 · 원래 시안(상단선 박스 + · 불릿, 표/회색칸 없음) */
+    const bonusBoxInner = (() => {
+      if (none) return `<p class="admit-record-empty">-</p>`;
+      const list = (items) =>
+        `<ul class="admit-record-bonus-list">${items
+          .map((line) => `<li>${escapeHtml(line)}</li>`)
+          .join("")}</ul>`;
       if (isJeongsi) {
         if (!hasQuant) {
-          return `<div class="admit-record-bonus-inner">
-              <p class="admit-record-bonus-note">※ 해당 전형은 학생부 정량 가산점을 적용하지 않습니다.</p>
-              <ul class="admit-record-bonus-list">
-                <li>수능 100% 전형: 학생부 이수 교과 가산점 없음</li>
-                <li>서류·면접 반영 전형의 가산은 정성평가에 포함하여 별도 점수화하지 않음</li>
-              </ul>
-            </div>`;
+          return `<p class="admit-record-bonus-note">※ 해당 전형은 학생부 정량 가산점을 적용하지 않습니다.</p>${list([
+            "수능 100% 전형: 학생부 이수 교과 가산점 없음",
+            "서류·면접 반영 전형의 가산은 정성평가에 포함하여 별도 점수화하지 않음",
+          ])}`;
         }
         const scienceTrack = track === "자연";
-        return `<div class="admit-record-bonus-inner">
-              <p class="admit-record-bonus-note">※ 전 계열 수능 반영영역별 지정 과목은 없으나, ${
-                scienceTrack ? "자연" : "인문"
-              } 계열 모집단위 학생부 이수 교과 가산점을 적용합니다.</p>
-              <ul class="admit-record-bonus-list">
-                <li>수능위주일반전형(수능·학생부형): 학생부 ${
-                  scienceTrack ? "수학·과학" : "국어·사회"
-                } 교과 3학년 2학기까지 선택과목(일반+진로+융합 선택과목) 권장 최소 이수학점(단위) 수 또는 과목 수 충족 시 전형 총점에서 가점 (총 8점)</li>
-                <li>${
-                  scienceTrack
-                    ? "수학교과 18학점(단위) 또는 5과목 이상: 4점"
-                    : "국어교과 16학점(단위) 또는 4과목 이상: 4점"
-                }</li>
-                <li>${
-                  scienceTrack
-                    ? "과학교과 20학점(단위) 또는 6과목 이상: 4점"
-                    : "사회교과 18학점(단위) 또는 5과목 이상: 4점"
-                }</li>
-                <li>수능위주일반전형(수능형)은 가산점 없음</li>
-              </ul>
-            </div>`;
+        return `<p class="admit-record-bonus-note">※ 전 계열 수능 반영영역별 지정 과목은 없으나, ${
+          scienceTrack ? "자연" : "인문"
+        } 계열 모집단위 학생부 이수 교과 가산점을 적용합니다.</p>${list([
+          `수능위주일반전형(수능·학생부형): 학생부 ${
+            scienceTrack ? "수학·과학" : "국어·사회"
+          } 교과 3학년 2학기까지 선택과목(일반+진로+융합 선택과목) 권장 최소 이수학점(단위) 수 또는 과목 수 충족 시 전형 총점에서 가점 (총 8점)`,
+          scienceTrack
+            ? "수학교과 18학점(단위) 또는 5과목 이상: 4점"
+            : "국어교과 16학점(단위) 또는 4과목 이상: 4점",
+          scienceTrack
+            ? "과학교과 20학점(단위) 또는 6과목 이상: 4점"
+            : "사회교과 18학점(단위) 또는 5과목 이상: 4점",
+          "수능위주일반전형(수능형)은 가산점 없음",
+        ])}`;
       }
       if (typeKey === "논술") {
-        return `<div class="admit-record-bonus-inner">
-              <p class="admit-record-bonus-note">※ 논술전형은 논술고사 성적이 중심이며, 학생부 교과 가산은 제한적으로 적용합니다.</p>
-              <ul class="admit-record-bonus-list">
-                <li>논술 성적 반영 후 동점자 처리 시 학생부 교과 우수자에게 가점</li>
-                <li>진로선택 과목 성취도 A 비율에 따른 가산: 최대 2점</li>
-                <li>학생부 미반영(논술 100%) 모집단위는 가산점 없음</li>
-              </ul>
-            </div>`;
+        return `<p class="admit-record-bonus-note">※ 논술전형은 논술고사 성적이 중심이며, 학생부 교과 가산은 제한적으로 적용합니다.</p>${list([
+          "논술 성적 반영 후 동점자 처리 시 학생부 교과 우수자에게 가점",
+          "진로선택 과목 성취도 A 비율에 따른 가산: 최대 2점",
+          "학생부 미반영(논술 100%) 모집단위는 가산점 없음",
+        ])}`;
       }
       if (typeKey === "종합" || (hasQual && !hasQuant)) {
-        return `<div class="admit-record-bonus-inner">
-              <p class="admit-record-bonus-note">※ 학생부종합전형은 정성평가에 포함하여 별도 가산점으로 분리하지 않습니다.</p>
-              <ul class="admit-record-bonus-list">
-                <li>서류·면접 평가 시 전공 관련 활동·이수 과목을 종합적으로 반영</li>
-                <li>정량 환산 가산점(학점·과목 수)은 적용하지 않음</li>
-                <li>동점자 발생 시 서류평가 점수 → 면접 점수 순으로 처리</li>
-              </ul>
-            </div>`;
+        return `<p class="admit-record-bonus-note">※ 학생부종합전형은 정성평가에 포함하여 별도 가산점으로 분리하지 않습니다.</p>${list([
+          "서류·면접 평가 시 전공 관련 활동·이수 과목을 종합적으로 반영",
+          "정량 환산 가산점(학점·과목 수)은 적용하지 않음",
+          "동점자 발생 시 서류평가 점수 → 면접 점수 순으로 처리",
+        ])}`;
       }
-      return `<div class="admit-record-bonus-inner">
-              <p class="admit-record-bonus-note">※ 학생부교과전형에서 진로선택·융합선택 과목 이수에 따른 가산점을 적용합니다.</p>
-              <ul class="admit-record-bonus-list">
-                <li>진로선택 과목 성취도 A·B 비율에 따라 최대 5점 가산</li>
-                <li>융합선택(사회·과학) 과목 이수 시 최대 2점 가산</li>
-                <li>${
-                  track === "자연" ? "수학·과학" : "국어·사회·수학"
-                } 교과 이수단위 충족 시 전형 총점에서 가점</li>
-                <li>출결·봉사 등 비교과 가산은 해당 모집단위에 한해 적용</li>
-              </ul>
-            </div>`;
+      return `<p class="admit-record-bonus-note">※ 학생부교과전형에서 진로선택·융합선택 과목 이수에 따른 가산점을 적용합니다.</p>${list([
+        "진로선택 과목 성취도 A·B 비율에 따라 최대 5점 가산",
+        "융합선택(사회·과학) 과목 이수 시 최대 2점 가산",
+        `${track === "자연" ? "수학·과학" : "국어·사회·수학"} 교과 이수단위 충족 시 전형 총점에서 가점`,
+        "출결·봉사 등 비교과 가산은 해당 모집단위에 한해 적용",
+      ])}`;
     })();
     const bonusHtml = `
       <section class="admit-detail-section">
         <h3 class="admit-detail-section-title">가산점</h3>
         <div class="admit-detail-table-wrap">
-          <table class="admit-detail-table admit-detail-table-bonus">
-            <tbody>
-              <tr>
-                <td class="is-align-left">${bonusInner}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="admit-record-bonus-box">${bonusBoxInner}</div>
         </div>
       </section>`;
 

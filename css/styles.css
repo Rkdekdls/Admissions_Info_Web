@@ -3877,15 +3877,13 @@ table.admit-detail-table td {
   line-height: 1.2;
 }
 
-/* 가산점·수능 최저: 제목만 두고 회색 라벨 칸 없음 */
-.admit-detail-table-bonus td.is-align-left,
-.admit-detail-table-min td.is-align-left {
-  text-align: left;
-  vertical-align: middle;
-  padding: 12px 14px;
-}
-
-.admit-record-bonus-inner {
+/* 가산점: 시안 원형 — 상단 파란선 박스 + ※ · 불릿 (표/회색칸 아님) */
+.admit-record-bonus-box {
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fff;
   color: #1f2937;
   font-size: 13px;
   font-weight: 400;
@@ -3922,6 +3920,12 @@ table.admit-detail-table td {
   top: 0;
   color: #1f2937;
   font-weight: 600;
+}
+
+.admit-detail-table-min td.is-align-left {
+  text-align: left;
+  vertical-align: middle;
+  padding: 12px 14px;
 }
 
 .admit-record-subject-grid {
