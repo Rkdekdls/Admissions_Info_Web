@@ -525,9 +525,9 @@ const Guide = (() => {
       root.querySelector(".admit-list-head .admit-list-title");
     if (!title) return;
     if (!title.dataset.baseLabel) {
-      title.dataset.baseLabel = title.textContent.replace(/\s*\d+\s*건\s*$/, "").trim();
+      title.dataset.baseLabel = title.textContent.replace(/\s*\(?\d+\s*건\)?\s*$/, "").trim();
     }
-    title.textContent = `${title.dataset.baseLabel} ${visibleCount}건`;
+    title.textContent = `${title.dataset.baseLabel}(${visibleCount}건)`;
   }
 
   function admitThemeButtons(includePharmacy) {
@@ -1484,6 +1484,8 @@ const Guide = (() => {
       if (!showGrade && (sort.value === "grade-desc" || sort.value === "grade-asc")) {
         sort.value = "name";
       }
+      /* 커스텀 셀렉트 메뉴에도 숨김 반영 — 종합·논술에서는 등급 정렬 제외 */
+      sort.closest(".admit-select")?._rebuildAdmitSelect?.();
     }
 
     const keyword = (root.querySelector('input[name="keyword"]')?.value || "").trim().toLowerCase();
@@ -1674,6 +1676,7 @@ const Guide = (() => {
       const rebuildOptions = () => {
         menu.replaceChildren();
         [...select.options].forEach((opt) => {
+          if (opt.hidden) return;
           const li = document.createElement("li");
           li.className = "admit-select-option";
           li.setAttribute("role", "option");
@@ -1688,6 +1691,7 @@ const Guide = (() => {
         syncFromSelect();
       };
 
+      wrap._rebuildAdmitSelect = rebuildOptions;
       rebuildOptions();
 
       trigger.addEventListener("click", (event) => {
@@ -2097,7 +2101,8 @@ const Guide = (() => {
       return;
     }
     if (table.classList.contains("admit-detail-table-record")) {
-      table.dataset.declaredColWidths = "12,12,14,15.5,15.5,15.5,15.5";
+      /* 구분 + 연도 4열 — 회색 스택열 제거 후 전체 폭 사용 */
+      table.dataset.declaredColWidths = "15,21.25,21.25,21.25,21.25";
       return;
     }
     if (table.classList.contains("admit-detail-table-schedule")) {
@@ -2537,27 +2542,20 @@ const Guide = (() => {
       }
       return defaults;
     })();
-    const recordRatioBody = RECORD_RATIO_ROWS.map((key, index) => {
-      const group =
-        index === 0
-          ? `<th scope="row" rowspan="${RECORD_RATIO_ROWS.length}" class="admit-detail-th-stack">학생부<br>반영 비율</th>`
-          : "";
-      return `<tr>${group}<th scope="row" colspan="2">${escapeHtml(key)}</th>${yearCells(
-        recordDefaults[key] || "-"
-      )}</tr>`;
-    }).join("");
+    const recordRatioBody = RECORD_RATIO_ROWS.map(
+      (key) =>
+        `<tr><th scope="row">${escapeHtml(key)}</th>${yearCells(recordDefaults[key] || "-")}</tr>`
+    ).join("");
     const recordDetailHtml = `
       <section class="admit-detail-section">
         <h3 class="admit-detail-section-title">학생부 반영 비율</h3>
         <div class="admit-detail-table-wrap">
           <table class="admit-detail-table admit-detail-table-record">
             <colgroup>
-              <col class="admit-detail-col-stack">
-              <col class="admit-detail-col-stack">
               <col class="admit-detail-col-item">
               <col span="${ADMIT_DETAIL_YEARS.length}" class="admit-detail-col-year">
             </colgroup>
-            <thead>${yearHeaderRow(3)}</thead>
+            <thead>${yearHeaderRow()}</thead>
             <tbody>${recordRatioBody}</tbody>
           </table>
         </div>
