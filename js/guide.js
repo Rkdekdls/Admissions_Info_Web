@@ -2102,6 +2102,35 @@ const Guide = (() => {
     return store[`${univ}|${unit}|${typeKey}`] || null;
   }
 
+  /* 수능 최저: 적용 → 영역·등급 합 상세 문구 / 미적용은 그대로 */
+  const ADMIT_MIN_DETAIL_SAMPLES = [
+    "국어·수학·영어·탐구 중 2개 영역 등급 합 5 이내",
+    "국어·수학·영어·탐구 중 3개 영역 등급 합 7 이내",
+    "국어·수학·영어·탐구 중 2개 영역 등급 합 4 이내",
+    "국어·수학·영어·탐구 중 3개 영역 등급 합 6 이내",
+    "국어·영어·탐구 중 2개 영역 등급 합 5 이내",
+    "수학·영어·탐구 중 2개 영역 등급 합 4 이내",
+    "국어·수학·영어 중 2개 영역 등급 합 4 이내",
+    "국어·수학·영어·탐구 중 2개 영역 각 3등급 이내",
+    "국어·수학·영어·탐구 중 3개 영역 등급 합 8 이내",
+    "영어 2등급 이내 및 국어·수학·탐구 중 1개 영역 3등급 이내",
+  ];
+
+  function admitMinSeedHash(seed) {
+    let h = 0;
+    const s = String(seed || "");
+    for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return h;
+  }
+
+  function expandAdmitMinLabel(label, seed = "") {
+    const raw = String(label == null ? "" : label).trim();
+    if (!raw || raw === "-") return "-";
+    if (raw === "미적용") return "미적용";
+    if (raw !== "적용") return raw;
+    return ADMIT_MIN_DETAIL_SAMPLES[admitMinSeedHash(seed) % ADMIT_MIN_DETAIL_SAMPLES.length];
+  }
+
   function yearlyFieldMap(yearly, field, years, fallback) {
     const out = {};
     years.forEach((year) => {
@@ -2243,8 +2272,8 @@ const Guide = (() => {
   const RECORD_RATIO_ROWS = ["교과", "출결", "자격증", "활동", "봉사", "기타"];
   const SCHEDULE_COLS = ["접수일정", "합격발표", "면접일정", "논술일정", "실기일정", "적성일정", "기타일정"];
 
-  /* 팝업 표: PC는 래퍼 맞춤(스크롤 X) / 태블릿·모바일은 PC min(876)+스크롤 */
-  const ADMIT_DETAIL_PC_MIN = 876;
+  /* 팝업 표: PC는 래퍼 맞춤(스크롤 X) / 태블릿·모바일은 PC min(1056)+스크롤 */
+  const ADMIT_DETAIL_PC_MIN = 1056;
 
   function applyAdmitDetailCols(table, widths) {
     let group = table.querySelector("colgroup");
@@ -2260,14 +2289,25 @@ const Guide = (() => {
     });
   }
 
+  function isAdmitDetailLabelTh(el) {
+    return (
+      el &&
+      el.tagName === "TH" &&
+      el.closest("tbody") &&
+      !el.classList.contains("admit-detail-th-stack")
+    );
+  }
+
   function containAdmitDetailCells(table) {
     table.querySelectorAll("th, td").forEach((el) => {
+      const isLabelTh = isAdmitDetailLabelTh(el);
       el.style.setProperty("width", "auto", "important");
       el.style.setProperty("min-width", "0", "important");
       el.style.setProperty("max-width", "none", "important");
-      el.style.setProperty("white-space", "normal", "important");
+      /* 회색 구분: 한 줄 유지 · PC 폭은 col %로 맞춤(스크롤 X) */
+      el.style.setProperty("white-space", isLabelTh ? "nowrap" : "normal", "important");
       el.style.setProperty("word-break", "keep-all", "important");
-      el.style.setProperty("overflow-wrap", "break-word", "important");
+      el.style.setProperty("overflow-wrap", isLabelTh ? "normal" : "break-word", "important");
       el.style.setProperty("overflow", "hidden", "important");
       el.style.setProperty("box-sizing", "border-box", "important");
     });
@@ -2280,11 +2320,18 @@ const Guide = (() => {
     probe.style.cssText =
       "position:absolute;left:-99999px;top:0;visibility:hidden;table-layout:auto;width:max-content;border-collapse:separate;border-spacing:0;margin:0;font:inherit;";
     probe.querySelectorAll("th, td").forEach((cell) => {
+      const isLabelTh = isAdmitDetailLabelTh(cell);
+      const isHeadTh = cell.tagName === "TH" && cell.closest("thead");
       cell.style.cssText = "";
-      cell.style.setProperty("white-space", "nowrap", "important");
+      /* 구분 열·헤더만 nowrap 측정 · 긴 데이터(수능 최저 등)는 줄바꿈 폭으로 */
+      cell.style.setProperty(
+        "white-space",
+        isLabelTh || isHeadTh ? "nowrap" : "normal",
+        "important"
+      );
       cell.style.setProperty("width", "auto", "important");
       cell.style.setProperty("min-width", "0", "important");
-      cell.style.setProperty("max-width", "none", "important");
+      cell.style.setProperty("max-width", isLabelTh || isHeadTh ? "none" : "160px", "important");
       cell.style.setProperty("overflow", "visible", "important");
       cell.style.setProperty("word-break", "keep-all", "important");
     });
@@ -2321,6 +2368,11 @@ const Guide = (() => {
 
   function assignAdmitDetailColWidths(table) {
     /* 종류별 비율은 항상 최신값으로 — 열 수 바뀌면 우측 빈 칸 방지 */
+    if (table.classList.contains("admit-detail-table-unit")) {
+      /* 구분(한 줄) + 연도 4열 — 회색 라벨 잘림 방지 */
+      table.dataset.declaredColWidths = "15,21.25,21.25,21.25,21.25";
+      return;
+    }
     if (table.classList.contains("admit-detail-table-method")) {
       table.dataset.declaredColWidths = "18,18,16,16,16,16";
       return;
@@ -2698,6 +2750,56 @@ const Guide = (() => {
         </div>
       </section>`;
 
+    /* 학생부 반영 비율 — 평가 유형과 교과성적 반영 방법 사이 */
+    const recordDefaults = (() => {
+      if (isJeongsi) {
+        if (none || !hasQuant) {
+          return { 교과: "-", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+        }
+        const defaults = { 교과: "100%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+        const pct = String(method || "").match(/학생부\s*(\d+)/);
+        if (pct) defaults.교과 = `${pct[1]}%`;
+        return defaults;
+      }
+      if (typeKey === "논술") {
+        return { 교과: "10%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+      }
+      const defaults = { 교과: "100%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+      if (typeKey === "교과" && /교과종합|종합평가/.test(method || "")) {
+        defaults.교과 = "70%";
+        defaults.기타 = "30%";
+      }
+      if (none || (!hasQuant && hasQual)) {
+        return { 교과: "-", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+      }
+      return defaults;
+    })();
+    const recordRatioBody = RECORD_RATIO_ROWS.map((key, index) => {
+      const group =
+        index === 0
+          ? `<th scope="row" rowspan="${RECORD_RATIO_ROWS.length}" class="admit-detail-th-stack">학생부<br>반영 비율</th>`
+          : "";
+      return `<tr>${group}<th scope="row" colspan="2">${escapeHtml(key)}</th>${yearCells(
+        recordDefaults[key] || "-"
+      )}</tr>`;
+    }).join("");
+    const recordDetailHtml = `
+      <section class="admit-detail-section">
+        <h3 class="admit-detail-section-title">학생부 반영 비율</h3>
+        <div class="admit-detail-table-wrap">
+          <table class="admit-detail-table admit-detail-table-record">
+            <colgroup>
+              <col class="admit-detail-col-stack">
+              <col class="admit-detail-col-stack">
+              <col class="admit-detail-col-item">
+              <col span="${ADMIT_DETAIL_YEARS.length}" class="admit-detail-col-year">
+            </colgroup>
+            <thead>${yearHeaderRow(3)}</thead>
+            <tbody>${recordRatioBody}</tbody>
+          </table>
+        </div>
+      </section>`;
+
     const methodTopHtml = hasQuant
       ? `<div class="admit-record-method-top">
             <span class="admit-record-method-badge">${escapeHtml(methodBadge)}</span>
@@ -2886,7 +2988,7 @@ const Guide = (() => {
         </div>
       </section>`;
 
-    return `${evalTypeHtml}${gradeMethodHtml}${bonusHtml}${subjectTypeHtml}${scoreCalcHtml}${qualHtml}${convertHtml}`;
+    return `${evalTypeHtml}${recordDetailHtml}${gradeMethodHtml}${bonusHtml}${subjectTypeHtml}${scoreCalcHtml}${qualHtml}${convertHtml}`;
   }
 
   function parseAdmitStatNumber(value) {
@@ -3253,12 +3355,17 @@ const Guide = (() => {
     }
 
     const yearly = pickSusiYearly(univ, unit, typeKey);
+    const minSeed = `${univ}|${unit}|${typeKey}`;
     /* 연도별 수집값 채운 뒤, 목록 표에 있는 값은 기준연도에 그대로 덮어씀 */
     const quotaByYear = yearlyFieldMap(yearly, "quota", ADMIT_DETAIL_YEARS, quota || "-");
-    const minByYear = yearlyFieldMap(yearly, "min", ADMIT_DETAIL_YEARS, minimum || "-");
+    const minByYearRaw = yearlyFieldMap(yearly, "min", ADMIT_DETAIL_YEARS, minimum || "-");
+    const minByYear = {};
+    ADMIT_DETAIL_YEARS.forEach((year) => {
+      minByYear[year] = expandAdmitMinLabel(minByYearRaw[year], minSeed);
+    });
     const methodByYear = yearlyFieldMap(yearly, "method", ADMIT_DETAIL_YEARS, method || "-");
     if (quota) quotaByYear[ADMIT_DETAIL_DATA_YEAR] = quota;
-    if (minimum) minByYear[ADMIT_DETAIL_DATA_YEAR] = minimum;
+    if (minimum) minByYear[ADMIT_DETAIL_DATA_YEAR] = expandAdmitMinLabel(minimum, minSeed);
     if (method) methodByYear[ADMIT_DETAIL_DATA_YEAR] = method;
     const rateByYearRaw = yearlyFieldMap(yearly, "rate", ADMIT_RESULT_YEARS, rate || "-");
     const rateByYear = {};
@@ -3350,29 +3457,11 @@ const Guide = (() => {
         .join("");
     })();
 
-    /* —— 학생부 반영 세부: 전형 유형별 공통 패턴을 연도 컬럼 전체에 채움 —— */
-    const recordDefaults =
-      typeKey === "논술"
-        ? { 교과: "10%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" }
-        : { 교과: "100%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
-    if (typeKey === "교과" && /교과종합|종합평가/.test(method)) {
-      recordDefaults.교과 = "70%";
-      recordDefaults.기타 = "30%";
-    }
-    const recordRatioBody = RECORD_RATIO_ROWS.map((key, index) => {
-      const group =
-        index === 0
-          ? `<th scope="row" rowspan="${RECORD_RATIO_ROWS.length}" class="admit-detail-th-stack">학생부<br>반영 비율</th>`
-          : "";
-      return `<tr>${group}<th scope="row" colspan="2">${escapeHtml(key)}</th>${yearCells(
-        recordDefaults[key] || "-"
-      )}</tr>`;
-    }).join("");
     infoPanel.innerHTML = `
       <section class="admit-detail-section">
         <h3 class="admit-detail-section-title">모집단위</h3>
         <div class="admit-detail-table-wrap">
-          <table class="admit-detail-table">
+          <table class="admit-detail-table admit-detail-table-unit">
             <thead>${yearHeaderRow()}</thead>
             <tbody>${unitRowsHtml}</tbody>
           </table>
@@ -3408,24 +3497,6 @@ const Guide = (() => {
             </colgroup>
             <thead>${yearHeaderRow(2)}</thead>
             <tbody>${methodBody}</tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="admit-detail-section">
-        <h3 class="admit-detail-section-title">학생부 반영 세부 정보</h3>
-        <div class="admit-detail-table-wrap">
-          <table class="admit-detail-table admit-detail-table-record">
-            <colgroup>
-              <col class="admit-detail-col-stack">
-              <col class="admit-detail-col-stack">
-              <col class="admit-detail-col-item">
-              <col span="${ADMIT_DETAIL_YEARS.length}" class="admit-detail-col-year">
-            </colgroup>
-            <thead>${yearHeaderRow(3)}</thead>
-            <tbody>
-              ${recordRatioBody}
-            </tbody>
           </table>
         </div>
       </section>`;
@@ -3739,10 +3810,15 @@ const Guide = (() => {
       materialsPanel.hidden = true;
     }
 
+    /* 정시 수능 최저: 수능 100% 단독은 미적용, 그 외는 영역·등급 합 상세 문구 */
+    const jeongsiMinLabel = /^수능\s*100%/.test(String(method || "").trim())
+      ? "미적용"
+      : expandAdmitMinLabel("적용", `${univ}|${unit}|${typeName || method}`);
     const unitRowsHtml = [
       ["모집인원", yearFill(quota || "-")],
       ["모집군", yearFill(groupFull)],
-      ["계열", toYearMap(track || "-", ADMIT_DETAIL_YEARS)],
+      ["계열", toYearMap(track ? `${track}계열` : "-", ADMIT_DETAIL_YEARS)],
+      ["수능 최저", toYearMap(jeongsiMinLabel, ADMIT_DETAIL_YEARS)],
     ]
       .map(([label, value]) => `<tr><th scope="row">${escapeHtml(label)}</th>${yearCells(value)}</tr>`)
       .join("");
@@ -3822,29 +3898,11 @@ const Guide = (() => {
       )
       .join("");
 
-    /* —— 학생부 반영 세부 (수시와 동일 표, 전형방법 아래) —— */
-    const hasJeongsiRecord = /정량|정성/.test(reflectLabel);
-    const jeongsiRecordDefaults = hasJeongsiRecord
-      ? { 교과: "100%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" }
-      : { 교과: "-", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
-    const jeongsiRecordPct = String(method || "").match(/학생부\s*(\d+)/);
-    if (hasJeongsiRecord && jeongsiRecordPct) {
-      jeongsiRecordDefaults.교과 = `${jeongsiRecordPct[1]}%`;
-    }
-    const jeongsiRecordRatioBody = RECORD_RATIO_ROWS.map((key, index) => {
-      const group =
-        index === 0
-          ? `<th scope="row" rowspan="${RECORD_RATIO_ROWS.length}" class="admit-detail-th-stack">학생부<br>반영 비율</th>`
-          : "";
-      return `<tr>${group}<th scope="row" colspan="2">${escapeHtml(key)}</th>${yearCells(
-        jeongsiRecordDefaults[key] || "-"
-      )}</tr>`;
-    }).join("");
     infoPanel.innerHTML = `
       <section class="admit-detail-section">
         <h3 class="admit-detail-section-title">모집단위</h3>
         <div class="admit-detail-table-wrap">
-          <table class="admit-detail-table">
+          <table class="admit-detail-table admit-detail-table-unit">
             <thead>${yearHeaderRow()}</thead>
             <tbody>${unitRowsHtml}</tbody>
           </table>
@@ -3862,37 +3920,6 @@ const Guide = (() => {
             </colgroup>
             <thead>${yearHeaderRow(2)}</thead>
             <tbody>${methodBody}</tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="admit-detail-section">
-        <h3 class="admit-detail-section-title">학생부 반영 세부 정보</h3>
-        <div class="admit-detail-table-wrap">
-          <table class="admit-detail-table admit-detail-table-record">
-            <colgroup>
-              <col class="admit-detail-col-stack">
-              <col class="admit-detail-col-stack">
-              <col class="admit-detail-col-item">
-              <col span="${ADMIT_DETAIL_YEARS.length}" class="admit-detail-col-year">
-            </colgroup>
-            <thead>${yearHeaderRow(3)}</thead>
-            <tbody>
-              ${jeongsiRecordRatioBody}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="admit-detail-section">
-        <h3 class="admit-detail-section-title">수능 최저학력 기준</h3>
-        <div class="admit-detail-table-wrap">
-          <table class="admit-detail-table admit-detail-table-min">
-            <tbody>
-              <tr>
-                <td class="is-align-left">-</td>
-              </tr>
-            </tbody>
           </table>
         </div>
       </section>`;
