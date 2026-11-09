@@ -262,31 +262,16 @@ MOBILE_MQ.addEventListener("change", () => {
   }
 });
 
-const { tab: hashTab, section: hashSection } = parseRoute();
-const knownTab = hashTab === "home" ? null : tabs.find((tab) => tab.dataset.tab === hashTab);
-const isHomeRoute = !hashTab || hashTab === "home" || !knownTab;
 /*
- * 라우팅 규칙 (PC·모바일 동일)
- * - 첫 인입(해시 없음) / 로고 클릭 → 홈
+ * 라우팅 규칙 (PC·모바일·태블릿 동일)
+ * - 페이지 로드(첫 화면·새로고침) → 항상 홈 (#home)
+ *   (이전 해시가 남아 있어도 홈으로 초기화 — 모바일 캐시/해시 잔존 방지)
  * - 입시 정보 그룹만 클릭 → 수시 › 교과
  * - 대입 제도 그룹만 클릭 → 교육과정 체계
- * - 새로고침 → 현재 해시 화면 유지
+ * - 로고 클릭 → 홈
  */
-const startKey = isHomeRoute ? "home" : knownTab.dataset.tab;
-const startGroup = isHomeRoute ? "home" : knownTab.dataset.group || "info";
-const startSection =
-  hashSection ||
-  (startKey === "susi" ? "susi-subject" : undefined);
-
-groups.forEach((group) => {
-  setGroupOpen(group.dataset.group, startGroup !== "home" && group.dataset.group === startGroup);
-});
-
-if (isHomeRoute) {
-  selectTab("home", true);
-} else {
-  selectTab(startKey, true, startSection);
-}
+groups.forEach((group) => setGroupOpen(group.dataset.group, false));
+selectTab(HOME_TAB, true);
 
 const brandHome = document.getElementById("brand-home");
 if (brandHome) {
