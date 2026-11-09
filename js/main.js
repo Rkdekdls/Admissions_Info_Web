@@ -2,6 +2,7 @@ const tabs = Array.from(document.querySelectorAll(".tab"));
 const panels = Array.from(document.querySelectorAll(".panel"));
 const crumbParent = document.getElementById("crumb-parent");
 const crumbCurrent = document.getElementById("crumb-current");
+const crumbCurrentSep = document.getElementById("crumb-current-sep");
 const crumbSectionSep = document.getElementById("crumb-section-sep");
 const crumbSection = document.getElementById("crumb-section");
 const app = document.getElementById("app");
@@ -11,6 +12,7 @@ const sidebarBackdrop = document.getElementById("sidebar-backdrop");
 const groups = Array.from(document.querySelectorAll(".nav-group[data-group]"));
 
 const titles = {
+  home: "홈",
   curriculum: "교육과정 체계",
   record: "학교생활기록부",
   exam: "수능 및 모의고사",
@@ -22,13 +24,15 @@ const titles = {
 };
 
 const groupTitles = {
+  home: "홈",
   admission: "대입 제도",
   info: "입시 정보",
 };
 
-const HOME_TAB = "susi";
-const HOME_SECTION = "susi-subject"; /* 수시 > 교과 */
+const HOME_TAB = "home";
+const HOME_SECTION = "";
 const DEFAULT_BY_GROUP = {
+  home: { tab: "home", section: "" },
   info: { tab: "susi", section: "susi-subject" },
   admission: { tab: "curriculum", section: "" },
 };
@@ -101,22 +105,42 @@ function sectionLabelFor(tab, section) {
   return btn ? btn.textContent.replace(/^\d+\.\s*/, "").trim() : "";
 }
 
+function setCrumbPart(el, show, text) {
+  if (!el) return;
+  if (typeof text === "string") el.textContent = text;
+  if (show) el.removeAttribute("hidden");
+  else el.setAttribute("hidden", "");
+}
+
 function setCrumb(tab, section) {
+  const isHome = tab === "home";
+  const mainTop = document.querySelector(".main-top");
+  const crumb = document.querySelector(".crumb");
+  if (mainTop) mainTop.classList.toggle("is-home", isHome);
+  if (crumb) {
+    if (isHome) crumb.setAttribute("hidden", "");
+    else crumb.removeAttribute("hidden");
+  }
+
+  if (isHome) {
+    setCrumbPart(crumbParent, false, "");
+    setCrumbPart(crumbCurrentSep, false);
+    setCrumbPart(crumbCurrent, false, "");
+    setCrumbPart(crumbSectionSep, false);
+    setCrumbPart(crumbSection, false, "");
+    return;
+  }
+
   const tabBtn = tabs.find((item) => item.dataset.tab === tab);
   const groupName = tabBtn?.dataset.group || "admission";
-  if (crumbParent) crumbParent.textContent = groupTitles[groupName] || groupTitles.admission;
-  if (crumbCurrent) crumbCurrent.textContent = titles[tab] || "";
   const label = sectionLabelFor(tab, section);
   const showSection = Boolean(label);
-  if (crumbSection) {
-    crumbSection.textContent = label;
-    crumbSection.hidden = !showSection;
-  }
-  /* 다음 단계 없으면 화살표도 숨김 (SVG hidden 미지원 대비 display) */
-  if (crumbSectionSep) {
-    crumbSectionSep.hidden = !showSection;
-    crumbSectionSep.style.display = showSection ? "" : "none";
-  }
+
+  setCrumbPart(crumbParent, true, groupTitles[groupName] || groupTitles.admission);
+  setCrumbPart(crumbCurrentSep, true);
+  setCrumbPart(crumbCurrent, true, titles[tab] || "");
+  setCrumbPart(crumbSectionSep, showSection);
+  setCrumbPart(crumbSection, showSection, label || "");
 }
 
 window.syncGuideHash = (tab, section) => {
@@ -126,12 +150,13 @@ window.syncGuideHash = (tab, section) => {
 };
 
 function selectTab(name, updateHash, targetId) {
-  const tab = tabs.find((item) => item.dataset.tab === name) || tabs[0];
-  const key = tab.dataset.tab;
-  const groupName = tab.dataset.group || "admission";
+  const isHome = name === "home" || name === HOME_TAB;
+  const tab = isHome ? null : tabs.find((item) => item.dataset.tab === name) || tabs[0];
+  const key = isHome ? "home" : tab.dataset.tab;
+  const groupName = isHome ? "home" : tab.dataset.group || "admission";
 
   tabs.forEach((item) => {
-    const active = item === tab;
+    const active = !isHome && item === tab;
     item.classList.toggle("is-active", active);
     item.setAttribute("aria-selected", active ? "true" : "false");
     item.tabIndex = active ? 0 : -1;
@@ -144,17 +169,25 @@ function selectTab(name, updateHash, targetId) {
   });
 
   document.title = "입시 정보 조회 서비스";
-  Guide.open(key, targetId);
+  if (!isHome && typeof Guide !== "undefined" && Guide.open) {
+    Guide.open(key, targetId);
+  }
   const panel = document.querySelector(`#panel-${key}`);
   const activeSection =
-    targetId ||
-    panel?.querySelector(".section-tab.is-active")?.dataset.section ||
-    "";
+    isHome
+      ? ""
+      : targetId ||
+        panel?.querySelector(".section-tab.is-active")?.dataset.section ||
+        "";
   setCrumb(key, activeSection);
   const main = document.querySelector(".main");
   if (main) main.scrollTop = 0;
 
-  openGroupExclusive(groupName);
+  if (isHome) {
+    groups.forEach((group) => setGroupOpen(group.dataset.group, false));
+  } else {
+    openGroupExclusive(groupName);
+  }
 
   if (updateHash) {
     setRoute(key, activeSection);
@@ -185,6 +218,11 @@ groups.forEach((group) => {
       app.classList.remove("is-collapsed");
       sidebarToggle.setAttribute("aria-expanded", "true");
       sidebarToggle.setAttribute("aria-label", "사이드바 접기");
+    }
+    /* 이미 열린 그룹을 다시 누르면 접기 */
+    if (group.classList.contains("is-open")) {
+      setGroupOpen(group.dataset.group, false);
+      return;
     }
     /* 입시 정보 → 수시·교과 / 대입 제도 → 교육과정 체계 */
     const fallback = DEFAULT_BY_GROUP[group.dataset.group] || { tab: HOME_TAB, section: HOME_SECTION };
@@ -225,39 +263,35 @@ MOBILE_MQ.addEventListener("change", () => {
 });
 
 const { tab: hashTab, section: hashSection } = parseRoute();
-const knownTab = tabs.find((tab) => tab.dataset.tab === hashTab);
+const knownTab = hashTab === "home" ? null : tabs.find((tab) => tab.dataset.tab === hashTab);
+const isHomeRoute = !hashTab || hashTab === "home" || !knownTab;
 /*
  * 라우팅 규칙 (PC·모바일 동일)
- * - 첫 인입(해시 없음) / 로고 클릭 → 입시 정보 › 수시 › 교과
+ * - 첫 인입(해시 없음) / 로고 클릭 → 홈
  * - 입시 정보 그룹만 클릭 → 수시 › 교과
  * - 대입 제도 그룹만 클릭 → 교육과정 체계
  * - 새로고침 → 현재 해시 화면 유지
  */
-const startTab =
-  knownTab ||
-  tabs.find((tab) => tab.dataset.tab === HOME_TAB) ||
-  tabs[0];
-const startKey = startTab.dataset.tab;
-const startGroup = startTab.dataset.group || "info";
+const startKey = isHomeRoute ? "home" : knownTab.dataset.tab;
+const startGroup = isHomeRoute ? "home" : knownTab.dataset.group || "info";
 const startSection =
   hashSection ||
-  (startKey === HOME_TAB ? HOME_SECTION : undefined);
+  (startKey === "susi" ? "susi-subject" : undefined);
 
 groups.forEach((group) => {
-  setGroupOpen(group.dataset.group, group.dataset.group === startGroup);
+  setGroupOpen(group.dataset.group, startGroup !== "home" && group.dataset.group === startGroup);
 });
 
-if (!hashTab || !knownTab) {
-  selectTab(HOME_TAB, true, HOME_SECTION);
+if (isHomeRoute) {
+  selectTab("home", true);
 } else {
-  selectTab(startKey, true, startSection || (startKey === HOME_TAB ? HOME_SECTION : undefined));
+  selectTab(startKey, true, startSection);
 }
 
 const brandHome = document.getElementById("brand-home");
 if (brandHome) {
   brandHome.addEventListener("click", (event) => {
     event.preventDefault();
-    /* 홈: 대입 제도 닫힘 + 입시 정보 수시·교과 */
-    selectTab(HOME_TAB, true, HOME_SECTION);
+    selectTab(HOME_TAB, true);
   });
 }

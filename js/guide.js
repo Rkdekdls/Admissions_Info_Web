@@ -1912,7 +1912,8 @@ const Guide = (() => {
     ];
   }
 
-  /* 전형방법 문구 → 학생부/면접/논술 등 칸에 매핑 (표 데이터만) */
+  /* 전형방법 문구 → 학생부/면접/논술 등 칸에 매핑
+     선발비율·비고만 %, 배점(학생부·면접·논술·총점 등)은 점 */
   function methodDetailToScores(detail) {
     const scores = {
       선발비율: "-",
@@ -1933,7 +1934,7 @@ const Guide = (() => {
     parts.forEach((part) => {
       const pct = part.match(/([\d.]+)\s*%/);
       const label = part.replace(/\s*[\d.]+\s*%\s*$/, "").trim();
-      const value = pct ? `${pct[1]}%` : part;
+      const value = pct ? `${pct[1]}점` : part;
       if (pct) {
         hasPct = true;
         sum += Number(pct[1]) || 0;
@@ -1950,10 +1951,13 @@ const Guide = (() => {
     });
     if (hasPct && Math.abs(sum - 100) < 0.05) {
       scores.선발비율 = "100%";
-      scores.총점 = "100%";
+      scores.총점 = "100점";
     } else if (parts.length === 1 && /100\s*%/.test(parts[0])) {
       scores.선발비율 = "100%";
-      scores.총점 = "100%";
+      scores.총점 = "100점";
+    } else if (hasPct) {
+      scores.선발비율 = `${sum}%`;
+      scores.총점 = `${sum}점`;
     }
     scores.비고 = text;
     return scores;
@@ -1992,7 +1996,7 @@ const Guide = (() => {
   }
 
   const METHOD_SCORE_ROWS = ["선발비율", "학생부", "면접", "논술", "실기", "전공적성", "기타", "비고", "총점"];
-  const RECORD_RATIO_ROWS = ["교과", "출결", "자격증", "활동", "봉사", "기타"];
+  const RECORD_RATIO_ROWS = ["교과", "출결", "자격증", "활동", "봉사", "기타", "비고"];
   const SCHEDULE_COLS = ["접수일정", "합격발표", "면접일정", "논술일정", "실기일정", "적성일정", "기타일정"];
 
   /* 팝업 표: PC는 래퍼 맞춤(스크롤 X) / 태블릿·모바일은 PC min(1056)+스크롤 */
@@ -2522,23 +2526,23 @@ const Guide = (() => {
     const recordDefaults = (() => {
       if (isJeongsi) {
         if (none || !hasQuant) {
-          return { 교과: "-", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+          return { 교과: "-", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-", 비고: "-" };
         }
-        const defaults = { 교과: "100%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+        const defaults = { 교과: "100%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-", 비고: "-" };
         const pct = String(method || "").match(/학생부\s*(\d+)/);
         if (pct) defaults.교과 = `${pct[1]}%`;
         return defaults;
       }
       if (typeKey === "논술") {
-        return { 교과: "10%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+        return { 교과: "10%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-", 비고: "-" };
       }
-      const defaults = { 교과: "100%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+      const defaults = { 교과: "100%", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-", 비고: "-" };
       if (typeKey === "교과" && /교과종합|종합평가/.test(method || "")) {
         defaults.교과 = "70%";
         defaults.기타 = "30%";
       }
       if (none || (!hasQuant && hasQual)) {
-        return { 교과: "-", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-" };
+        return { 교과: "-", 출결: "-", 자격증: "-", 활동: "-", 봉사: "-", 기타: "-", 비고: "-" };
       }
       return defaults;
     })();
@@ -3448,7 +3452,7 @@ const Guide = (() => {
         if (year === "2027" || !Number.isFinite(finalN)) return `<td>-</td><td>-</td>`;
         const hour = 17 + (admitMinSeedHash(`${minSeed}|t|${year}|${idx}`) % 3);
         const rateN = Math.max(0.2, finalN * (0.25 + idx * 0.22)).toFixed(2);
-        return `<td>${hour}:00</td><td>${rateN}</td>`;
+        return `<td>${hour}시</td><td>${rateN}</td>`;
       }).join("");
       return `<tr><th scope="row">${year}</th>${slotCells}<td class="is-final">${escapeHtml(
         finalVal
@@ -3723,7 +3727,8 @@ const Guide = (() => {
       parts.forEach((part) => {
         const pct = part.match(/([\d.]+)\s*%/);
         const label = part.replace(/\s*[\d.]+\s*%\s*$/, "").trim();
-        const value = pct ? `${pct[1]}%` : part;
+        /* 배점 칸은 점, 선발비율·비고만 % */
+        const value = pct ? `${pct[1]}점` : part;
         if (pct) {
           hasPct = true;
           sumPct += Number(pct[1]) || 0;
@@ -3737,7 +3742,7 @@ const Guide = (() => {
       });
       if (hasPct) {
         scores.선발비율 = Math.abs(sumPct - 100) < 0.05 ? "100%" : `${sumPct}%`;
-        scores.총점 = Math.abs(sumPct - 100) < 0.05 ? "100%" : `${sumPct}%`;
+        scores.총점 = Math.abs(sumPct - 100) < 0.05 ? "100점" : `${sumPct}점`;
       }
       /* 수능 100% 단독이면 1단계 시안 점수 스케일 */
       if (parts.length === 1 && /수능\s*100/.test(text)) {
@@ -3749,6 +3754,7 @@ const Guide = (() => {
         scores.기타 = "0점";
         scores.총점 = "1,000점";
       }
+      scores.비고 = text;
       return scores;
     };
     /* 2단계: 면접·서류가 있으면 시안 점수, 없으면 "-" */
@@ -3763,6 +3769,7 @@ const Guide = (() => {
       scores.실기 = "0점";
       scores.기타 = /서류/.test(text) ? "700점" : "0점";
       scores.총점 = "1,000점";
+      scores.비고 = text.trim() || "-";
       return scores;
     };
     const methodSteps = [
@@ -4070,7 +4077,7 @@ const Guide = (() => {
         if (!Number.isFinite(finalN)) return `<td>-</td><td>-</td>`;
         const hour = 10 + ((admitMinSeedHash(`${jeongsiMinSeed}|jt|${year}|${i}`) + i * 3) % 9);
         const rateN = Math.max(0.3, finalN * (0.2 + i * 0.15)).toFixed(2);
-        return `<td>${String(hour).padStart(2, "0")}:00</td><td>${rateN}</td>`;
+        return `<td>${hour}시</td><td>${rateN}</td>`;
       }).join("");
       return `<tr><th scope="row">${year}</th>${slotCells}<td class="is-final">${escapeHtml(
         finalVal
@@ -4492,5 +4499,5 @@ const Guide = (() => {
     closeGradeMethodExample();
   });
 
-  return { open, guides };
+  return { open, guides, enhanceAdmitSelects };
 })();

@@ -5,33 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>입시 정보 조회 서비스</title>
   <script>
-    /* 해시 없으면 즉시 수시 › 교과로 — 모바일 첫 페인트 전에도 URL 맞춤 */
+    /* 해시 없으면 홈 — 모바일 첫 페인트 전에도 URL 맞춤 */
     (function () {
       var h = String(location.hash || "").replace(/^#/, "").trim();
       if (!h) {
-        try { history.replaceState(null, "", "#susi/susi-subject"); }
-        catch (e) { location.hash = "susi/susi-subject"; }
+        try { history.replaceState(null, "", "#home"); }
+        catch (e) { location.hash = "home"; }
       }
     })();
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=509">
+  <link rel="stylesheet" href="css/styles.css?v=20260309o">
 </head>
 <body>
   <div class="app" id="app">
     <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
     <aside class="sidebar" id="sidebar">
-      <a class="brand" href="./index.html#susi/susi-subject" id="brand-home" aria-label="입시 정보 수시 교과로 이동">
+      <a class="brand" href="./index.html#home" id="brand-home" aria-label="홈으로 이동">
         <img src="img/logo.png" alt="megastudy">
       </a>
 
       <nav class="nav" aria-label="주요 메뉴">
-        <div class="nav-group is-open" data-group="info">
+        <div class="nav-group" data-group="info">
           <button
             class="nav-parent"
             type="button"
-            aria-expanded="true"
+            aria-expanded="false"
             aria-controls="info-tabs"
           >
             <span class="nav-parent-main">
@@ -49,7 +49,7 @@
           </button>
 
           <div class="submenu" id="info-tabs" role="tablist" aria-label="입시 정보">
-            <button class="tab is-active" type="button" role="tab" id="tab-susi" aria-controls="panel-susi" aria-selected="true" data-tab="susi" data-group="info">
+            <button class="tab" type="button" role="tab" id="tab-susi" aria-controls="panel-susi" aria-selected="false" data-tab="susi" data-group="info">
               수시
             </button>
             <button class="tab" type="button" role="tab" id="tab-jeongsi" aria-controls="panel-jeongsi" aria-selected="false" data-tab="jeongsi" data-group="info">
@@ -117,18 +117,184 @@
             <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </button>
-        <p class="crumb">
-          <span id="crumb-parent">입시 정보</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span id="crumb-current">수시</span>
-          <svg id="crumb-section-sep" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span id="crumb-section">교과</span>
+        <p class="crumb" hidden>
+          <span id="crumb-parent"></span>
+          <span id="crumb-current-sep" class="crumb-sep" aria-hidden="true" hidden>›</span>
+          <span id="crumb-current" hidden></span>
+          <span id="crumb-section-sep" class="crumb-sep" aria-hidden="true" hidden>›</span>
+          <span id="crumb-section" hidden></span>
         </p>
       </div>
+
+      <section class="panel is-active panel-home" id="panel-home" role="tabpanel" aria-label="홈">
+        <div class="home" data-home>
+          <section class="home-hero">
+            <div class="home-hero-copy">
+              <p class="home-kicker">입시 정보 조회 서비스</p>
+              <h1 class="home-title">대학 입시, 필요한 정보를 <span>한곳에</span></h1>
+              <p class="home-lead">수시·정시 전형부터 대학 정보, 대입 가이드 및 주요 입시 일정까지 한눈에 확인하세요</p>
+            </div>
+            <div class="home-hero-search">
+              <form class="home-search" data-home-search>
+                <div class="home-search-type">
+                  <select class="admit-search-select" name="scope" aria-label="조회 구분">
+                    <option value="susi">수시</option>
+                    <option value="jeongsi">정시</option>
+                    <option value="university">대학</option>
+                  </select>
+                </div>
+                <label class="home-search-field">
+                  <span class="visually-hidden">대학명 또는 모집단위 입력</span>
+                  <input type="search" name="q" placeholder="대학명 또는 모집단위 입력" autocomplete="off">
+                </label>
+                <button type="submit" class="home-search-btn" aria-label="검색">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="m20 20-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </form>
+              <div class="home-chips" aria-label="검색 예시">
+                <button type="button" class="home-chip" data-home-chip="고려대">#고려대</button>
+                <button type="button" class="home-chip" data-home-chip="가천대">#가천대</button>
+                <button type="button" class="home-chip" data-home-chip="경영학과">#경영학과</button>
+                <button type="button" class="home-chip" data-home-chip="간호학과">#간호학과</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="home-features" aria-label="입시 정보 바로가기">
+            <article class="home-feature is-susi">
+              <div class="home-feature-copy">
+                <p class="home-feature-label">전형별 모집 정보</p>
+                <h2 class="home-feature-title">수시 전형 조회</h2>
+                <p class="home-feature-desc">모집인원 · 학생부 반영 · 수능 최저</p>
+                <div class="home-feature-actions">
+                  <button type="button" data-home-go="susi" data-home-section="susi-subject">교과 →</button>
+                  <button type="button" data-home-go="susi" data-home-section="susi-holistic">종합 →</button>
+                  <button type="button" data-home-go="susi" data-home-section="susi-essay">논술 →</button>
+                </div>
+              </div>
+              <div class="home-feature-art" aria-hidden="true">
+                <div class="home-art home-art-susi">
+                  <div class="home-glass">
+                    <p class="home-glass-title">수시 전형 구성</p>
+                    <div class="home-glass-bars">
+                      <div class="home-glass-bar" style="--h:38%"><b>1</b></div>
+                      <div class="home-glass-bar" style="--h:54%"><b>2</b></div>
+                      <div class="home-glass-bar" style="--h:68%"><b>3</b></div>
+                      <div class="home-glass-bar" style="--h:82%"><b>4</b></div>
+                      <div class="home-glass-bar" style="--h:96%"><b>5</b></div>
+                    </div>
+                    <p class="home-glass-foot">모집인원 · 반영비율 비교</p>
+                  </div>
+                  <span class="home-glass-tag">모집요강</span>
+                </div>
+              </div>
+            </article>
+            <article class="home-feature is-jeongsi">
+              <div class="home-feature-copy">
+                <p class="home-feature-label">모집군별 전형 정보</p>
+                <h2 class="home-feature-title">정시 전형 조회</h2>
+                <p class="home-feature-desc">가·나·다군 · 수능 반영 영역 · 탐구 반영</p>
+                <div class="home-feature-actions">
+                  <button type="button" data-home-go="jeongsi">정시 →</button>
+                </div>
+              </div>
+              <div class="home-feature-art" aria-hidden="true">
+                <div class="home-art home-art-jeongsi">
+                  <div class="home-glass">
+                    <p class="home-glass-title">수능 반영 비율</p>
+                    <div class="home-glass-meters">
+                      <div class="home-glass-meter"><span>가</span><i style="--w:82%"></i></div>
+                      <div class="home-glass-meter"><span>나</span><i style="--w:64%"></i></div>
+                      <div class="home-glass-meter"><span>다</span><i style="--w:48%"></i></div>
+                    </div>
+                    <p class="home-glass-foot">가·나·다군 반영 비교</p>
+                  </div>
+                  <span class="home-glass-tag">탐구반영</span>
+                </div>
+              </div>
+            </article>
+            <article class="home-feature is-university">
+              <div class="home-feature-copy">
+                <p class="home-feature-label">대학별 기본 정보</p>
+                <h2 class="home-feature-title">대학 정보 조회</h2>
+                <p class="home-feature-desc">캠퍼스 · 입학정원 · 신입생 경쟁률</p>
+                <div class="home-feature-actions">
+                  <button type="button" data-home-go="university">대학 →</button>
+                </div>
+              </div>
+              <div class="home-feature-art" aria-hidden="true">
+                <div class="home-art home-art-university">
+                  <div class="home-glass">
+                    <p class="home-glass-title">캠퍼스 정보</p>
+                    <div class="home-glass-stats">
+                      <div class="home-glass-stat"><strong>3,240</strong><em>입학정원</em></div>
+                      <div class="home-glass-stat"><strong>6.8:1</strong><em>경쟁률</em></div>
+                    </div>
+                    <p class="home-glass-foot">대학 · 캠퍼스별 조회</p>
+                  </div>
+                  <span class="home-glass-tag">대학조회</span>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <section class="home-lower">
+            <div class="home-panel">
+              <h2 class="home-panel-title is-marked">대입 제도 가이드</h2>
+              <ul class="home-guide-list">
+                <li><button type="button" data-home-go="curriculum">교육과정 체계<span aria-hidden="true">→</span></button></li>
+                <li><button type="button" data-home-go="record">학교생활기록부<span aria-hidden="true">→</span></button></li>
+                <li><button type="button" data-home-go="exam">수능 및 모의고사<span aria-hidden="true">→</span></button></li>
+                <li><button type="button" data-home-go="screening">대입전형 이해<span aria-hidden="true">→</span></button></li>
+                <li><button type="button" data-home-go="schedule">일정 및 원서접수<span aria-hidden="true">→</span></button></li>
+              </ul>
+            </div>
+            <div class="home-panel">
+              <h2 class="home-panel-title is-marked">다가오는 입시 일정</h2>
+              <ul class="home-schedule-list">
+                <li class="is-soon">
+                  <div class="home-schedule-main">
+                    <span class="home-schedule-d">D-10</span>
+                    <span class="home-schedule-name">2027학년도 수능</span>
+                    <span class="home-schedule-date">11/19(목)</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="home-schedule-main">
+                    <span class="home-schedule-d">D-14</span>
+                    <span class="home-schedule-name">수능 응시료 환불 신청</span>
+                    <span class="home-schedule-date">11/23 – 11/27</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="home-schedule-main">
+                    <span class="home-schedule-d">D-32</span>
+                    <span class="home-schedule-name">2027학년도 수능 성적 통지</span>
+                    <span class="home-schedule-date">12/11(금)</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="home-schedule-main">
+                    <span class="home-schedule-d">D-39</span>
+                    <span class="home-schedule-name">수시 합격자 발표 마감</span>
+                    <span class="home-schedule-date">~12/18(금)</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="home-schedule-main">
+                    <span class="home-schedule-d">D-46</span>
+                    <span class="home-schedule-name">정시 원서접수 시작</span>
+                    <span class="home-schedule-date">12/29(월)</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </div>
+      </section>
 
       <section class="panel" id="panel-curriculum" data-guide="curriculum" role="tabpanel" aria-labelledby="tab-curriculum" hidden></section>
       <section class="panel" id="panel-record" data-guide="record" role="tabpanel" aria-labelledby="tab-record" hidden></section>
@@ -136,7 +302,7 @@
       <section class="panel" id="panel-screening" data-guide="screening" role="tabpanel" aria-labelledby="tab-screening" hidden></section>
       <section class="panel" id="panel-schedule" data-guide="schedule" role="tabpanel" aria-labelledby="tab-schedule" hidden></section>
       <section class="panel" id="panel-university" data-guide="university" role="tabpanel" aria-labelledby="tab-university" hidden></section>
-      <section class="panel is-active" id="panel-susi" data-guide="susi" role="tabpanel" aria-labelledby="tab-susi"></section>
+      <section class="panel" id="panel-susi" data-guide="susi" role="tabpanel" aria-labelledby="tab-susi" hidden></section>
       <section class="panel" id="panel-jeongsi" data-guide="jeongsi" role="tabpanel" aria-labelledby="tab-jeongsi" hidden></section>
     </main>
   </div>
@@ -23191,7 +23357,8 @@
   <script src="js/admit-demo-units.js?v=3"></script>
   <script src="js/admit-uni-data.js?v=6"></script>
   <script src="js/admit-susi-yearly.js?v=5"></script>
-  <script src="js/guide.js?v=303"></script>
-  <script src="js/main.js?v=65"></script>
+  <script src="js/guide.js?v=307"></script>
+  <script src="js/home.js?v=3"></script>
+  <script src="js/main.js?v=71"></script>
 </body>
 </html>
