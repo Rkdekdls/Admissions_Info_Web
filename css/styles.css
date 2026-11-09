@@ -5094,9 +5094,11 @@ table.admit-detail-table td {
   width: 168px;
   max-width: 168px;
   height: 168px;
+  aspect-ratio: 1;
   flex: 0 0 168px;
   transform: rotate(4deg);
   transform-origin: center center;
+  overflow: visible;
 }
 
 .home-glass {
@@ -5275,21 +5277,35 @@ table.admit-detail-table td {
 }
 
 .home-glass-donut-ring {
+  position: relative;
   width: min(100%, 108px);
   aspect-ratio: 1;
   border-radius: 50%;
   background: conic-gradient(
     #0f766e 0 62%,
-    rgba(153, 246, 228, 0.55) 62% 82%,
-    rgba(204, 251, 241, 0.85) 82% 100%
+    rgba(94, 234, 212, 0.75) 62% 82%,
+    rgba(204, 251, 241, 0.95) 82% 100%
   );
-  -webkit-mask: radial-gradient(circle, transparent 52%, #000 53%);
-  mask: radial-gradient(circle, transparent 52%, #000 53%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+/* mask 대신 안쪽 원 — 모바일에서 도넛이 깨지지 않게 */
+.home-glass-donut-ring::after {
+  content: "";
+  position: absolute;
+  inset: 22%;
+  border-radius: 50%;
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(240, 253, 250, 0.96) 100%
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .home-glass-donut-center {
   position: absolute;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -5303,13 +5319,6 @@ table.admit-detail-table td {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;
-}
-
-.home-glass-donut-center em {
-  color: rgba(31, 41, 55, 0.55);
-  font-size: 10px;
-  font-style: normal;
-  font-weight: 650;
 }
 
 .home-glass-tag {
@@ -5627,11 +5636,30 @@ table.admit-detail-table td {
     min-height: 0;
     height: auto;
     grid-template-columns: 1fr;
+    overflow: visible;
   }
 
   .home-feature-art {
     justify-content: center;
+    align-items: center;
     order: -1;
+    transform: none;
+    padding: 14px 18px 22px;
+    overflow: visible;
+  }
+
+  .home-art {
+    width: 168px;
+    max-width: 168px;
+    height: 168px;
+    flex: 0 0 168px;
+    transform: rotate(3deg);
+    overflow: visible;
+  }
+
+  .home-glass {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 
   .home-feature-actions {
@@ -5723,17 +5751,24 @@ table.admit-detail-table td {
   }
 
   .home-feature-art {
-    min-height: 132px;
-    padding: 4px 8px;
-    transform: none;
+    min-height: 0;
+    padding: 12px 14px 20px;
   }
 
   .home-art {
-    width: 140px;
-    max-width: 140px;
-    height: 140px;
-    flex-basis: 140px;
+    width: 152px;
+    max-width: 152px;
+    height: 152px;
+    flex: 0 0 152px;
     transform: rotate(3deg);
+  }
+
+  .home-glass-donut-ring {
+    width: min(100%, 96px);
+  }
+
+  .home-glass-donut-center strong {
+    font-size: 16px;
   }
 
   .home-feature-title {
