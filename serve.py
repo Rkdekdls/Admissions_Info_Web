@@ -17,7 +17,8 @@ PORT = int(os.environ.get("PORT", "8765"))
 KAKAO_TRANSIT = "https://dapi.kakao.com/v2/routing/publictraffic"
 KAKAO_KEYWORD = "https://dapi.kakao.com/v2/local/search/keyword.json"
 KAKAO_ADDRESS = "https://dapi.kakao.com/v2/local/search/address.json"
-API_PATHS = {"/api/kakao/transit", "/api/kakao/places"}
+API_PATHS = {"/api/kakao/transit", "/api/kakao/places", "/api/kakao/maps-sdk"}
+KAKAO_MAPS_SDK = "https://dapi.kakao.com/v2/maps/sdk.js"
 
 
 def load_rest_key() -> str:
@@ -134,7 +135,86 @@ class Handler(SimpleHTTPRequestHandler):
         if parsed.path == "/api/kakao/places":
             self.proxy_places(parsed.query)
             return
+        if parsed.path == "/api/kakao/maps-sdk":
+            self.proxy_maps_sdk(parsed.query)
+            return
         super().do_GET()
+
+    def proxy_maps_sdk(self, query: str) -> None:
+        """Proxy Kakao Maps JS SDK without browser Referer.
+
+        Browser requests to dapi.kakao.com include Referer and get 401 when the
+        Web domain is not registered. Server-side fetch omits Referer so the
+        loader can run locally; we then rewrite the script so appkey/libraries
+        are still detected (SDK only reads those from a dapi.kakao.com script src).
+        """
+        qs = parse_qs(query, keep_blank_values=True)
+        key = (qs.get("appkey") or [""])[0].strip()
+        if not key:
+            self._json_error(400, "appkey required")
+            return
+        libraries = (qs.get("libraries") or [""])[0].strip()
+        autoload = (qs.get("autoload") or ["false"])[0].strip() or "false"
+        params = {"appkey": key, "autoload": autoload}
+        if libraries:
+            params["libraries"] = libraries
+        upstream = f"{KAKAO_MAPS_SDK}?{urlencode(params)}"
+        req = Request(
+            upstream,
+            headers={
+                "User-Agent": "Mozilla/5.0",
+                "Accept": "*/*",
+            },
+        )
+        try:
+            with urlopen(req, timeout=20) as res:
+                raw = res.read()
+                content_type = res.headers.get("Content-Type", "application/javascript; charset=utf-8")
+                status = res.status
+        except HTTPError as err:
+            body = err.read() if err.fp else str(err).encode("utf-8")
+            self._send_bytes(err.code, body, "text/plain; charset=utf-8")
+            return
+        except URLError as err:
+            self._json_error(502, f"Kakao SDK upstream error: {err.reason}")
+            return
+
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            self._send_bytes(status, raw, content_type)
+            return
+
+        # Proxied script src is not dapi.kakao.com, so the loader's script-tag
+        # scan misses appkey/libraries/autoload. Rewrite the scan loop into a
+        # plain assignment (keep surrounding statements intact).
+        fake_src = f"https://dapi.kakao.com/v2/maps/sdk.js?{urlencode(params)}"
+        needle = (
+            'for(var i,o="http:"==location.protocol?"http:":"https:",r="",'
+            's=document.getElementsByTagName("script"),c=s.length;i=s[--c];)'
+            "if(/\\/(beta-)?dapi\\.kakao\\.com\\/v2\\/maps\\/sdk\\.js\\b/.test(i.src))"
+            "{r=i.src;break}s=null;"
+        )
+        repl = (
+            'var o="http:"==location.protocol?"http:":"https:",'
+            f"r={json.dumps(fake_src)};/* maps-sdk proxy */"
+        )
+        if needle in text:
+            text = text.replace(needle, repl, 1)
+        else:
+            if 'p=["v3"]' in text and libraries:
+                lib_items = [part.strip() for part in libraries.split(",") if part.strip()]
+                if lib_items:
+                    patched = 'p=["v3"' + "".join(f",{json.dumps(item)}" for item in lib_items) + "]"
+                    text = text.replace('p=["v3"]', patched, 1)
+            text += (
+                "\n;window.kakao&&window.kakao.maps&&("
+                f"window.kakao.maps.apikey={json.dumps(key)}"
+                ");/* maps-sdk proxy */"
+            )
+
+        out = text.encode("utf-8")
+        self._send_bytes(200, out, "application/javascript; charset=utf-8")
 
     def proxy_transit(self, query: str) -> None:
         key = load_rest_key()

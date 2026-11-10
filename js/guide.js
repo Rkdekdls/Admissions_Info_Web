@@ -4453,23 +4453,86 @@ const Guide = (() => {
     return Boolean(String(window.KAKAO_MAP_APP_KEY || "").trim());
   }
 
+  function kakaoMapsSdkCandidates(key) {
+    const qs = `appkey=${encodeURIComponent(key)}&libraries=services&autoload=false`;
+    const list = [];
+    // Local serve.py proxy avoids Kakao 401 on unregistered Referer (127.0.0.1).
+    list.push(`/api/kakao/maps-sdk?${qs}`);
+    if (location.port === "8765" || /^(localhost|127\.0\.0\.1)$/i.test(location.hostname)) {
+      list.push(`http://127.0.0.1:8765/api/kakao/maps-sdk?${qs}`);
+    }
+    list.push(`https://dapi.kakao.com/v2/maps/sdk.js?${qs}`);
+    return [...new Set(list)];
+  }
+
+  function loadKakaoScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.async = true;
+      script.charset = "UTF-8";
+      script.onload = () => resolve(script);
+      script.onerror = () => reject(new Error(`kakao-sdk-load-failed:${src}`));
+      document.head.appendChild(script);
+    });
+  }
+
+  function ensureKakaoSdkProbe(key) {
+    const probeSrc = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&libraries=services&autoload=false`;
+    const exists = [...document.getElementsByTagName("script")].some((node) => node.src === probeSrc);
+    if (exists) return;
+    // text/plain: SDK scans src for appkey/libraries, browser does not execute it.
+    const probe = document.createElement("script");
+    probe.type = "text/plain";
+    probe.src = probeSrc;
+    probe.dataset.kakaoSdkProbe = "1";
+    document.head.appendChild(probe);
+  }
+
   function loadKakaoMaps() {
-    if (window.kakao && window.kakao.maps) return Promise.resolve(window.kakao);
+    if (window.kakao && window.kakao.maps && typeof window.kakao.maps.Map === "function") {
+      return Promise.resolve(window.kakao);
+    }
     if (window.__kakaoMapsLoading) return window.__kakaoMapsLoading;
     const key = String(window.KAKAO_MAP_APP_KEY || "").trim();
-    window.__kakaoMapsLoading = new Promise((resolve, reject) => {
+    window.__kakaoMapsLoading = new Promise(async (resolve, reject) => {
       if (!key) {
         reject(new Error("missing-kakao-key"));
         return;
       }
-      const script = document.createElement("script");
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&libraries=services&autoload=false`;
-      script.async = true;
-      script.onload = () => {
-        window.kakao.maps.load(() => resolve(window.kakao));
-      };
-      script.onerror = () => reject(new Error("kakao-sdk-load-failed"));
-      document.head.appendChild(script);
+      ensureKakaoSdkProbe(key);
+      const urls = kakaoMapsSdkCandidates(key);
+      let lastErr = null;
+      for (const src of urls) {
+        try {
+          if (!(window.kakao && window.kakao.maps && typeof window.kakao.maps.load === "function")) {
+            await loadKakaoScript(src);
+          }
+          if (!window.kakao?.maps?.load) throw new Error("kakao-maps-missing");
+          if (!window.kakao.maps.apikey) window.kakao.maps.apikey = key;
+          if (typeof window.kakao.maps.Map !== "function") {
+            await new Promise((res, rej) => {
+              const timer = setTimeout(() => rej(new Error("kakao-maps-load-timeout")), 12000);
+              try {
+                window.kakao.maps.load(() => {
+                  clearTimeout(timer);
+                  res();
+                });
+              } catch (err) {
+                clearTimeout(timer);
+                rej(err);
+              }
+            });
+          }
+          if (typeof window.kakao.maps.Map !== "function") throw new Error("kakao-map-ctor-missing");
+          resolve(window.kakao);
+          return;
+        } catch (err) {
+          lastErr = err;
+          console.warn("[kakao] sdk candidate failed", src, err);
+        }
+      }
+      reject(lastErr || new Error("kakao-sdk-load-failed"));
     }).catch((err) => {
       window.__kakaoMapsLoading = null;
       throw err;
