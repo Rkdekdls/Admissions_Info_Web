@@ -4433,24 +4433,8 @@ const Guide = (() => {
     const desc = isMap
       ? "대학 위치와 통학 경로는 카카오 지도가 연결된 환경에서 확인할 수 있습니다."
       : "캠퍼스 거리 풍경은 카카오 로드뷰가 연결된 환경에서 확인할 수 있습니다.";
-    const scene = isMap
-      ? `<div class="campus-kakao-preview-map" aria-hidden="true">
-          <span class="campus-kakao-preview-pin" style="--x:22%;--y:28%"></span>
-          <span class="campus-kakao-preview-pin" style="--x:38%;--y:24%"></span>
-          <span class="campus-kakao-preview-pin" style="--x:48%;--y:42%"></span>
-          <span class="campus-kakao-preview-pin" style="--x:58%;--y:36%"></span>
-          <span class="campus-kakao-preview-pin" style="--x:66%;--y:58%"></span>
-          <span class="campus-kakao-preview-pin" style="--x:72%;--y:72%"></span>
-          <span class="campus-kakao-preview-land"></span>
-        </div>`
-      : `<div class="campus-kakao-preview-road" aria-hidden="true">
-          <span class="campus-kakao-preview-sky"></span>
-          <span class="campus-kakao-preview-tree campus-kakao-preview-tree--l"></span>
-          <span class="campus-kakao-preview-tree campus-kakao-preview-tree--r"></span>
-          <span class="campus-kakao-preview-path"></span>
-        </div>`;
     return `<div class="campus-kakao-preview campus-kakao-preview--${isMap ? "map" : "road"}" role="img" aria-label="${title}">
-      ${scene}
+      <div class="campus-kakao-preview-scene" aria-hidden="true"></div>
       <div class="campus-kakao-preview-card">
         <p class="campus-kakao-preview-kicker">미리보기</p>
         <p class="campus-kakao-preview-title">${title}</p>

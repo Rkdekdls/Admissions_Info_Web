@@ -6452,108 +6452,41 @@ table.admit-detail-table td {
   box-sizing: border-box;
 }
 
-.campus-kakao-preview-map,
-.campus-kakao-preview-road {
+.campus-kakao-preview-scene {
   position: absolute;
   inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   pointer-events: none;
 }
 
-.campus-kakao-preview-map {
-  background:
-    radial-gradient(ellipse 70% 55% at 52% 48%, rgba(148, 180, 210, 0.35), transparent 70%),
-    linear-gradient(165deg, #d7e3ef 0%, #e8eef5 42%, #dce6f0 100%);
+.campus-kakao-preview--map .campus-kakao-preview-scene {
+  background-image: url("../img/campus-map-preview.png");
 }
 
-.campus-kakao-preview-map::before {
+.campus-kakao-preview--road .campus-kakao-preview-scene {
+  background-image: url("../img/campus-roadview-preview.jpg");
+}
+
+.campus-kakao-preview-scene::after {
   content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.35) 1px, transparent 1px);
-  background-size: 48px 48px;
-  opacity: 0.45;
-}
-
-.campus-kakao-preview-land {
-  position: absolute;
-  left: 18%;
-  top: 16%;
-  width: 64%;
-  height: 68%;
-  border-radius: 42% 48% 40% 52%;
-  background: linear-gradient(160deg, rgba(170, 196, 176, 0.55), rgba(148, 176, 158, 0.28));
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
-}
-
-.campus-kakao-preview-pin {
-  position: absolute;
-  left: var(--x);
-  top: var(--y);
-  z-index: 1;
-  width: 10px;
-  height: 10px;
-  border-radius: 50% 50% 50% 0;
-  background: #0f7f93;
-  box-shadow: 0 6px 14px rgba(15, 127, 147, 0.28);
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-
-.campus-kakao-preview-road {
-  background: linear-gradient(180deg, #c5d6e6 0%, #dbe4ec 38%, #b7c2cb 39%, #9aa6b0 100%);
-}
-
-.campus-kakao-preview-sky {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 38%;
-  background: linear-gradient(180deg, #b9cce0, #d5e1ec);
-}
-
-.campus-kakao-preview-path {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 46%;
-  height: 62%;
-  background: linear-gradient(180deg, #aeb8c2, #8f9aa5);
-  transform: translateX(-50%) perspective(420px) rotateX(48deg);
-  transform-origin: center bottom;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
-}
-
-.campus-kakao-preview-tree {
-  position: absolute;
-  bottom: 34%;
-  width: 54px;
-  height: 78px;
-  background: linear-gradient(180deg, #6f8f78 0 58%, #7a6552 58%);
-  border-radius: 40% 40% 12% 12%;
-  opacity: 0.72;
-}
-
-.campus-kakao-preview-tree--l {
-  left: 16%;
-}
-
-.campus-kakao-preview-tree--r {
-  right: 18%;
-  height: 92px;
-  width: 62px;
+  background: rgba(15, 23, 42, 0.08);
 }
 
 .campus-kakao-preview-card {
   position: relative;
   z-index: 2;
-  width: min(420px, calc(100% - 32px));
+  width: min(520px, calc(100% - 32px));
   margin: 0;
   padding: 18px 20px;
-  border: 1px solid rgba(229, 231, 235, 0.95);
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   text-align: left;
 }
 
@@ -6586,6 +6519,13 @@ table.admit-detail-table td {
   font-weight: 500;
   line-height: 1.45;
   word-break: keep-all;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .campus-kakao-preview-desc {
+    white-space: normal;
+  }
 }
 
 .campus-map-hint {
