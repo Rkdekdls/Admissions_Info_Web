@@ -6462,7 +6462,7 @@ table.admit-detail-table td {
 }
 
 .campus-kakao-preview--map .campus-kakao-preview-scene {
-  background-image: url("../img/campus-map-preview.png");
+  background-image: url("../img/campus-map-preview.png?v=2");
 }
 
 .campus-kakao-preview--road .campus-kakao-preview-scene {
@@ -6518,7 +6518,7 @@ table.admit-detail-table td {
 }
 
 .campus-kakao-preview-desc {
-  color: #6b7280;
+  color: #111827;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.3;
