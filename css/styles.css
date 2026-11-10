@@ -6989,6 +6989,32 @@ table.admit-detail-table td {
 }
 
 @media (max-width: 1279px) {
+  .campus-roadview-head {
+    align-items: flex-start;
+    min-height: 0;
+    padding: 12px 16px;
+  }
+
+  .campus-roadview-heading {
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .campus-roadview-head .campus-roadview-title {
+    flex: none;
+    width: 100%;
+  }
+
+  .campus-roadview-meta {
+    width: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.35;
+  }
+
   .campus-roadview-tools,
   .campus-map-tools {
     flex-direction: column;
