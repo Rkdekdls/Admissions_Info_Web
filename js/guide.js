@@ -4429,7 +4429,7 @@ const Guide = (() => {
 
   function campusKakaoPreviewHtml(kind = "map") {
     const isMap = kind === "map";
-    const title = isMap ? "캠퍼스 지도 미리보기" : "캠퍼스 로드뷰 미리보기";
+    const title = isMap ? "캠퍼스 지도 샘플" : "캠퍼스 로드뷰 샘플";
     const desc = isMap
       ? "대학 위치와 통학 경로는 카카오 지도가 연결된 환경에서 확인할 수 있습니다."
       : "캠퍼스 거리 풍경은 카카오 로드뷰가 연결된 환경에서 확인할 수 있습니다.";
