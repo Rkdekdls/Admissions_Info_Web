@@ -199,11 +199,20 @@ const Guide = (() => {
     },
     university: {
       kicker: "",
-      title: "대학",
+      title: "대학 정보",
       numberNav: false,
+      hideSectionNav: true,
       search: "university",
-      nav: [],
-      blocks: [],
+      nav: [
+        { href: "#university-info", label: "대학별 현황" },
+        { href: "#university-map", label: "캠퍼스 지도" },
+        { href: "#university-roadview", label: "캠퍼스 로드뷰" },
+      ],
+      blocks: [
+        { id: "university-info", title: "", heading: "대학별 현황", pages: [] },
+        { id: "university-map", title: "", heading: "캠퍼스 지도", pages: [] },
+        { id: "university-roadview", title: "", heading: "캠퍼스 로드뷰", pages: [] },
+      ],
     },
   };
 
@@ -569,15 +578,15 @@ const Guide = (() => {
   function admitSearchHtml(type) {
     const regionSelect = `<select class="admit-search-select" name="region" aria-label="지역">
       <option value="">지역 전체</option>
-      <option value="gangwon">강원</option>
+      <option value="seoul">서울</option>
       <option value="gyeonggi">경기</option>
+      <option value="gangwon">강원</option>
       <option value="gyeongnam">경남</option>
       <option value="gyeongbuk">경북</option>
       <option value="gwangju">광주</option>
       <option value="daegu">대구</option>
       <option value="daejeon">대전</option>
       <option value="busan">부산</option>
-      <option value="seoul">서울</option>
       <option value="ulsan">울산</option>
       <option value="incheon">인천</option>
       <option value="jeonnam">전남</option>
@@ -626,7 +635,7 @@ const Guide = (() => {
               <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
               <path d="m20 20-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
             </svg>
-            <input type="search" name="keyword" placeholder="대학 검색" aria-label="대학 검색">
+            <input type="search" name="keyword" placeholder="대학명 검색" aria-label="대학명 검색">
           </label>
           ${regionSelect}
           <select class="admit-search-select" name="year" aria-label="연도">
@@ -769,7 +778,7 @@ const Guide = (() => {
             <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
             <path d="m20 20-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
-          <input type="search" name="keyword" placeholder="대학·모집단위 검색" aria-label="대학·모집단위 검색">
+          <input type="search" name="keyword" placeholder="대학명 또는 모집단위 검색" aria-label="대학명 또는 모집단위 검색">
         </label>
         ${filters}
       </div>
@@ -4231,6 +4240,1646 @@ const Guide = (() => {
     refresh();
   }
 
+  /* lat/lng는 공식 주소 기준 좌표. heading은 로드뷰 초기 시야 */
+  const CAMPUS_POINTS = {
+    "서울대학교": { lat: 37.460201, lng: 126.952241, heading: 78.2, address: "서울특별시 관악구 관악로 1" },
+    "연세대학교(서울)": { lat: 37.565784, lng: 126.938572, heading: 33.8, address: "서울특별시 서대문구 연세로 50" },
+    "경희대학교(서울)": { lat: 37.596845, lng: 127.052728, heading: 352.6, address: "서울특별시 동대문구 경희대로 26" },
+    "성균관대학교(수원)": { lat: 37.293917, lng: 126.974681, heading: 273.9, address: "경기도 수원시 장안구 서부로 2066" },
+    "건국대학교(서울)": { lat: 37.540762, lng: 127.079342, heading: 114.7, address: "서울특별시 광진구 능동로 120" },
+    "이화여자대학교": { lat: 37.561742, lng: 126.946541, heading: 145.3, address: "서울특별시 서대문구 이화여대길 52" },
+    "한국교원대학교": { lat: 36.6096, lng: 127.3603, heading: 0, address: "충청북도 청주시 흥덕구 강내면 태성탑연로 250" },
+    "공주교육대학교": { lat: 36.4529, lng: 127.1245, heading: 0, address: "충청남도 공주시 웅진로 27" },
+    "부산대학교": { lat: 35.233691, lng: 129.080978, heading: 317.8, address: "부산광역시 금정구 부산대학로63번길 2" },
+    "중앙대학교(서울)": { lat: 37.505548, lng: 126.957045, heading: 240.6, address: "서울특별시 동작구 흑석로 84" },
+    "연세대학교(미래)": { lat: 37.87967, lng: 127.728371, heading: 335.3, address: "강원특별자치도 원주시 흥업면 연세대길 1" },
+    "가천대학교": { lat: 37.450652, lng: 127.126714, heading: 359.2, address: "경기도 성남시 수정구 성남대로 1342" },
+    "고려대학교(서울)": { lat: 37.5894, lng: 127.0324, heading: 185.1, address: "서울특별시 성북구 안암로 145" },
+    "숙명여자대학교": { lat: 37.546574, lng: 126.965893, heading: 10, address: "서울특별시 용산구 청파로47길 100" },
+    "서울교육대학교": { lat: 37.491256, lng: 127.017219, heading: 311.3, address: "서울특별시 서초구 서초대로 96" },
+    "한국외국어대학교(서울)": { lat: 37.597647, lng: 127.056985, heading: 178.8, address: "서울특별시 동대문구 이문로 107" },
+    "가천대학교(글로벌)": { lat: 37.450652, lng: 127.126714, heading: 229.1, address: "경기도 성남시 수정구 성남대로 1342" },
+    "성균관대학교(서울)": { lat: 37.588458, lng: 126.993641, heading: 323.1, address: "서울특별시 종로구 성균관로 25-2" },
+    "한양대학교(서울)": { lat: 37.556967, lng: 127.0468, heading: 327, address: "서울특별시 성동구 왕십리로 222" },
+    "숭실대학교": { lat: 37.496337, lng: 126.957458, heading: 197.1, address: "서울특별시 동작구 상도로 369" },
+    KAIST: { lat: 36.372681, lng: 127.356252, heading: 22.3, address: "대전광역시 유성구 대학로 291" },
+    "포항공과대학교": { lat: 36.014514, lng: 129.325243, heading: 336.3, address: "경상북도 포항시 남구 청암로 77" },
+    "한양대학교(ERICA)": { lat: 37.299591, lng: 126.830641, heading: 21.1, address: "경기도 안산시 상록구 한양대학로 55" },
+    "인하대학교": { lat: 37.451803, lng: 126.654359, heading: 109.7, address: "인천광역시 미추홀구 인하로 100" },
+    "울산과학기술원": { lat: 35.576041, lng: 129.189724, heading: 247, address: "울산광역시 울주군 언양읍 유니스트길 50" },
+    "서강대학교": { lat: 37.551464, lng: 126.941041, heading: 69.2, address: "서울특별시 마포구 백범로 35" },
+    "전남대학교": { lat: 35.176116, lng: 126.905823, heading: 270.8, address: "광주광역시 북구 용봉로 77" },
+    "충남대학교": { lat: 36.369473, lng: 127.340041, heading: 15, address: "대전광역시 유성구 대학로 99" },
+    "제주대학교": { lat: 33.456125, lng: 126.561852, heading: 71, address: "제주특별자치도 제주시 제주대학로 102" },
+    "동국대학교(서울)": { lat: 37.558702, lng: 126.9984, heading: 77.9, address: "서울특별시 중구 필동로1길 30" },
+    "홍익대학교(서울)": { lat: 37.550976, lng: 126.924235, heading: 183.3, address: "서울특별시 마포구 와우산로 94" },
+    "아주대학교": { lat: 37.2828, lng: 127.0437, heading: 65.1, address: "경기도 수원시 영통구 월드컵로 206" },
+    "영남대학교": { lat: 35.83624, lng: 128.752897, heading: 63.5, address: "경상북도 경산시 대학로 280" },
+    "전북대학교": { lat: 35.8468, lng: 127.1297, heading: 308.2, address: "전북특별자치도 전주시 덕진구 백제대로 567" },
+    "강원대학교": { lat: 37.8688, lng: 127.7446, heading: 0, address: "강원특별자치도 춘천시 강원대학길 1" },
+  };
+
+  function campusRoadviewRadius() {
+    return 180;
+  }
+
+  const CAMPUS_REGION_ORDER = [
+    "서울",
+    "경기",
+    "강원",
+    "경남",
+    "경북",
+    "광주",
+    "대구",
+    "대전",
+    "부산",
+    "울산",
+    "인천",
+    "전남",
+    "전북",
+    "제주",
+    "충남",
+    "충북",
+  ];
+
+  function campusRegionRank(region) {
+    return region === "서울" ? 0 : region === "경기" ? 1 : 2;
+  }
+
+  function campusRows() {
+    return (window.ADMIT_DEMO_UNIVS || [])
+      .map((row) => (Array.isArray(row) ? { name: row[0], region: row[1] } : row))
+      .filter((row) => row && CAMPUS_POINTS[row.name])
+      .sort((a, b) => campusRegionRank(a.region) - campusRegionRank(b.region));
+  }
+
+  function campusRegionButtonsHtml(rows, attrs = "data-campus-region", defaultRegion = "서울") {
+    const present = new Set(rows.map((row) => row.region).filter(Boolean));
+    return CAMPUS_REGION_ORDER.filter((name) => present.has(name))
+      .map((name) => {
+        const on = name === defaultRegion;
+        return `<button type="button" class="campus-roadview-region${on ? " is-active" : ""}" ${attrs}="${escapeHtml(name)}" aria-pressed="${on ? "true" : "false"}">${escapeHtml(name)}</button>`;
+      })
+      .join("");
+  }
+
+  function campusShortName(name) {
+    return String(name || "")
+      .replace(/\([^)]*\)\s*$/, "")
+      .trim();
+  }
+
+  function campusDistanceKm(aLat, aLng, bLat, bLng) {
+    const toRad = (deg) => (deg * Math.PI) / 180;
+    const dLat = toRad(bLat - aLat);
+    const dLng = toRad(bLng - aLng);
+    const lat1 = toRad(aLat);
+    const lat2 = toRad(bLat);
+    const h =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+    return 6371 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+  }
+
+  const campusAddressCache = new Map();
+  const campusCoordsCache = new Map();
+
+  function campusPoint(name) {
+    const raw = CAMPUS_POINTS[name];
+    if (!raw) return null;
+    if (Array.isArray(raw)) {
+      return {
+        lat: Number(raw[0]),
+        lng: Number(raw[1]),
+        heading: Number(raw[3]),
+        address: String(raw[4] || ""),
+      };
+    }
+    return {
+      lat: Number(raw.lat),
+      lng: Number(raw.lng),
+      heading: Number(raw.heading),
+      address: String(raw.address || ""),
+    };
+  }
+
+  function campusOfficialAddress(name) {
+    const key = String(name || "");
+    if (!key) return "";
+    if (campusAddressCache.has(key)) return campusAddressCache.get(key);
+    const address = campusPoint(key)?.address || "";
+    if (address) campusAddressCache.set(key, address);
+    return address;
+  }
+
+  function resolveCampusPlace(geocoder, name, onDone) {
+    const key = String(name || "");
+    const info = campusPoint(key);
+    if (!info) return;
+    const official = campusOfficialAddress(key);
+    if (campusCoordsCache.has(key)) {
+      onDone?.({ ...info, ...campusCoordsCache.get(key), address: official || info.address });
+      return;
+    }
+    if (!geocoder || !official) {
+      onDone?.({ ...info, address: official || info.address });
+      return;
+    }
+    geocoder.addressSearch(official, (result, status) => {
+      if (status === window.kakao.maps.services.Status.OK && result?.[0]) {
+        const lat = Number(result[0].y);
+        const lng = Number(result[0].x);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+          campusCoordsCache.set(key, { lat, lng });
+          onDone?.({ ...info, lat, lng, address: official });
+          return;
+        }
+      }
+      onDone?.({ ...info, address: official });
+    });
+  }
+
+  function resolveCampusAddress(geocoder, name, lat, lng, onDone) {
+    const key = String(name || "");
+    const official = campusOfficialAddress(key);
+    if (official) {
+      onDone?.(official);
+      if (!campusCoordsCache.has(key) && geocoder) {
+        resolveCampusPlace(geocoder, key, () => {});
+      }
+      return;
+    }
+    if (!key || !Number.isFinite(lat) || !Number.isFinite(lng) || !geocoder) return;
+    geocoder.coord2Address(lng, lat, (result, status) => {
+      if (status !== window.kakao.maps.services.Status.OK) return;
+      const row = result?.[0];
+      const address = row?.road_address?.address_name || row?.address?.address_name || "";
+      if (!address) return;
+      campusAddressCache.set(key, address);
+      onDone?.(address);
+    });
+  }
+
+  function campusKakaoMapUrl(home, dest) {
+    if (!home || !dest) return "";
+    const sName = encodeURIComponent(home.name || "출발지");
+    const eName = encodeURIComponent(dest.address || campusOfficialAddress(dest.name) || campusShortName(dest.name));
+    return `https://map.kakao.com/?map_type=TYPE_MAP&target=transit&sX=${home.lng}&sY=${home.lat}&eX=${dest.lng}&eY=${dest.lat}&sName=${sName}&eName=${eName}`;
+  }
+
+  function campusKakaoPreviewHtml(kind = "map") {
+    const isMap = kind === "map";
+    const title = isMap ? "캠퍼스 지도 미리보기" : "캠퍼스 로드뷰 미리보기";
+    const desc = isMap
+      ? "대학 위치와 통학 경로는 카카오 지도가 연결된 환경에서 확인할 수 있습니다."
+      : "캠퍼스 거리 풍경은 카카오 로드뷰가 연결된 환경에서 확인할 수 있습니다.";
+    const scene = isMap
+      ? `<div class="campus-kakao-preview-map" aria-hidden="true">
+          <span class="campus-kakao-preview-pin" style="--x:22%;--y:28%"></span>
+          <span class="campus-kakao-preview-pin" style="--x:38%;--y:24%"></span>
+          <span class="campus-kakao-preview-pin" style="--x:48%;--y:42%"></span>
+          <span class="campus-kakao-preview-pin" style="--x:58%;--y:36%"></span>
+          <span class="campus-kakao-preview-pin" style="--x:66%;--y:58%"></span>
+          <span class="campus-kakao-preview-pin" style="--x:72%;--y:72%"></span>
+          <span class="campus-kakao-preview-land"></span>
+        </div>`
+      : `<div class="campus-kakao-preview-road" aria-hidden="true">
+          <span class="campus-kakao-preview-sky"></span>
+          <span class="campus-kakao-preview-tree campus-kakao-preview-tree--l"></span>
+          <span class="campus-kakao-preview-tree campus-kakao-preview-tree--r"></span>
+          <span class="campus-kakao-preview-path"></span>
+        </div>`;
+    return `<div class="campus-kakao-preview campus-kakao-preview--${isMap ? "map" : "road"}" role="img" aria-label="${title}">
+      ${scene}
+      <div class="campus-kakao-preview-card">
+        <p class="campus-kakao-preview-kicker">미리보기</p>
+        <p class="campus-kakao-preview-title">${title}</p>
+        <p class="campus-kakao-preview-desc">${desc}</p>
+      </div>
+    </div>`;
+  }
+
+  function showCampusKakaoPreview(el, kind = "map") {
+    if (!el) return;
+    el.classList.add("is-preview");
+    el.innerHTML = campusKakaoPreviewHtml(kind);
+  }
+
+  function hasKakaoAppKey() {
+    return Boolean(String(window.KAKAO_MAP_APP_KEY || "").trim());
+  }
+
+  function loadKakaoMaps() {
+    if (window.kakao && window.kakao.maps) return Promise.resolve(window.kakao);
+    if (window.__kakaoMapsLoading) return window.__kakaoMapsLoading;
+    const key = String(window.KAKAO_MAP_APP_KEY || "").trim();
+    window.__kakaoMapsLoading = new Promise((resolve, reject) => {
+      if (!key) {
+        reject(new Error("missing-kakao-key"));
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&libraries=services&autoload=false`;
+      script.async = true;
+      script.onload = () => {
+        window.kakao.maps.load(() => resolve(window.kakao));
+      };
+      script.onerror = () => reject(new Error("kakao-sdk-load-failed"));
+      document.head.appendChild(script);
+    }).catch((err) => {
+      window.__kakaoMapsLoading = null;
+      throw err;
+    });
+    return window.__kakaoMapsLoading;
+  }
+
+  async function parseKakaoTransitResponse(res) {
+    const ct = (res.headers.get("content-type") || "").toLowerCase();
+    if (!ct.includes("json")) return null;
+    const data = await res.json();
+    if (!data || typeof data !== "object") return null;
+    if (data.status || Array.isArray(data.routes)) return data;
+    return null;
+  }
+
+  function campusTransitProxyUrls(query) {
+    const custom = String(window.KAKAO_TRANSIT_PROXY || "").trim().replace(/\/$/, "");
+    const list = [];
+    if (custom) list.push(`${custom}?${query}`);
+    list.push(`/api/kakao/transit?${query}`);
+    if (location.hostname !== "127.0.0.1" || location.port !== "8765") {
+      list.push(`http://127.0.0.1:8765/api/kakao/transit?${query}`);
+    }
+    if (location.hostname !== "localhost" || location.port !== "8765") {
+      list.push(`http://localhost:8765/api/kakao/transit?${query}`);
+    }
+    return [...new Set(list)];
+  }
+
+  function campusPlacesProxyUrls(query) {
+    const custom = String(window.KAKAO_TRANSIT_PROXY || "").trim().replace(/\/$/, "");
+    const list = [];
+    if (custom) list.push(`${custom.replace(/\/transit$/, "/places")}?${query}`);
+    list.push(`/api/kakao/places?${query}`);
+    if (location.hostname !== "127.0.0.1" || location.port !== "8765") {
+      list.push(`http://127.0.0.1:8765/api/kakao/places?${query}`);
+    }
+    if (location.hostname !== "localhost" || location.port !== "8765") {
+      list.push(`http://localhost:8765/api/kakao/places?${query}`);
+    }
+    return [...new Set(list)];
+  }
+
+  async function fetchKakaoPlaces(query, center) {
+    const q = String(query || "").trim();
+    if (!q) return [];
+    const params = new URLSearchParams({ query: q, size: "10" });
+    if (center && Number.isFinite(center.lng) && Number.isFinite(center.lat)) {
+      params.set("x", String(center.lng));
+      params.set("y", String(center.lat));
+    }
+    const qs = params.toString();
+    for (const url of campusPlacesProxyUrls(qs)) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const ct = (res.headers.get("content-type") || "").toLowerCase();
+        if (!ct.includes("json")) continue;
+        const data = await res.json();
+        if (Array.isArray(data?.documents)) return data.documents;
+      } catch (_) {
+        /* try next */
+      }
+    }
+    return null;
+  }
+
+  async function fetchKakaoTransit(home, dest) {
+    if (!home || !dest) return null;
+    const params = new URLSearchParams({
+      start_x: String(home.lng),
+      start_y: String(home.lat),
+      end_x: String(dest.lng),
+      end_y: String(dest.lat),
+      s_name: home.name || "출발지",
+      e_name: `${campusShortName(dest.name)} 정문`,
+      input_coord: "WGS84",
+      output_coord: "WGS84",
+    });
+    const query = params.toString();
+    // Browser → Kakao REST is blocked by CORS. Use serve.py proxy (same-origin or :8765).
+    let lastProxyError = null;
+    for (const url of campusTransitProxyUrls(query)) {
+      try {
+        const proxyRes = await fetch(url);
+        if (proxyRes.ok) {
+          const data = await parseKakaoTransitResponse(proxyRes);
+          if (data) return data;
+          continue;
+        }
+        if (proxyRes.status === 404) continue;
+        const text = await proxyRes.text();
+        lastProxyError = new Error(text || `proxy-${proxyRes.status}`);
+      } catch (err) {
+        lastProxyError = err;
+      }
+    }
+    const restKey = window.KAKAO_MAP_REST_KEY || window.KAKAO_MAP_APP_KEY || "";
+    if (!restKey) throw lastProxyError || new Error("rest-key-missing");
+    const res = await fetch(`https://dapi.kakao.com/v2/routing/publictraffic?${query}`, {
+      headers: {
+        Authorization: `KakaoAK ${restKey}`,
+        KA: `sdk/1.0 os/javascript origin/${location.origin}`,
+      },
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || `http-${res.status}`);
+    }
+    const data = await parseKakaoTransitResponse(res);
+    if (!data) throw lastProxyError || new Error("invalid-transit-json");
+    return data;
+  }
+
+  function campusTransitStepProps(step) {
+    return step?.properties || step || {};
+  }
+
+  function campusTransitStepType(step) {
+    const props = campusTransitStepProps(step);
+    return String(props.type || props.mode || props.vehicleType || step?.type || step?.mode || "").toUpperCase();
+  }
+
+  function campusTransitStepPoints(step) {
+    const props = campusTransitStepProps(step);
+    return step?.path?.points || props.path?.points || step?.points || props.points || [];
+  }
+
+  function campusTransitStepLabel(step) {
+    const props = campusTransitStepProps(step);
+    const type = campusTransitStepType(step);
+    if (type.includes("WALK") || type.includes("도보")) return "도보";
+    if (type.includes("SUBWAY") || type.includes("지하철")) {
+      const vehicle = props.vehicles?.[0]?.name;
+      return vehicle || "지하철";
+    }
+    if (type.includes("BUS") || type.includes("버스")) {
+      const vehicle = props.vehicles?.[0]?.name;
+      return vehicle ? `버스 ${vehicle}` : "버스";
+    }
+    return props.guidance || props.name || props.vehicleName || "";
+  }
+
+  function campusTransitMinutes(sec) {
+    const n = Math.max(0, Math.round(Number(sec || 0) / 60));
+    return n;
+  }
+
+  function campusTransitFare(props) {
+    const value = props?.fare?.value ?? props?.fare;
+    const num = Number(value);
+    return Number.isFinite(num) ? num : null;
+  }
+
+  function campusTransitWalkSeconds(route) {
+    return (route?.steps || [])
+      .filter((step) => campusTransitStepType(step).includes("WALK"))
+      .reduce((sum, step) => {
+        const stepProps = campusTransitStepProps(step);
+        return sum + (stepProps.time || step.sectionTime || step.time || 0);
+      }, 0);
+  }
+
+  function campusSubwayLineColor(name) {
+    const key = String(name || "").replace(/\s+/g, "");
+    const map = {
+      "1호선": "#0052A4",
+      "2호선": "#00A84D",
+      "3호선": "#EF7C1C",
+      "4호선": "#00A5E3",
+      "5호선": "#996CAC",
+      "6호선": "#CD7C2F",
+      "7호선": "#747F00",
+      "8호선": "#E6186C",
+      "9호선": "#BDB092",
+      경의중앙선: "#77C4A3",
+      공항철도: "#0090D2",
+      신분당선: "#D4003B",
+      수인분당선: "#F5A200",
+      경춘선: "#0C8E72",
+      우이신설선: "#B7C452",
+      서해선: "#8FC31F",
+      신림선: "#6789CA",
+      경강선: "#003DA5",
+      GTZ: "#B71C1C",
+    };
+    for (const [line, color] of Object.entries(map)) {
+      if (key.includes(line.replace(/\s+/g, ""))) return color;
+    }
+    return "#1a4796";
+  }
+
+  function campusBusTypeColor(type) {
+    const key = String(type || "");
+    if (key.includes("광역") || key.includes("직행")) return "#F06A00";
+    if (key.includes("간선")) return "#3D5BAB";
+    if (key.includes("지선")) return "#5BB025";
+    if (key.includes("마을")) return "#70B235";
+    if (key.includes("공항")) return "#8B5A2B";
+    if (key.includes("순환")) return "#33CC99";
+    return "#5BB025";
+  }
+
+  function campusTransitModeIcon(kind) {
+    if (kind === "subway") {
+      return `<svg class="campus-transit-mode-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 17v2M16 17v2M4 11h16M9 7h.01M15 7h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 21h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+    }
+    if (kind === "bus") {
+      return `<svg class="campus-transit-mode-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 10h16M8 19h.01M16 19h.01M6 16h2M16 16h2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="19" r="1.6" fill="currentColor"/><circle cx="16" cy="19" r="1.6" fill="currentColor"/></svg>`;
+    }
+    return `<svg class="campus-transit-mode-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v5M9 21l3-8 3 8M8 12h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  }
+
+  function campusTransitChipHtml(step) {
+    const props = campusTransitStepProps(step);
+    const type = campusTransitStepType(step);
+    if (type.includes("WALK")) {
+      return `<span class="campus-transit-chip is-walk">${campusTransitModeIcon("walk")}<span>도보</span></span>`;
+    }
+    if (type.includes("SUBWAY")) {
+      const name = props.vehicles?.[0]?.name || "지하철";
+      const color = campusSubwayLineColor(name);
+      return `<span class="campus-transit-chip is-subway" style="--chip:${color}">${campusTransitModeIcon("subway")}<span>${escapeHtml(name)}</span></span>`;
+    }
+    if (type.includes("BUS")) {
+      const vehicle = props.vehicles?.[0] || {};
+      const name = vehicle.name || "버스";
+      const color = campusBusTypeColor(vehicle.type);
+      return `<span class="campus-transit-chip is-bus" style="--chip:${color}">${campusTransitModeIcon("bus")}<span>${escapeHtml(name)}</span></span>`;
+    }
+    return `<span class="campus-transit-chip">${escapeHtml(campusTransitStepLabel(step))}</span>`;
+  }
+
+  function campusTransitStopNames(props) {
+    return (props.stops || []).map((stop) => stop?.name || stop).filter(Boolean);
+  }
+
+  function campusTransitPickRoutes(routes) {
+    const list = Array.isArray(routes) ? [...routes] : [];
+    if (!list.length) return { featured: [], rest: [] };
+    const byTime = [...list].sort(
+      (a, b) => (a.properties?.totalTime || 0) - (b.properties?.totalTime || 0)
+    );
+    const byTransfer = [...list].sort((a, b) => {
+      const ta = a.properties?.transfers ?? 99;
+      const tb = b.properties?.transfers ?? 99;
+      if (ta !== tb) return ta - tb;
+      return (a.properties?.totalTime || 0) - (b.properties?.totalTime || 0);
+    });
+    const featured = [];
+    const pushUnique = (route) => {
+      if (!route || featured.includes(route)) return;
+      featured.push(route);
+    };
+    pushUnique(byTime[0]);
+    pushUnique(byTransfer[0]);
+    const rest = list.filter((route) => !featured.includes(route));
+    return { featured, rest };
+  }
+
+  function campusTransitBadge(route, index, featured) {
+    if (!featured.length) return "";
+    if (index === 0) return "가장 빠른 경로";
+    if (featured.length > 1 && index === 1) {
+      const first = featured[0]?.properties?.transfers ?? 0;
+      const second = route?.properties?.transfers ?? 0;
+      if (second < first) return "환승 최소";
+      return `환승 ${second}회`;
+    }
+    return "";
+  }
+
+  function campusTransitStepsTimelineHtml(route) {
+    const steps = route?.steps || [];
+    const nodes = [];
+    steps.forEach((step, index) => {
+      const stepProps = campusTransitStepProps(step);
+      const type = campusTransitStepType(step);
+      const timeMin = campusTransitMinutes(stepProps.time || step.sectionTime || step.time || 0);
+      const distance = Number(stepProps.distance || 0);
+      const stops = campusTransitStopNames(stepProps);
+      const from = stops[0] || "";
+      const to = stops[stops.length - 1] || "";
+      const viaCount = Math.max(0, stops.length - 1);
+
+      if (type.includes("WALK")) {
+        const guide = String(stepProps.guidance || "").trim();
+        const exitMatch = guide.match(/\(([^)]*출구[^)]*)\)/);
+        nodes.push(`<li class="campus-transit-step is-walk">
+          <span class="campus-transit-step-rail" aria-hidden="true"></span>
+          <div>
+            <p class="campus-transit-step-title">도보 ${timeMin || 1}분${distance ? ` · ${distance}m` : ""}</p>
+            ${exitMatch ? `<p class="campus-transit-step-sub">${escapeHtml(exitMatch[1])}</p>` : guide ? `<p class="campus-transit-step-sub">${escapeHtml(guide)}</p>` : ""}
+          </div>
+        </li>`);
+        return;
+      }
+
+      const vehicle = stepProps.vehicles?.[0] || {};
+      const vehicleName = vehicle.name || (type.includes("SUBWAY") ? "지하철" : "버스");
+      const vehicleType = vehicle.type || "";
+      const color = type.includes("SUBWAY")
+        ? campusSubwayLineColor(vehicleName)
+        : campusBusTypeColor(vehicleType);
+      const rideLabel = type.includes("SUBWAY")
+        ? `${viaCount}개 역 · ${timeMin || 1}분`
+        : `${viaCount}개 정류장 · ${timeMin || 1}분`;
+      nodes.push(`<li class="campus-transit-step is-ride" style="--leg:${color}">
+        <span class="campus-transit-step-rail" aria-hidden="true"></span>
+        <div>
+          <div class="campus-transit-ride-head">${campusTransitChipHtml(step)}${vehicleType ? `<span class="campus-transit-step-sub">${escapeHtml(vehicleType)}</span>` : ""}</div>
+          <p class="campus-transit-step-title">${escapeHtml(from || "승차")} → ${escapeHtml(to || "하차")}</p>
+          <p class="campus-transit-step-sub">${rideLabel}${index < steps.length - 1 ? " · 환승" : ""}</p>
+        </div>
+      </li>`);
+    });
+    return `<ol class="campus-transit-steps">${nodes.join("")}</ol>`;
+  }
+
+  function campusTransitRouteCardHtml(route, index, selected, expanded, badge) {
+    const props = route.properties || {};
+    const minutes = Math.max(1, campusTransitMinutes(props.totalTime));
+    const fare = campusTransitFare(props);
+    const walkMin = campusTransitMinutes(campusTransitWalkSeconds(route));
+    const transfers = props.transfers ?? 0;
+    const km = ((props.totalDistance || 0) / 1000).toFixed(1);
+    const chips = (route.steps || [])
+      .filter((step) => !campusTransitStepType(step).includes("WALK"))
+      .map(campusTransitChipHtml)
+      .join("");
+    const metaBits = [
+      `환승 ${transfers}회`,
+      walkMin ? `도보 ${walkMin}분` : "",
+      `${km}km`,
+      fare != null ? `${fare.toLocaleString("ko-KR")}원` : "",
+    ].filter(Boolean);
+    return `<article class="campus-transit-option${selected ? " is-active" : ""}${expanded ? " is-expanded" : ""}" data-campus-route-option="${index}">
+      <button type="button" class="campus-transit-option-btn" aria-expanded="${expanded ? "true" : "false"}">
+        <div class="campus-transit-option-top">
+          <strong class="campus-transit-option-time">${minutes}<span>분</span></strong>
+          ${badge ? `<span class="campus-transit-option-badge">${escapeHtml(badge)}</span>` : ""}
+        </div>
+        <p class="campus-transit-option-meta">${escapeHtml(metaBits.join(" · "))}</p>
+        <div class="campus-transit-option-chips">${chips || `<span class="campus-transit-chip is-walk">${campusTransitModeIcon("walk")}<span>도보</span></span>`}</div>
+      </button>
+      <div class="campus-transit-option-detail"${expanded ? "" : " hidden"}>${campusTransitStepsTimelineHtml(route)}</div>
+    </article>`;
+  }
+
+  function campusMapHtml() {
+    const rows = campusRows();
+    const regionButtons = `<button type="button" class="campus-roadview-region is-active" data-campus-map-region="" aria-pressed="true">전체</button>${campusRegionButtonsHtml(rows, "data-campus-map-region", "")}`;
+    return `<section class="campus-map" data-campus-map>
+      <div class="campus-map-tools">
+        <label class="admit-search-field">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m20 20-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <input type="search" data-campus-map-keyword placeholder="대학명 검색" aria-label="대학명 검색">
+        </label>
+        <div class="campus-roadview-regions" role="group" aria-label="지역">${regionButtons}</div>
+      </div>
+      <div class="campus-map-layout">
+        <aside class="campus-map-panel" aria-label="통학 경로">
+          <div class="campus-map-input" data-campus-map-input>
+            <div class="campus-map-field">
+              <p class="campus-map-field-label">출발</p>
+              <div class="campus-map-origin" data-campus-origin>
+                <div class="campus-map-origin-actions campus-roadview-regions" data-campus-origin-choose>
+                  <button type="button" class="campus-roadview-region campus-map-home-geo" data-campus-home-geo>
+                    <span class="campus-map-origin-ico" aria-hidden="true">📍</span>현재 위치 사용
+                  </button>
+                  <button type="button" class="campus-roadview-region campus-map-home-btn" data-campus-home-pick aria-pressed="false">
+                    <span class="campus-map-origin-ico" aria-hidden="true">🗺️</span>지도에서 선택
+                  </button>
+                </div>
+                <div class="campus-map-origin-picking" data-campus-origin-picking hidden>
+                  <p class="campus-map-origin-guide">지도에서 출발할 위치를 눌러 주세요</p>
+                  <button type="button" class="campus-map-home-cancel" data-campus-home-cancel>취소</button>
+                </div>
+                <div class="campus-map-origin-selected" data-campus-origin-selected hidden>
+                  <p class="campus-map-origin-value campus-roadview-region" data-campus-origin-value></p>
+                  <button type="button" class="campus-roadview-region campus-map-home-edit" data-campus-home-edit>변경</button>
+                </div>
+              </div>
+            </div>
+            <div class="campus-map-field">
+              <p class="campus-map-field-label">도착</p>
+              <p class="campus-map-dest-guide is-empty" data-campus-dest-box>지도에서 대학을 선택해 주세요</p>
+            </div>
+            <div class="campus-map-route-area" data-campus-route-area>
+              <div class="campus-map-route-placeholder is-empty" data-campus-route-placeholder>대중교통 경로 보기</div>
+              <div class="campus-map-route-body" data-campus-route-result hidden>
+                <div class="campus-transit-options" data-campus-route-options role="listbox" aria-label="대중교통 경로 후보"></div>
+                <p class="campus-map-eta" data-campus-eta hidden></p>
+                <p class="campus-map-meta-line" data-campus-route-meta hidden></p>
+                <button type="button" class="campus-roadview-view campus-map-route-more" data-campus-route-more hidden>다른 경로 더 보기</button>
+              </div>
+            </div>
+          </div>
+        </aside>
+        <div class="campus-map-stage">
+          <div class="campus-roadview-head">
+            <div class="campus-roadview-heading">
+              <h2 class="campus-roadview-title" data-campus-map-title>통학 경로</h2>
+              <p class="campus-roadview-meta" data-campus-map-meta hidden></p>
+            </div>
+            <button type="button" class="campus-roadview-view" data-campus-map-view disabled>상세 보기</button>
+          </div>
+          <p class="campus-map-pick-banner" data-campus-map-banner hidden>지도에서 출발할 위치를 눌러 주세요</p>
+          <div class="campus-map-canvas" data-campus-map-el role="presentation"></div>
+          <p class="campus-map-hint" data-campus-map-hint hidden></p>
+        </div>
+      </div>
+    </section>`;
+  }
+
+  function bindCampusMap(root) {
+    if (!root || root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
+    const mapEl = root.querySelector("[data-campus-map-el]");
+    const input = root.querySelector("[data-campus-map-keyword]");
+    const regionButtons = [...root.querySelectorAll("[data-campus-map-region]")];
+    const originChoose = root.querySelector("[data-campus-origin-choose]");
+    const originPicking = root.querySelector("[data-campus-origin-picking]");
+    const originSelected = root.querySelector("[data-campus-origin-selected]");
+    const originValue = root.querySelector("[data-campus-origin-value]");
+    const destBox = root.querySelector("[data-campus-dest-box]");
+    const homePickBtn = root.querySelector("[data-campus-home-pick]");
+    const homeGeoBtn = root.querySelector("[data-campus-home-geo]");
+    const homeCancelBtn = root.querySelector("[data-campus-home-cancel]");
+    const homeEditBtn = root.querySelector("[data-campus-home-edit]");
+    const routePlaceholder = root.querySelector("[data-campus-route-placeholder]");
+    const resultBox = root.querySelector("[data-campus-route-result]");
+    const optionsEl = root.querySelector("[data-campus-route-options]");
+    const etaEl = root.querySelector("[data-campus-eta]");
+    const metaEl = root.querySelector("[data-campus-route-meta]");
+    const moreBtn = root.querySelector("[data-campus-route-more]");
+    const hint = root.querySelector("[data-campus-map-hint]");
+    const pickBanner = root.querySelector("[data-campus-map-banner]");
+    const mapTitle = root.querySelector("[data-campus-map-title]");
+    const mapMeta = root.querySelector("[data-campus-map-meta]");
+    const mapViewBtn = root.querySelector("[data-campus-map-view]");
+    const rows = campusRows().map((row) => {
+      const point = campusPoint(row.name);
+      return {
+        ...row,
+        lat: point?.lat,
+        lng: point?.lng,
+        address: campusOfficialAddress(row.name),
+      };
+    });
+
+    let regionFilter = "";
+    let pickHome = false;
+    let routeState = "idle";
+    let home = null;
+    let dest = null;
+    let map = null;
+    let geocoder = null;
+    let homeOverlay = null;
+    let routeLines = [];
+    let featuredRoutes = [];
+    let restRoutes = [];
+    let showAllRoutes = false;
+    let selectedRouteIndex = 0;
+    let expandedRouteIndex = -1;
+    let routeReqId = 0;
+    const markerByName = new Map();
+
+    const destLabel = () => (dest ? dest.name : "");
+    const visibleRoutes = () => (showAllRoutes ? [...featuredRoutes, ...restRoutes] : [...featuredRoutes]);
+    const formatDistanceKm = (km) => {
+      if (!Number.isFinite(km) || km <= 0) return "";
+      if (km < 1) return `약 ${Math.max(0.1, Math.round(km * 10) / 10)}km`;
+      if (km < 10) return `약 ${km.toFixed(1)}km`;
+      return `약 ${Math.round(km)}km`;
+    };
+    const headMetaText = () => {
+      if (!home || !dest) return "";
+      const km = campusDistanceKm(home.lat, home.lng, dest.lat, dest.lng);
+      return formatDistanceKm(km);
+    };
+    const homeDisplayLabel = () => {
+      if (!home) return "";
+      if (home.source === "geo") return "📍 현재 위치";
+      return `🗺️ ${home.name || "선택한 위치"}`;
+    };
+    const shortRegionLabel = (result) => {
+      const row = result?.[0];
+      const addr = row?.address;
+      if (addr) {
+        const sido = String(addr.region_1depth_name || "")
+          .replace(/특별시$|광역시$|특별자치시$/, "")
+          .replace(/특별자치도$/, "")
+          .trim();
+        return [sido, addr.region_2depth_name, addr.region_3depth_name].filter(Boolean).join(" ");
+      }
+      return row?.road_address?.address_name || row?.address?.address_name || "지도에서 선택한 위치";
+    };
+
+    const setHint = (text, show = true) => {
+      if (!hint) return;
+      hint.hidden = !show;
+      if (text) hint.textContent = text;
+    };
+
+    const setPickMode = (on) => {
+      pickHome = Boolean(on);
+      root.classList.toggle("is-picking-home", pickHome);
+      if (homePickBtn) {
+        homePickBtn.classList.toggle("is-active", pickHome);
+        homePickBtn.setAttribute("aria-pressed", pickHome ? "true" : "false");
+      }
+      if (pickBanner) pickBanner.hidden = true;
+      syncPanel();
+    };
+
+    const syncOriginUi = () => {
+      const mode = pickHome ? "picking" : home ? "selected" : "choose";
+      if (originChoose) originChoose.hidden = mode !== "choose";
+      if (originPicking) originPicking.hidden = mode !== "picking";
+      if (originSelected) originSelected.hidden = mode !== "selected";
+      if (originValue) originValue.textContent = homeDisplayLabel();
+    };
+
+    const setRoutePlaceholder = (text, empty = true) => {
+      if (!routePlaceholder) return;
+      routePlaceholder.hidden = false;
+      routePlaceholder.textContent = text;
+      routePlaceholder.classList.toggle("is-empty", empty);
+      routePlaceholder.classList.toggle("is-loading", !empty && text.includes("조회"));
+    };
+
+    const showRouteIdle = () => {
+      routeState = "idle";
+      root.classList.remove("has-transit-result");
+      if (resultBox) resultBox.hidden = true;
+      if (optionsEl) optionsEl.replaceChildren();
+      if (etaEl) {
+        etaEl.hidden = true;
+        etaEl.textContent = "";
+      }
+      if (metaEl) {
+        metaEl.hidden = true;
+        metaEl.textContent = "";
+      }
+      if (moreBtn) moreBtn.hidden = true;
+      setRoutePlaceholder("대중교통 경로 보기", true);
+      clearRouteDraw();
+    };
+
+    const showRouteLoading = () => {
+      routeState = "loading";
+      root.classList.remove("has-transit-result");
+      if (resultBox) resultBox.hidden = true;
+      setRoutePlaceholder("경로 조회 중…", false);
+    };
+
+    const showRouteResult = () => {
+      routeState = "result";
+      root.classList.add("has-transit-result");
+      if (routePlaceholder) routePlaceholder.hidden = true;
+      if (resultBox) resultBox.hidden = false;
+      setHint("", false);
+    };
+
+    const syncPanel = () => {
+      syncOriginUi();
+      if (destBox) {
+        destBox.textContent = dest ? destLabel() : "지도에서 대학을 선택해 주세요";
+        destBox.classList.toggle("is-empty", !dest);
+      }
+      if (mapTitle) mapTitle.textContent = dest?.name || "통학 경로";
+      if (mapMeta) {
+        const metaText = headMetaText();
+        mapMeta.hidden = !metaText;
+        mapMeta.textContent = metaText;
+      }
+      if (mapViewBtn) mapViewBtn.disabled = !dest;
+      if (routeState === "idle" || routeState === "loading") {
+        setHint("", false);
+      }
+    };
+
+    const clearRouteDraw = () => {
+      routeLines.forEach((line) => line.setMap(null));
+      routeLines = [];
+    };
+
+    const drawPath = (points, options) => {
+      if (!map || !points || points.length < 2) return null;
+      const path = points.map((pt) => new window.kakao.maps.LatLng(pt.y ?? pt[1], pt.x ?? pt[0]));
+      const line = new window.kakao.maps.Polyline({
+        path,
+        strokeWeight: options.weight || 5,
+        strokeColor: options.color || "#1a4796",
+        strokeOpacity: options.opacity || 0.9,
+        strokeStyle: options.style || "solid",
+      });
+      line.setMap(map);
+      return line;
+    };
+
+    const drawTransitRoute = (route) => {
+      clearRouteDraw();
+      if (!route || !map) return;
+      const bounds = new window.kakao.maps.LatLngBounds();
+      let drew = false;
+      (route.steps || []).forEach((step) => {
+        const type = campusTransitStepType(step);
+        const points = campusTransitStepPoints(step);
+        const stepProps = campusTransitStepProps(step);
+        const isWalk = type.includes("WALK") || type.includes("도보");
+        let color = "#1a4796";
+        if (isWalk) color = "#6b7280";
+        else if (type.includes("SUBWAY")) color = campusSubwayLineColor(stepProps.vehicles?.[0]?.name);
+        else if (type.includes("BUS")) color = campusBusTypeColor(stepProps.vehicles?.[0]?.type);
+        const line = drawPath(points, {
+          color,
+          style: isWalk ? "dash" : "solid",
+          weight: isWalk ? 4 : 6,
+          opacity: isWalk ? 0.75 : 0.92,
+        });
+        if (line) {
+          routeLines.push(line);
+          points.forEach((pt) => {
+            const lat = pt.y ?? pt[1];
+            const lng = pt.x ?? pt[0];
+            if (lat != null && lng != null) {
+              bounds.extend(new window.kakao.maps.LatLng(lat, lng));
+              drew = true;
+            }
+          });
+        }
+      });
+      if (drew) {
+        try {
+          map.setBounds(bounds, 48, 48, 48, 48);
+        } catch (_) {
+          map.setBounds(bounds);
+        }
+      }
+    };
+
+    const scrollSelectedRouteToTop = () => {
+      if (!resultBox || !optionsEl) return;
+      const card = optionsEl.querySelector(`[data-campus-route-option="${selectedRouteIndex}"]`);
+      if (!card) return;
+      requestAnimationFrame(() => {
+        const pad = Number.parseFloat(getComputedStyle(resultBox).paddingTop) || 0;
+        const delta = card.getBoundingClientRect().top - resultBox.getBoundingClientRect().top - pad;
+        resultBox.scrollTop += delta;
+      });
+    };
+
+    const renderTransitResult = (index = 0, expand = true) => {
+      const routes = visibleRoutes();
+      if (!routes.length || !home || !dest) return;
+      selectedRouteIndex = Math.max(0, Math.min(index, routes.length - 1));
+      if (expand) expandedRouteIndex = selectedRouteIndex;
+      const route = routes[selectedRouteIndex];
+      if (optionsEl) {
+        optionsEl.hidden = false;
+        optionsEl.innerHTML = routes
+          .map((item, i) =>
+            campusTransitRouteCardHtml(
+              item,
+              i,
+              i === selectedRouteIndex,
+              i === expandedRouteIndex,
+              campusTransitBadge(item, i, featuredRoutes)
+            )
+          )
+          .join("");
+      }
+      if (etaEl) {
+        etaEl.hidden = true;
+        etaEl.textContent = "";
+      }
+      if (metaEl) {
+        metaEl.hidden = true;
+        metaEl.textContent = "";
+      }
+      if (moreBtn) moreBtn.hidden = showAllRoutes || restRoutes.length === 0;
+      showRouteResult();
+      drawTransitRoute(route);
+      syncPanel();
+      scrollSelectedRouteToTop();
+    };
+
+    const renderTransitFallback = (message) => {
+      featuredRoutes = [];
+      restRoutes = [];
+      selectedRouteIndex = 0;
+      expandedRouteIndex = -1;
+      if (!hasKakaoAppKey()) {
+        if (optionsEl) {
+          optionsEl.hidden = true;
+          optionsEl.replaceChildren();
+        }
+        if (etaEl) {
+          etaEl.hidden = true;
+          etaEl.textContent = "";
+        }
+        if (metaEl) {
+          metaEl.hidden = true;
+          metaEl.textContent = "";
+        }
+        if (moreBtn) moreBtn.hidden = true;
+        setRoutePlaceholder("통학 경로 미리보기", true);
+        setHint("", false);
+        showCampusKakaoPreview(mapEl, "map");
+        syncPanel();
+        return;
+      }
+      if (optionsEl) {
+        optionsEl.hidden = true;
+        optionsEl.replaceChildren();
+      }
+      if (etaEl) {
+        etaEl.hidden = false;
+        const km = home && dest ? campusDistanceKm(home.lat, home.lng, dest.lat, dest.lng) : 0;
+        etaEl.textContent = `직선 약 ${km < 10 ? km.toFixed(1) : Math.round(km)}km`;
+      }
+      if (metaEl) {
+        metaEl.hidden = false;
+        metaEl.textContent = message;
+      }
+      if (moreBtn) moreBtn.hidden = true;
+      showRouteResult();
+      setHint("경로선은 serve.py(프록시)로 열면 지도에 표시됩니다.", true);
+      if (home && dest) {
+        const fallback = drawPath(
+          [
+            { x: home.lng, y: home.lat },
+            { x: dest.lng, y: dest.lat },
+          ],
+          { color: "#0f7f93", style: "dash", weight: 4 }
+        );
+        if (fallback) routeLines.push(fallback);
+      }
+      syncPanel();
+    };
+
+    const markerHtml = (name, active) =>
+      `<div class="campus-map-marker${active ? " is-active-marker" : ""}">
+        <span class="campus-map-marker-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20V9.5L12 5l8 4.5V20"/>
+            <path d="M9 20v-5h6v5"/>
+            <path d="M9 11h.01M15 11h.01"/>
+          </svg>
+        </span>
+        <span class="campus-map-marker-label">${escapeHtml(campusShortName(name))}</span>
+      </div>`;
+
+    const placeHomePin = (lat, lng) => {
+      if (!map) return;
+      const pos = new window.kakao.maps.LatLng(lat, lng);
+      if (homeOverlay) homeOverlay.setMap(null);
+      homeOverlay = new window.kakao.maps.CustomOverlay({
+        position: pos,
+        yAnchor: 1,
+        zIndex: 20,
+        content: `<div class="campus-map-home-pin"><span class="campus-map-home-dot"></span><span class="campus-map-home-label">출발</span></div>`,
+      });
+      homeOverlay.setMap(map);
+    };
+
+    const clearHome = () => {
+      home = null;
+      if (homeOverlay) {
+        homeOverlay.setMap(null);
+        homeOverlay = null;
+      }
+      featuredRoutes = [];
+      restRoutes = [];
+      showRouteIdle();
+      syncPanel();
+    };
+
+    const maybeRunRoute = () => {
+      if (home && dest) {
+        runRoute();
+        return;
+      }
+      showRouteIdle();
+      syncPanel();
+    };
+
+    const setHome = (lat, lng, name, source = "map") => {
+      home = {
+        lat,
+        lng,
+        name: name || (source === "geo" ? "현재 위치" : "선택한 출발지"),
+        source,
+      };
+      placeHomePin(lat, lng);
+      setPickMode(false);
+      featuredRoutes = [];
+      restRoutes = [];
+      maybeRunRoute();
+    };
+
+    const resolveMapAddress = (lat, lng) => {
+      setHome(lat, lng, "선택한 위치", "map");
+      if (map) {
+        map.setLevel(Math.min(map.getLevel(), 5));
+        map.setCenter(new window.kakao.maps.LatLng(lat, lng));
+      }
+      if (!geocoder) return;
+      geocoder.coord2Address(lng, lat, (result, status) => {
+        if (!home || home.source !== "map" || home.lat !== lat || home.lng !== lng) return;
+        if (status !== window.kakao.maps.services.Status.OK) return;
+        const label = shortRegionLabel(result);
+        if (!label) return;
+        home.name = label;
+        syncPanel();
+      });
+    };
+
+    const setDest = (row) => {
+      const point = row ? campusPoint(row.name) : null;
+      const cached = row ? campusCoordsCache.get(row.name) : null;
+      dest = row
+        ? {
+            name: row.name,
+            lat: cached?.lat ?? point?.lat ?? row.lat,
+            lng: cached?.lng ?? point?.lng ?? row.lng,
+            region: row.region || "",
+            address: campusOfficialAddress(row.name) || row.address || "",
+          }
+        : null;
+      featuredRoutes = [];
+      restRoutes = [];
+      rebuildMarkers();
+      syncPanel();
+      if (dest) {
+        resolveCampusPlace(geocoder, dest.name, (place) => {
+          if (!dest || dest.name !== row.name) return;
+          dest.lat = place.lat;
+          dest.lng = place.lng;
+          dest.address = place.address || dest.address;
+          rebuildMarkers();
+          syncPanel();
+          maybeRunRoute();
+        });
+      }
+      maybeRunRoute();
+    };
+
+    const fitKoreaOverview = () => {
+      if (!map) return;
+      map.setLevel(13);
+      map.setCenter(new window.kakao.maps.LatLng(36.35, 127.85));
+    };
+
+    const fitVisible = (visible) => {
+      if (!map || !visible.length) return;
+      const q = (input?.value || "").trim();
+      if (!regionFilter && !q) {
+        fitKoreaOverview();
+        return;
+      }
+      if (visible.length === 1) {
+        map.setLevel(5);
+        map.setCenter(new window.kakao.maps.LatLng(visible[0].lat, visible[0].lng));
+        return;
+      }
+      const bounds = new window.kakao.maps.LatLngBounds();
+      visible.forEach((row) => bounds.extend(new window.kakao.maps.LatLng(row.lat, row.lng)));
+      map.setBounds(bounds, 48, 48, 48, 48);
+    };
+
+    const rebuildMarkers = () => {
+      if (!map) return;
+      const q = (input?.value || "").trim().toLowerCase();
+      markerByName.forEach((overlay) => overlay.setMap(null));
+      markerByName.clear();
+      const visible = rows.filter((row) => {
+        const regionOk = !regionFilter || row.region === regionFilter;
+        const keywordOk = !q || row.name.toLowerCase().includes(q);
+        return regionOk && keywordOk;
+      });
+      visible.forEach((row) => {
+        const active = dest && dest.name === row.name;
+        const content = document.createElement("div");
+        content.innerHTML = markerHtml(row.name, active);
+        const button = content.firstElementChild;
+        if (button) {
+          button.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setDest(row);
+          });
+        }
+        const overlay = new window.kakao.maps.CustomOverlay({
+          position: new window.kakao.maps.LatLng(row.lat, row.lng),
+          yAnchor: 1,
+          xAnchor: 0.18,
+          zIndex: active ? 12 : 3,
+          content,
+          clickable: true,
+        });
+        overlay.setMap(map);
+        markerByName.set(row.name, overlay);
+      });
+      if (q && visible.length === 1 && (!dest || dest.name !== visible[0].name)) {
+        setDest(visible[0]);
+        return;
+      }
+      fitVisible(visible);
+    };
+
+    const runRoute = async () => {
+      if (!home || !dest) return;
+      if (!hasKakaoAppKey() || !map) {
+        clearRouteDraw();
+        featuredRoutes = [];
+        restRoutes = [];
+        if (optionsEl) {
+          optionsEl.hidden = true;
+          optionsEl.replaceChildren();
+        }
+        if (etaEl) {
+          etaEl.hidden = true;
+          etaEl.textContent = "";
+        }
+        if (metaEl) {
+          metaEl.hidden = true;
+          metaEl.textContent = "";
+        }
+        if (moreBtn) moreBtn.hidden = true;
+        setRoutePlaceholder("통학 경로 미리보기", true);
+        setHint("", false);
+        showCampusKakaoPreview(mapEl, "map");
+        syncPanel();
+        return;
+      }
+      const reqId = ++routeReqId;
+      const origin = { ...home };
+      const target = { ...dest };
+      showRouteLoading();
+      syncPanel();
+      clearRouteDraw();
+      try {
+        const data = await fetchKakaoTransit(origin, target);
+        if (reqId !== routeReqId) return;
+        if (!home || !dest || home.lat !== origin.lat || home.lng !== origin.lng || dest.name !== target.name) return;
+        const routes = data && data.status === "OK" && Array.isArray(data.routes) ? data.routes : [];
+        if (!routes.length) throw new Error(data?.status || data?.message || "no-route");
+        const picked = campusTransitPickRoutes(routes);
+        featuredRoutes = picked.featured;
+        restRoutes = picked.rest;
+        showAllRoutes = false;
+        expandedRouteIndex = 0;
+        renderTransitResult(0, true);
+      } catch (err) {
+        if (reqId !== routeReqId) return;
+        console.warn("[campus-map] transit", err);
+        renderTransitFallback(
+          "카카오 대중교통 API를 아직 불러오지 못했습니다. python serve.py 로 실행했는지 확인하거나 카카오맵에서 보세요."
+        );
+      }
+    };
+
+    if (!hasKakaoAppKey()) {
+      showCampusKakaoPreview(mapEl, "map");
+    } else {
+      loadKakaoMaps()
+        .then((kakao) => {
+          map = new kakao.maps.Map(mapEl, {
+            center: new kakao.maps.LatLng(36.35, 127.85),
+            level: 13,
+          });
+          geocoder = new kakao.maps.services.Geocoder();
+          rows.forEach((row) => {
+            resolveCampusPlace(geocoder, row.name, (place) => {
+              row.lat = place.lat;
+              row.lng = place.lng;
+              row.address = place.address || row.address;
+              if (dest?.name === row.name) {
+                dest.lat = place.lat;
+                dest.lng = place.lng;
+                dest.address = place.address || dest.address;
+                syncPanel();
+              }
+              rebuildMarkers();
+            });
+          });
+          root._campusMap = map;
+          root._campusMapRefresh = () => {
+            map.relayout();
+            rebuildMarkers();
+          };
+
+          kakao.maps.event.addListener(map, "click", (mouseEvent) => {
+            if (!pickHome) return;
+            const latlng = mouseEvent.latLng;
+            resolveMapAddress(latlng.getLat(), latlng.getLng());
+          });
+
+          // marker click via delegation on content overlays
+          root.addEventListener("click", (event) => {
+            const markerBtn = event.target.closest(".campus-map-marker");
+            if (!markerBtn || !root.contains(markerBtn)) return;
+            const label = markerBtn.querySelector(".campus-map-marker-label")?.textContent || "";
+            const row = rows.find((item) => campusShortName(item.name) === label || item.name === label);
+            if (row) setDest(row);
+          });
+
+          rebuildMarkers();
+          syncPanel();
+          requestAnimationFrame(() => map.relayout());
+          setTimeout(() => {
+            map.relayout();
+            rebuildMarkers();
+          }, 160);
+        })
+        .catch(() => {
+          showCampusKakaoPreview(mapEl, "map");
+        });
+    }
+
+    if (homePickBtn) {
+      homePickBtn.addEventListener("click", () => {
+        if (!hasKakaoAppKey() || !map) {
+          showCampusKakaoPreview(mapEl, "map");
+          setHint("", false);
+          return;
+        }
+        setPickMode(true);
+      });
+    }
+
+    if (homeCancelBtn) {
+      homeCancelBtn.addEventListener("click", () => {
+        setPickMode(false);
+      });
+    }
+
+    if (homeEditBtn) {
+      homeEditBtn.addEventListener("click", () => {
+        clearHome();
+        setPickMode(false);
+      });
+    }
+
+    if (homeGeoBtn) {
+      homeGeoBtn.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+          if (hasKakaoAppKey()) setHint("이 브라우저에서는 현재 위치를 쓸 수 없습니다. 지도에서 선택해 주세요.");
+          else setHint("", false);
+          return;
+        }
+        homeGeoBtn.disabled = true;
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            homeGeoBtn.disabled = false;
+            setHome(pos.coords.latitude, pos.coords.longitude, "현재 위치", "geo");
+            if (map) {
+              map.setLevel(5);
+              map.setCenter(new window.kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+            } else {
+              showCampusKakaoPreview(mapEl, "map");
+            }
+          },
+          () => {
+            homeGeoBtn.disabled = false;
+            if (hasKakaoAppKey()) setHint("현재 위치를 가져오지 못했습니다. 지도에서 선택해 주세요.");
+            else setHint("", false);
+          },
+          { enableHighAccuracy: true, timeout: 8000 }
+        );
+      });
+    }
+
+    if (mapViewBtn) {
+      mapViewBtn.addEventListener("click", () => {
+        if (!dest?.name) return;
+        openCampusUniversityDetail(dest.name);
+      });
+    }
+    if (moreBtn) {
+      moreBtn.addEventListener("click", () => {
+        showAllRoutes = true;
+        renderTransitResult(selectedRouteIndex, false);
+      });
+    }
+    if (optionsEl) {
+      optionsEl.addEventListener("click", (event) => {
+        const card = event.target.closest("[data-campus-route-option]");
+        if (!card || !optionsEl.contains(card)) return;
+        const index = Number(card.dataset.campusRouteOption) || 0;
+        if (selectedRouteIndex === index && expandedRouteIndex === index) {
+          expandedRouteIndex = -1;
+          renderTransitResult(index, false);
+          return;
+        }
+        renderTransitResult(index, true);
+      });
+    }
+    regionButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const next = btn.dataset.campusMapRegion ?? "";
+        regionFilter = regionFilter === next && next !== "" ? "" : next;
+        // 전체("")는 토글 없이 전체 유지
+        if (btn.dataset.campusMapRegion === "") regionFilter = "";
+        regionButtons.forEach((item) => {
+          const value = item.dataset.campusMapRegion ?? "";
+          const on = regionFilter === value || (regionFilter === "" && value === "");
+          item.classList.toggle("is-active", on);
+          item.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+        rebuildMarkers();
+      });
+    });
+    regionButtons.forEach((item) => {
+      const value = item.dataset.campusMapRegion ?? "";
+      const on = regionFilter === value;
+      item.classList.toggle("is-active", on);
+      item.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+
+    if (input) input.addEventListener("input", rebuildMarkers);
+    syncPanel();
+  }
+
+  function campusRoadviewHtml() {
+    const rows = campusRows();
+    const items = rows
+      .map((row, index) => {
+        const point = campusPoint(row.name);
+        const address = campusOfficialAddress(row.name);
+        const selected = index === 0 ? "true" : "false";
+        const active = index === 0 ? " is-active" : "";
+        return `<button type="button" class="campus-roadview-item${active}" role="option" data-campus-item aria-selected="${selected}" data-name="${escapeHtml(row.name)}" data-region="${escapeHtml(row.region || "")}" data-address="${escapeHtml(address)}" data-lat="${point?.lat ?? ""}" data-lng="${point?.lng ?? ""}" data-heading="${point?.heading ?? ""}">
+            <span class="campus-roadview-name">${escapeHtml(row.name)}</span>
+            <span class="campus-roadview-item-region">${escapeHtml(row.region || "")}</span>
+          </button>`;
+      })
+      .join("");
+
+    const regionButtons = campusRegionButtonsHtml(rows);
+
+    return `<section class="campus-roadview" data-campus-roadview>
+      <div class="campus-roadview-tools">
+        <label class="admit-search-field">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m20 20-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <input type="search" data-campus-keyword placeholder="대학명 검색" aria-label="대학명 검색">
+        </label>
+        <div class="campus-roadview-regions" role="group" aria-label="지역">${regionButtons}</div>
+      </div>
+      <p class="campus-roadview-empty" data-campus-empty hidden>검색 결과가 없습니다.</p>
+      <div class="campus-roadview-layout">
+        <div class="campus-roadview-list" role="listbox" aria-label="캠퍼스 목록">${items}</div>
+        <div class="campus-roadview-stage">
+          <div class="campus-roadview-head">
+            <div class="campus-roadview-heading">
+              <h2 class="campus-roadview-title" data-campus-title>캠퍼스</h2>
+              <p class="campus-roadview-meta" data-campus-meta></p>
+            </div>
+            <button type="button" class="campus-roadview-view" data-campus-view>상세 보기</button>
+          </div>
+          <div class="campus-roadview-viewer">
+            <div class="campus-roadview-frame" data-campus-frame role="application" aria-label="캠퍼스 로드뷰"></div>
+            <p class="campus-roadview-miss" data-campus-roadview-miss hidden>이 위치 근처 카카오 로드뷰가 없습니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>`;
+  }
+
+  function openCampusUniversityDetail(name) {
+    const target = String(name || "").replace(/\s+/g, " ").trim();
+    if (!target) return;
+    const row = [...document.querySelectorAll('#university-info tr[data-uni-row]')].find((tr) => {
+      const label = (tr.cells[0]?.textContent || "").replace(/\s+/g, " ").trim();
+      return label === target;
+    });
+    if (row) openUniversityAdmitDetail(row);
+  }
+
+  function bindCampusRoadview(root) {
+    if (!root || root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
+    const input = root.querySelector("[data-campus-keyword]");
+    const regionButtons = [...root.querySelectorAll("[data-campus-region]")];
+    const items = [...root.querySelectorAll("[data-campus-item]")];
+    const frame = root.querySelector("[data-campus-frame]");
+    const miss = root.querySelector("[data-campus-roadview-miss]");
+    const title = root.querySelector("[data-campus-title]");
+    const meta = root.querySelector("[data-campus-meta]");
+    const empty = root.querySelector("[data-campus-empty]");
+    const layout = root.querySelector(".campus-roadview-layout");
+    const view = root.querySelector("[data-campus-view]");
+    let currentName = "";
+    let roadview = null;
+    let roadviewClient = null;
+    let loadGen = 0;
+    let pendingBtn = null;
+    let wantedHeading = NaN;
+
+    const setMiss = (text, show, asPreview = false) => {
+      if (asPreview && show) {
+        showCampusKakaoPreview(frame, "road");
+        if (miss) miss.hidden = true;
+        return;
+      }
+      if (frame?.classList.contains("is-preview") && !show) {
+        frame.classList.remove("is-preview");
+        frame.innerHTML = "";
+      }
+      if (!miss) return;
+      miss.hidden = !show;
+      if (text) miss.textContent = text;
+      if (frame) frame.classList.toggle("is-empty", Boolean(show));
+    };
+
+    const applyWantedHeading = () => {
+      if (!roadview || !Number.isFinite(wantedHeading)) return;
+      try {
+        roadview.setViewpoint({ pan: wantedHeading, tilt: 0, zoom: 0 });
+      } catch (_) {
+        /* ignore unsupported viewpoint */
+      }
+    };
+
+    const refreshRoadview = () => {
+      if (roadview && typeof roadview.relayout === "function") roadview.relayout();
+    };
+    root._campusRoadviewRefresh = refreshRoadview;
+
+    const ensureRoadview = async () => {
+      const kakao = await loadKakaoMaps();
+      if (!frame) throw new Error("missing-roadview-frame");
+      if (frame.classList.contains("is-preview")) {
+        frame.classList.remove("is-preview");
+        frame.innerHTML = "";
+        roadview = null;
+        roadviewClient = null;
+      }
+      if (!roadview) {
+        roadview = new kakao.maps.Roadview(frame);
+        roadviewClient = new kakao.maps.RoadviewClient();
+        kakao.maps.event.addListener(roadview, "init", () => {
+          refreshRoadview();
+          applyWantedHeading();
+        });
+      }
+      return kakao;
+    };
+
+    const showRoadviewAt = async (btn) => {
+      if (!btn || !frame) return;
+      const lat = Number(btn.dataset.lat);
+      const lng = Number(btn.dataset.lng);
+      const heading = Number(btn.dataset.heading);
+      const name = btn.dataset.name || "캠퍼스";
+      const gen = ++loadGen;
+      wantedHeading = Number.isFinite(heading) ? heading : NaN;
+      frame.setAttribute("aria-label", `${name} 캠퍼스 로드뷰`);
+      if (!hasKakaoAppKey()) {
+        setMiss("", true, true);
+        return;
+      }
+      setMiss("로드뷰를 불러오는 중…", true);
+      try {
+        const kakao = await ensureRoadview();
+        if (gen !== loadGen) return;
+        const position = new kakao.maps.LatLng(lat, lng);
+        roadviewClient.getNearestPanoId(position, campusRoadviewRadius(), (panoId) => {
+          if (gen !== loadGen) return;
+          if (panoId == null) {
+            setMiss("이 위치의 거리 풍경은 아직 준비되지 않았습니다.", true);
+            return;
+          }
+          setMiss("", false);
+          roadview.setPanoId(panoId, position);
+          requestAnimationFrame(() => {
+            refreshRoadview();
+            applyWantedHeading();
+          });
+          setTimeout(() => {
+            refreshRoadview();
+            applyWantedHeading();
+          }, 160);
+        });
+      } catch (_) {
+        if (gen !== loadGen) return;
+        setMiss("", true, true);
+      }
+    };
+
+    const select = (btn) => {
+      if (!btn) return;
+      items.forEach((item) => {
+        const on = item === btn;
+        item.classList.toggle("is-active", on);
+        item.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      const name = btn.dataset.name || "";
+      const region = btn.dataset.region || "";
+      currentName = name;
+      pendingBtn = btn;
+      if (view) view.setAttribute("aria-label", name ? `${name} 상세 보기` : "상세 보기");
+      if (title) title.textContent = name;
+      const official = btn.dataset.address || campusOfficialAddress(name);
+      if (meta) meta.textContent = official || region || "";
+      showRoadviewAt(btn);
+      loadKakaoMaps()
+        .then((kakao) => {
+          const geocoder = new kakao.maps.services.Geocoder();
+          resolveCampusPlace(geocoder, name, (place) => {
+            if (currentName !== name) return;
+            if (meta) meta.textContent = place.address || official || region || "";
+            if (Number.isFinite(place.lat) && Number.isFinite(place.lng)) {
+              btn.dataset.lat = String(place.lat);
+              btn.dataset.lng = String(place.lng);
+              showRoadviewAt(btn);
+            }
+          });
+        })
+        .catch(() => {});
+    };
+
+    items.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        select(btn);
+      });
+    });
+
+    if (view) {
+      view.addEventListener("click", () => {
+        openCampusUniversityDetail(currentName);
+      });
+    }
+
+    let regionFilter = regionButtons.some((btn) => btn.dataset.campusRegion === "서울") ? "서울" : "";
+
+    const applyFilter = () => {
+      const q = (input?.value || "").trim().toLowerCase();
+      let visible = 0;
+      let firstVisible = null;
+      items.forEach((btn) => {
+        const name = (btn.dataset.name || "").toLowerCase();
+        const regionOk = !regionFilter || (btn.dataset.region || "") === regionFilter;
+        const keywordOk = !q || name.includes(q);
+        const show = regionOk && keywordOk;
+        btn.hidden = !show;
+        if (show) {
+          visible += 1;
+          if (!firstVisible) firstVisible = btn;
+        }
+      });
+      if (empty) empty.hidden = visible !== 0;
+      if (layout) layout.hidden = visible === 0;
+      const chosen =
+        items.find((btn) => btn.classList.contains("is-active") && !btn.hidden) || firstVisible;
+      if (chosen) select(chosen);
+      else {
+        pendingBtn = null;
+        setMiss("", false);
+      }
+    };
+
+    regionButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const next = btn.dataset.campusRegion || "";
+        regionFilter = regionFilter === next ? "" : next;
+        regionButtons.forEach((item) => {
+          const on = Boolean(regionFilter) && item.dataset.campusRegion === regionFilter;
+          item.classList.toggle("is-active", on);
+          item.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+        applyFilter();
+      });
+    });
+
+    if (input) input.addEventListener("input", applyFilter);
+    applyFilter();
+
+    root._campusRoadviewShowPending = () => {
+      refreshRoadview();
+      if (pendingBtn) showRoadviewAt(pendingBtn);
+    };
+  }
+
   function render(key) {
     const guide = guides[key];
     const panel = document.querySelector(`[data-guide="${key}"]`);
@@ -4250,20 +5899,25 @@ const Guide = (() => {
       })
       .join("");
 
+    const searchInBlock = guide.search === "university";
     const blocks = guide.blocks
       .map((block) => {
         const chapter = chapterOf(block.id);
         const slices = block.slices ? ' data-slices="1"' : "";
+        let inner = `<div class="book-stack">${pageMounts(block.pages)}</div>`;
+        if (block.id === "university-info") inner = admitSearchHtml("university");
+        else if (block.id === "university-map") inner = campusMapHtml();
+        else if (block.id === "university-roadview") inner = campusRoadviewHtml();
         return `<section class="guide-block" id="${block.id}" data-chapter="${chapter || ""}"${slices}>
-          <div class="book-stack">${pageMounts(block.pages)}</div>
+          ${inner}
         </section>`;
       })
       .join("");
 
     const sectionNav = guide.nav.length
-      ? `<div class="section-nav" role="tablist" aria-label="${guide.title} 안의 항목">${nav}</div>`
+      ? `<div class="section-nav" role="tablist" aria-label="${guide.title} 안의 항목"${guide.hideSectionNav ? " hidden" : ""}>${nav}</div>`
       : "";
-    const search = guide.search ? admitSearchHtml(guide.search) : "";
+    const search = guide.search && !searchInBlock ? admitSearchHtml(guide.search) : "";
 
     panel.innerHTML = `<h1>${guide.title}</h1>
       ${sectionNav}
@@ -4271,6 +5925,10 @@ const Guide = (() => {
       ${blocks}`;
 
     if (guide.search) bindAdmitSearch(panel);
+    const campusMap = panel.querySelector("[data-campus-map]");
+    if (campusMap) bindCampusMap(campusMap);
+    const roadview = panel.querySelector("[data-campus-roadview]");
+    if (roadview) bindCampusRoadview(roadview);
 
     panel.querySelectorAll(".guide-block").forEach((block) => {
       const mount = block.querySelector(".info-mount");
@@ -4426,7 +6084,7 @@ const Guide = (() => {
   function activate(panel, id, scroll) {
     const buttons = [...panel.querySelectorAll(".section-tab")];
     const known = new Set(buttons.map((button) => button.dataset.section));
-    /* 대학 탭처럼 섹션 탭이 없으면 필터만 적용 */
+    /* 섹션 탭이 없으면 필터만 적용 */
     if (!buttons.length) {
       applyAdmitFilters(panel);
       const key = panel.dataset.guide;
@@ -4457,6 +6115,25 @@ const Guide = (() => {
     const key = panel.dataset.guide;
     if (key && typeof window.syncGuideHash === "function") {
       window.syncGuideHash(key, id);
+    }
+    if (id === "university-map") {
+      const mapRoot = panel.querySelector("[data-campus-map]");
+      const refresh = mapRoot && mapRoot._campusMapRefresh;
+      if (typeof refresh === "function") {
+        requestAnimationFrame(refresh);
+        setTimeout(refresh, 160);
+      } else if (mapRoot && mapRoot._campusMap) {
+        requestAnimationFrame(() => mapRoot._campusMap.relayout());
+        setTimeout(() => mapRoot._campusMap.relayout(), 160);
+      }
+    }
+    if (id === "university-roadview") {
+      const roadRoot = panel.querySelector("[data-campus-roadview]");
+      const refresh = roadRoot && (roadRoot._campusRoadviewShowPending || roadRoot._campusRoadviewRefresh);
+      if (typeof refresh === "function") {
+        requestAnimationFrame(refresh);
+        setTimeout(refresh, 160);
+      }
     }
     if (!scroll) return;
     const main = panel.closest(".main") || document.querySelector(".main");

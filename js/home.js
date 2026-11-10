@@ -2,7 +2,7 @@
 (() => {
   const SCOPE_UI = {
     susi: {
-      placeholder: "대학명 또는 모집단위 입력",
+      placeholder: "대학명 또는 모집단위 검색",
       chips: [
         { q: "고려대", label: "#고려대" },
         { q: "가천대", label: "#가천대" },
@@ -11,7 +11,7 @@
       ],
     },
     jeongsi: {
-      placeholder: "대학명 또는 모집단위 입력",
+      placeholder: "대학명 또는 모집단위 검색",
       chips: [
         { q: "고려대", label: "#고려대" },
         { q: "가천대", label: "#가천대" },
@@ -20,7 +20,7 @@
       ],
     },
     university: {
-      placeholder: "대학명 입력",
+      placeholder: "대학명 검색",
       chips: [
         { q: "고려대", label: "#고려대" },
         { q: "가천대", label: "#가천대" },
@@ -39,7 +39,7 @@
   function applyHomeSearch(query, scope) {
     const q = String(query || "").trim();
     const tab = scope === "jeongsi" || scope === "university" ? scope : "susi";
-    const section = tab === "susi" ? "susi-subject" : "";
+    const section = tab === "susi" ? "susi-subject" : tab === "university" ? "university-info" : "";
     go(tab, section);
     window.setTimeout(() => {
       const panel = document.querySelector(`#panel-${tab}`);

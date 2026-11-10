@@ -20,13 +20,14 @@ const titles = {
   schedule: "일정 및 원서접수",
   susi: "수시",
   jeongsi: "정시",
-  university: "대학",
+  university: "대학 정보",
 };
 
 const groupTitles = {
   home: "홈",
-  admission: "대입 제도",
+  admission: "대입 준비",
   info: "입시 정보",
+  university: "대학 정보",
 };
 
 const HOME_TAB = "home";
@@ -34,6 +35,7 @@ const HOME_SECTION = "";
 const DEFAULT_BY_GROUP = {
   home: { tab: "home", section: "" },
   info: { tab: "susi", section: "susi-subject" },
+  university: { tab: "university", section: "university-info" }, /* 대학별 현황 */
   admission: { tab: "curriculum", section: "" },
 };
 /* 세로≤860 + 폰 가로(짧은 높이) — 큰 폰 가로에서 데스크톱 사이드바/글자가 켜지지 않게 */
@@ -131,14 +133,21 @@ function setCrumb(tab, section) {
     return;
   }
 
-  const tabBtn = tabs.find((item) => item.dataset.tab === tab);
+  const sectionTab = section
+    ? tabs.find((item) => item.dataset.tab === tab && item.dataset.section === section)
+    : null;
+  const tabBtn = sectionTab || tabs.find((item) => item.dataset.tab === tab);
   const groupName = tabBtn?.dataset.group || "admission";
-  const label = sectionLabelFor(tab, section);
+  const sidebarSection = Boolean(sectionTab?.dataset.section);
+  const label = sidebarSection ? "" : sectionLabelFor(tab, section);
+  const currentLabel = sidebarSection
+    ? sectionTab.textContent.replace(/\s+/g, " ").trim()
+    : titles[tab] || "";
   const showSection = Boolean(label);
 
   setCrumbPart(crumbParent, true, groupTitles[groupName] || groupTitles.admission);
   setCrumbPart(crumbCurrentSep, true);
-  setCrumbPart(crumbCurrent, true, titles[tab] || "");
+  setCrumbPart(crumbCurrent, true, currentLabel);
   setCrumbPart(crumbSectionSep, showSection);
   setCrumbPart(crumbSection, showSection, label || "");
 }
@@ -151,16 +160,20 @@ window.syncGuideHash = (tab, section) => {
 
 function selectTab(name, updateHash, targetId) {
   const isHome = name === "home" || name === HOME_TAB;
-  const tab = isHome ? null : tabs.find((item) => item.dataset.tab === name) || tabs[0];
+  const preferred =
+    !isHome && targetId
+      ? tabs.find((item) => item.dataset.tab === name && item.dataset.section === targetId)
+      : null;
+  const tab =
+    isHome
+      ? null
+      : preferred ||
+        tabs.find((item) => item.dataset.tab === name && !item.dataset.section) ||
+        tabs.find((item) => item.dataset.tab === name) ||
+        tabs[0];
   const key = isHome ? "home" : tab.dataset.tab;
   const groupName = isHome ? "home" : tab.dataset.group || "admission";
-
-  tabs.forEach((item) => {
-    const active = !isHome && item === tab;
-    item.classList.toggle("is-active", active);
-    item.setAttribute("aria-selected", active ? "true" : "false");
-    item.tabIndex = active ? 0 : -1;
-  });
+  const requestedSection = targetId || tab?.dataset.section || "";
 
   panels.forEach((panel) => {
     const active = panel.id === `panel-${key}`;
@@ -170,15 +183,25 @@ function selectTab(name, updateHash, targetId) {
 
   document.title = "입시 정보 조회 서비스";
   if (!isHome && typeof Guide !== "undefined" && Guide.open) {
-    Guide.open(key, targetId);
+    Guide.open(key, requestedSection || undefined);
   }
   const panel = document.querySelector(`#panel-${key}`);
   const activeSection =
     isHome
       ? ""
-      : targetId ||
+      : requestedSection ||
         panel?.querySelector(".section-tab.is-active")?.dataset.section ||
         "";
+
+  tabs.forEach((item) => {
+    const sameTab = !isHome && item.dataset.tab === key;
+    const section = item.dataset.section || "";
+    const active = sameTab && (!section || section === activeSection);
+    item.classList.toggle("is-active", active);
+    item.setAttribute("aria-selected", active ? "true" : "false");
+    item.tabIndex = active ? 0 : -1;
+  });
+
   setCrumb(key, activeSection);
   const main = document.querySelector(".main");
   if (main) main.scrollTop = 0;
@@ -205,7 +228,7 @@ tabs.forEach((tab) => {
       sidebarToggle.setAttribute("aria-expanded", "true");
       sidebarToggle.setAttribute("aria-label", "사이드바 접기");
     }
-    selectTab(tab.dataset.tab, true);
+    selectTab(tab.dataset.tab, true, tab.dataset.section || undefined);
   });
 });
 
@@ -224,7 +247,7 @@ groups.forEach((group) => {
       setGroupOpen(group.dataset.group, false);
       return;
     }
-    /* 입시 정보 → 수시·교과 / 대입 제도 → 교육과정 체계 */
+    /* 대입 준비 → 교육과정 체계 / 입시 정보 → 수시 / 대학 정보 → 대학 상세 정보 */
     const fallback = DEFAULT_BY_GROUP[group.dataset.group] || { tab: HOME_TAB, section: HOME_SECTION };
     selectTab(fallback.tab, true, fallback.section || undefined);
   });
@@ -266,8 +289,9 @@ MOBILE_MQ.addEventListener("change", () => {
  * 라우팅 규칙 (PC·모바일·태블릿 동일)
  * - 페이지 로드(첫 화면·새로고침) → 항상 홈 (#home)
  *   (이전 해시가 남아 있어도 홈으로 초기화 — 모바일 캐시/해시 잔존 방지)
+ * - 대입 준비 그룹만 클릭 → 교육과정 체계
  * - 입시 정보 그룹만 클릭 → 수시 › 교과
- * - 대입 제도 그룹만 클릭 → 교육과정 체계
+ * - 대학 정보 그룹만 클릭 → 대학 상세 정보
  * - 로고 클릭 → 홈
  */
 groups.forEach((group) => setGroupOpen(group.dataset.group, false));

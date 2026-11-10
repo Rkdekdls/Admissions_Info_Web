@@ -16,7 +16,7 @@
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=20260309s">
+  <link rel="stylesheet" href="css/styles.css?v=20260312n">
 </head>
 <body>
   <div class="app" id="app">
@@ -55,8 +55,43 @@
             <button class="tab" type="button" role="tab" id="tab-jeongsi" aria-controls="panel-jeongsi" aria-selected="false" data-tab="jeongsi" data-group="info">
               정시
             </button>
-            <button class="tab" type="button" role="tab" id="tab-university" aria-controls="panel-university" aria-selected="false" data-tab="university" data-group="info">
-              대학
+          </div>
+        </div>
+
+        <div class="nav-group" data-group="university">
+          <button
+            class="nav-parent"
+            type="button"
+            aria-expanded="false"
+            aria-controls="university-tabs"
+          >
+            <span class="nav-parent-main">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <g class="nav-glyph" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" transform="translate(12 12) scale(0.98 0.92) translate(-12 -12)">
+                  <path d="M3 21h18"/>
+                  <path d="M6 21V12"/>
+                  <path d="M12 21V12"/>
+                  <path d="M18 21V12"/>
+                  <path d="M3.5 12h17"/>
+                  <path d="M3.5 12 12 4 20.5 12"/>
+                </g>
+              </svg>
+              <span>대학 정보</span>
+            </span>
+            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="submenu" id="university-tabs" role="tablist" aria-label="대학 정보">
+            <button class="tab" type="button" role="tab" id="tab-university-info" aria-controls="panel-university" aria-selected="false" data-tab="university" data-section="university-info" data-group="university">
+              대학별 현황
+            </button>
+            <button class="tab" type="button" role="tab" id="tab-university-map" aria-controls="panel-university" aria-selected="false" data-tab="university" data-section="university-map" data-group="university">
+              캠퍼스 지도
+            </button>
+            <button class="tab" type="button" role="tab" id="tab-university-roadview" aria-controls="panel-university" aria-selected="false" data-tab="university" data-section="university-roadview" data-group="university">
+              캠퍼스 로드뷰
             </button>
           </div>
         </div>
@@ -76,14 +111,14 @@
                   <path d="M6 12.6V16a6 3 0 0 0 12 0v-3.4"/>
                 </g>
               </svg>
-              <span>대입 제도</span>
+              <span>대입 준비</span>
             </span>
             <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
 
-          <div class="submenu" id="admission-tabs" role="tablist" aria-label="대입 제도">
+          <div class="submenu" id="admission-tabs" role="tablist" aria-label="대입 준비">
             <button class="tab" type="button" role="tab" id="tab-curriculum" aria-controls="panel-curriculum" aria-selected="false" data-tab="curriculum" data-group="admission">
               교육과정 체계
             </button>
@@ -144,8 +179,8 @@
                   </select>
                 </div>
                 <label class="home-search-field">
-                  <span class="visually-hidden">대학명 또는 모집단위 입력</span>
-                  <input type="search" name="q" placeholder="대학명 또는 모집단위 입력" autocomplete="off">
+                  <span class="visually-hidden">대학명 또는 모집단위 검색</span>
+                  <input type="search" name="q" placeholder="대학명 또는 모집단위 검색" autocomplete="off">
                 </label>
                 <button type="submit" class="home-search-btn" aria-label="검색">
                   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -213,7 +248,7 @@
                 <h2 class="home-feature-title">대학 정보 조회</h2>
                 <p class="home-feature-desc">캠퍼스 · 입학정원 · 신입생 경쟁률</p>
                 <div class="home-feature-actions">
-                  <button type="button" data-home-go="university">대학 →</button>
+                  <button type="button" data-home-go="university" data-home-section="university-info">대학 →</button>
                 </div>
               </div>
               <div class="home-feature-art" aria-hidden="true">
@@ -293,7 +328,7 @@
       <section class="panel" id="panel-exam" data-guide="exam" role="tabpanel" aria-labelledby="tab-exam" hidden></section>
       <section class="panel" id="panel-screening" data-guide="screening" role="tabpanel" aria-labelledby="tab-screening" hidden></section>
       <section class="panel" id="panel-schedule" data-guide="schedule" role="tabpanel" aria-labelledby="tab-schedule" hidden></section>
-      <section class="panel" id="panel-university" data-guide="university" role="tabpanel" aria-labelledby="tab-university" hidden></section>
+      <section class="panel" id="panel-university" data-guide="university" role="tabpanel" aria-labelledby="tab-university-info" hidden></section>
       <section class="panel" id="panel-susi" data-guide="susi" role="tabpanel" aria-labelledby="tab-susi" hidden></section>
       <section class="panel" id="panel-jeongsi" data-guide="jeongsi" role="tabpanel" aria-labelledby="tab-jeongsi" hidden></section>
     </main>
@@ -23349,8 +23384,9 @@
   <script src="js/admit-demo-units.js?v=3"></script>
   <script src="js/admit-uni-data.js?v=6"></script>
   <script src="js/admit-susi-yearly.js?v=5"></script>
-  <script src="js/guide.js?v=307"></script>
-  <script src="js/home.js?v=4"></script>
-  <script src="js/main.js?v=72"></script>
+  <script src="js/kakao-config.js?v=3"></script>
+  <script src="js/guide.js?v=363"></script>
+  <script src="js/home.js?v=6"></script>
+  <script src="js/main.js?v=77"></script>
 </body>
 </html>

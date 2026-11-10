@@ -1,0 +1,29 @@
+# Secrets / local API keys — never commit
+js/kakao-config.js
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.idea/
+.vscode/
+
+# Logs / caches
+*.log
+npm-debug.log*
+.cache/
+dist/
+build/
+__pycache__/
+*.pyc
+.Python
+.venv/
+venv/
