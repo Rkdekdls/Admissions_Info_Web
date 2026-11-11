@@ -18,25 +18,28 @@ const titles = {
   exam: "수능 및 모의고사",
   screening: "대입전형 이해",
   schedule: "일정 및 원서접수",
+  major: "전공·권장과목",
   susi: "수시",
   jeongsi: "정시",
-  university: "대학 정보",
+  university: "대학·캠퍼스 정보",
 };
 
 const groupTitles = {
   home: "홈",
-  admission: "대입 준비",
-  info: "입시 정보",
-  university: "대학 정보",
+  admission: "대입 준비 가이드",
+  major: "전공·권장과목",
+  university: "대학·캠퍼스 정보",
+  info: "수시·정시 정보",
 };
 
 const HOME_TAB = "home";
 const HOME_SECTION = "";
 const DEFAULT_BY_GROUP = {
   home: { tab: "home", section: "" },
-  info: { tab: "susi", section: "susi-subject" },
-  university: { tab: "university", section: "university-info" }, /* 대학별 현황 */
   admission: { tab: "curriculum", section: "" },
+  major: { tab: "major", section: "major-explore" },
+  university: { tab: "university", section: "university-info" },
+  info: { tab: "susi", section: "susi-subject" },
 };
 /* 세로≤860 + 폰 가로(짧은 높이) — 큰 폰 가로에서 데스크톱 사이드바/글자가 켜지지 않게 */
 const MOBILE_MQ = window.matchMedia(
@@ -247,7 +250,7 @@ groups.forEach((group) => {
       setGroupOpen(group.dataset.group, false);
       return;
     }
-    /* 대입 준비 → 교육과정 체계 / 입시 정보 → 수시 / 대학 정보 → 대학 상세 정보 */
+    /* 대입 준비 가이드 → 교육과정 / 전공·권장과목 → 전공 탐색 / 대학·캠퍼스 → 대학별 현황 / 수시·정시 → 수시 */
     const fallback = DEFAULT_BY_GROUP[group.dataset.group] || { tab: HOME_TAB, section: HOME_SECTION };
     selectTab(fallback.tab, true, fallback.section || undefined);
   });
@@ -287,15 +290,29 @@ MOBILE_MQ.addEventListener("change", () => {
 
 /*
  * 라우팅 규칙 (PC·모바일·태블릿 동일)
- * - 페이지 로드(첫 화면·새로고침) → 항상 홈 (#home)
- *   (이전 해시가 남아 있어도 홈으로 초기화 — 모바일 캐시/해시 잔존 방지)
- * - 대입 준비 그룹만 클릭 → 교육과정 체계
- * - 입시 정보 그룹만 클릭 → 수시 › 교과
- * - 대학 정보 그룹만 클릭 → 대학 상세 정보
+ * - 첫 인입(해시 없음) → 홈 (#home)
+ * - 새로고침 → 현재 해시(탭/섹션) 유지
  * - 로고 클릭 → 홈
+ * - 대입 준비 가이드 그룹만 클릭 → 교육과정 체계
+ * - 전공·권장과목 그룹만 클릭 → 전공 탐색
+ * - 대학·캠퍼스 정보 그룹만 클릭 → 대학별 현황
+ * - 수시·정시 정보 그룹만 클릭 → 수시 › 교과
  */
+function resolveInitialRoute() {
+  const { tab, section } = parseRoute();
+  if (!tab) return { tab: HOME_TAB, section: HOME_SECTION };
+  if (tab === HOME_TAB) return { tab: HOME_TAB, section: HOME_SECTION };
+  if (!document.querySelector(`#panel-${tab}`)) {
+    return { tab: HOME_TAB, section: HOME_SECTION };
+  }
+  return { tab, section: section || "" };
+}
+
 groups.forEach((group) => setGroupOpen(group.dataset.group, false));
-selectTab(HOME_TAB, true);
+{
+  const initial = resolveInitialRoute();
+  selectTab(initial.tab, true, initial.section || undefined);
+}
 
 const brandHome = document.getElementById("brand-home");
 if (brandHome) {

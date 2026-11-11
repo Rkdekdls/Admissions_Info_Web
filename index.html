@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -16,7 +16,7 @@
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=20260312z">
+  <link rel="stylesheet" href="css/styles.css?v=20260312cw">
 </head>
 <body>
   <div class="app" id="app">
@@ -27,75 +27,6 @@
       </a>
 
       <nav class="nav" aria-label="주요 메뉴">
-        <div class="nav-group" data-group="info">
-          <button
-            class="nav-parent"
-            type="button"
-            aria-expanded="false"
-            aria-controls="info-tabs"
-          >
-            <span class="nav-parent-main">
-              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <g class="nav-glyph" fill="none" stroke="currentColor" stroke-width="2.06" stroke-linecap="round" stroke-linejoin="round" transform="translate(12 12) scale(0.875) translate(-12 -12)">
-                  <circle cx="11" cy="11" r="8"/>
-                  <path d="m21 21-4.35-4.35"/>
-                </g>
-              </svg>
-              <span>입시 정보</span>
-            </span>
-            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-
-          <div class="submenu" id="info-tabs" role="tablist" aria-label="입시 정보">
-            <button class="tab" type="button" role="tab" id="tab-susi" aria-controls="panel-susi" aria-selected="false" data-tab="susi" data-group="info">
-              수시
-            </button>
-            <button class="tab" type="button" role="tab" id="tab-jeongsi" aria-controls="panel-jeongsi" aria-selected="false" data-tab="jeongsi" data-group="info">
-              정시
-            </button>
-          </div>
-        </div>
-
-        <div class="nav-group" data-group="university">
-          <button
-            class="nav-parent"
-            type="button"
-            aria-expanded="false"
-            aria-controls="university-tabs"
-          >
-            <span class="nav-parent-main">
-              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <g class="nav-glyph" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" transform="translate(12 12) scale(0.98 0.92) translate(-12 -12)">
-                  <path d="M3 21h18"/>
-                  <path d="M6 21V12"/>
-                  <path d="M12 21V12"/>
-                  <path d="M18 21V12"/>
-                  <path d="M3.5 12h17"/>
-                  <path d="M3.5 12 12 4 20.5 12"/>
-                </g>
-              </svg>
-              <span>대학 정보</span>
-            </span>
-            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-
-          <div class="submenu" id="university-tabs" role="tablist" aria-label="대학 정보">
-            <button class="tab" type="button" role="tab" id="tab-university-info" aria-controls="panel-university" aria-selected="false" data-tab="university" data-section="university-info" data-group="university">
-              대학별 현황
-            </button>
-            <button class="tab" type="button" role="tab" id="tab-university-map" aria-controls="panel-university" aria-selected="false" data-tab="university" data-section="university-map" data-group="university">
-              캠퍼스 지도
-            </button>
-            <button class="tab" type="button" role="tab" id="tab-university-roadview" aria-controls="panel-university" aria-selected="false" data-tab="university" data-section="university-roadview" data-group="university">
-              캠퍼스 로드뷰
-            </button>
-          </div>
-        </div>
-
         <div class="nav-group" data-group="admission">
           <button
             class="nav-parent"
@@ -105,20 +36,20 @@
           >
             <span class="nav-parent-main">
               <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <g class="nav-glyph" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" transform="translate(12 12) scale(1.092) translate(-12 -12)">
+                <g class="nav-glyph" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" transform="translate(12 12) scale(1.1) translate(-12 -12)">
                   <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/>
                   <path d="M22 10v6"/>
                   <path d="M6 12.6V16a6 3 0 0 0 12 0v-3.4"/>
                 </g>
               </svg>
-              <span>대입 준비</span>
+              <span>대입 준비 가이드</span>
             </span>
             <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
 
-          <div class="submenu" id="admission-tabs" role="tablist" aria-label="대입 준비">
+          <div class="submenu" id="admission-tabs" role="tablist" aria-label="대입 준비 가이드">
             <button class="tab" type="button" role="tab" id="tab-curriculum" aria-controls="panel-curriculum" aria-selected="false" data-tab="curriculum" data-group="admission">
               교육과정 체계
             </button>
@@ -133,6 +64,111 @@
             </button>
             <button class="tab" type="button" role="tab" id="tab-schedule" aria-controls="panel-schedule" aria-selected="false" data-tab="schedule" data-group="admission">
               일정 및 원서접수
+            </button>
+          </div>
+        </div>
+
+        <div class="nav-group" data-group="major">
+          <button
+            class="nav-parent"
+            type="button"
+            aria-expanded="false"
+            aria-controls="major-tabs"
+          >
+            <span class="nav-parent-main">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <g class="nav-glyph" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" transform="translate(12 12) scale(1) translate(-12 -12)">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                  <path d="M8 7h8"/>
+                  <path d="M8 11h6"/>
+                </g>
+              </svg>
+              <span>전공·권장과목</span>
+            </span>
+            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="submenu" id="major-tabs" role="tablist" aria-label="전공·권장과목">
+            <button class="tab" type="button" role="tab" id="tab-major-explore" aria-controls="panel-major" aria-selected="false" data-tab="major" data-section="major-explore" data-group="major">
+              전공 탐색
+            </button>
+            <button class="tab" type="button" role="tab" id="tab-major-by-field" aria-controls="panel-major" aria-selected="false" data-tab="major" data-section="major-by-field" data-group="major">
+              전공별 권장과목
+            </button>
+            <button class="tab" type="button" role="tab" id="tab-major-by-univ" aria-controls="panel-major" aria-selected="false" data-tab="major" data-section="major-by-univ" data-group="major">
+              대학별 권장과목
+            </button>
+          </div>
+        </div>
+
+        <div class="nav-group" data-group="university">
+          <button
+            class="nav-parent"
+            type="button"
+            aria-expanded="false"
+            aria-controls="university-tabs"
+          >
+            <span class="nav-parent-main">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <g class="nav-glyph" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" transform="translate(12 12) scale(1) translate(-12 -12)">
+                  <path d="M3 21h18"/>
+                  <path d="M6 21V12"/>
+                  <path d="M12 21V12"/>
+                  <path d="M18 21V12"/>
+                  <path d="M3.5 12h17"/>
+                  <path d="M3.5 12 12 4 20.5 12"/>
+                </g>
+              </svg>
+              <span>대학·캠퍼스 정보</span>
+            </span>
+            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="submenu" id="university-tabs" role="tablist" aria-label="대학·캠퍼스 정보">
+            <button class="tab" type="button" role="tab" id="tab-university-info" aria-controls="panel-university" aria-selected="false" data-tab="university" data-section="university-info" data-group="university">
+              대학별 현황
+            </button>
+            <button class="tab" type="button" role="tab" id="tab-university-map" aria-controls="panel-university" aria-selected="false" data-tab="university" data-section="university-map" data-group="university">
+              캠퍼스 지도
+            </button>
+            <button class="tab" type="button" role="tab" id="tab-university-roadview" aria-controls="panel-university" aria-selected="false" data-tab="university" data-section="university-roadview" data-group="university">
+              캠퍼스 로드뷰
+            </button>
+          </div>
+        </div>
+
+        <div class="nav-group" data-group="info">
+          <button
+            class="nav-parent"
+            type="button"
+            aria-expanded="false"
+            aria-controls="info-tabs"
+          >
+            <span class="nav-parent-main">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <g class="nav-glyph" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" transform="translate(12 12) scale(1) translate(-12 -12)">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.35-4.35"/>
+                </g>
+              </svg>
+              <span>수시·정시 정보</span>
+            </span>
+            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="submenu" id="info-tabs" role="tablist" aria-label="수시·정시 정보">
+            <button class="tab" type="button" role="tab" id="tab-susi" aria-controls="panel-susi" aria-selected="false" data-tab="susi" data-group="info">
+              수시
+            </button>
+            <button class="tab" type="button" role="tab" id="tab-jeongsi" aria-controls="panel-jeongsi" aria-selected="false" data-tab="jeongsi" data-group="info">
+              정시
             </button>
           </div>
         </div>
@@ -328,6 +364,7 @@
       <section class="panel" id="panel-exam" data-guide="exam" role="tabpanel" aria-labelledby="tab-exam" hidden></section>
       <section class="panel" id="panel-screening" data-guide="screening" role="tabpanel" aria-labelledby="tab-screening" hidden></section>
       <section class="panel" id="panel-schedule" data-guide="schedule" role="tabpanel" aria-labelledby="tab-schedule" hidden></section>
+      <section class="panel" id="panel-major" data-guide="major" role="tabpanel" aria-labelledby="tab-major-explore" hidden></section>
       <section class="panel" id="panel-university" data-guide="university" role="tabpanel" aria-labelledby="tab-university-info" hidden></section>
       <section class="panel" id="panel-susi" data-guide="susi" role="tabpanel" aria-labelledby="tab-susi" hidden></section>
       <section class="panel" id="panel-jeongsi" data-guide="jeongsi" role="tabpanel" aria-labelledby="tab-jeongsi" hidden></section>
@@ -23382,11 +23419,12 @@
   <!-- page-source:end -->
   <script src="js/web-info.js?v=181"></script>
   <script src="js/admit-demo-units.js?v=3"></script>
+  <script src="js/admit-univ-recommend.js?v=4"></script>
   <script src="js/admit-uni-data.js?v=6"></script>
   <script src="js/admit-susi-yearly.js?v=5"></script>
   <script src="js/kakao-config.js?v=3"></script>
-  <script src="js/guide.js?v=367"></script>
+  <script src="js/guide.js?v=417"></script>
   <script src="js/home.js?v=6"></script>
-  <script src="js/main.js?v=77"></script>
+  <script src="js/main.js?v=81"></script>
 </body>
 </html>

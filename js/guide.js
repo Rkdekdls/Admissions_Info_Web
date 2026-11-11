@@ -199,7 +199,7 @@ const Guide = (() => {
     },
     university: {
       kicker: "",
-      title: "대학 정보",
+      title: "대학·캠퍼스 정보",
       numberNav: false,
       hideSectionNav: true,
       search: "university",
@@ -212,6 +212,37 @@ const Guide = (() => {
         { id: "university-info", title: "", heading: "대학별 현황", pages: [] },
         { id: "university-map", title: "", heading: "캠퍼스 지도", pages: [] },
         { id: "university-roadview", title: "", heading: "캠퍼스 로드뷰", pages: [] },
+      ],
+    },
+    major: {
+      kicker: "",
+      title: "전공·권장과목",
+      numberNav: false,
+      hideSectionNav: true,
+      nav: [
+        { href: "#major-explore", label: "전공 탐색" },
+        { href: "#major-by-field", label: "전공별 권장과목" },
+        { href: "#major-by-univ", label: "대학별 권장과목" },
+      ],
+      blocks: [
+        {
+          id: "major-explore",
+          title: "",
+          heading: "전공 탐색",
+          pages: [],
+        },
+        {
+          id: "major-by-field",
+          title: "",
+          heading: "전공별 권장과목",
+          pages: [],
+        },
+        {
+          id: "major-by-univ",
+          title: "",
+          heading: "대학별 권장과목",
+          pages: [],
+        },
       ],
     },
   };
@@ -573,6 +604,572 @@ const Guide = (() => {
           </button>`
       )
       .join("");
+  }
+
+  /* 드롭다운 항목 = 표 셀 값 (동일 문자열로 구성·노출) */
+  /* 수시·정시 데모 30건 모집단위명 = 전공 탐색 전공명 (이름 그대로) */
+  function normalizeMajorExploreName(unit) {
+    return String(unit || "").trim();
+  }
+
+  function majorExploreMetaFromUnit(item, majorName) {
+    const unit = String(item.unit || "");
+    const theme = String(item.theme || "");
+    const blob = `${unit} ${majorName} ${theme}`;
+    let track = "공학계열";
+    let subtrack = "융합";
+    if (
+      item.track === "인문" ||
+      /교육|행정|경영|관광|경찰|커뮤니케이션|보건행정/.test(blob)
+    ) {
+      track = "인문사회계열";
+      if (/초등|교육/.test(blob)) subtrack = "교육";
+      else if (/경영|관광/.test(blob)) subtrack = "경영경제";
+      else if (/간호|보건/.test(blob)) subtrack = "간호보건";
+      else if (/행정|경찰/.test(blob)) subtrack = "사회과학";
+      else if (/커뮤니케이션/.test(blob)) subtrack = "미디어";
+      else subtrack = "인문일반";
+    } else if (/의예|치의|한의|약학|수의|간호|생명|med|nurse/.test(blob)) {
+      track = "자연과학계열";
+      if (/간호|보건|nurse/.test(blob)) subtrack = "간호보건";
+      else if (/의예|치의|한의|약학|수의|med/.test(blob)) subtrack = "의학약학";
+      else subtrack = "자연일반";
+    } else {
+      track = "공학계열";
+      if (/반도체|전기|전자|전산|소프트|인공지능|IT|계약|advanced|contract/.test(blob)) {
+        subtrack = "전기전자컴퓨터";
+      } else if (/기계|항공|우주/.test(blob)) subtrack = "기계";
+      else subtrack = "공학일반";
+    }
+    return { track, subtrack };
+  }
+
+  function majorExploreKeywordsFor(name) {
+    const known = {
+      의예과: ["의학", "임상", "기초"],
+      치의예과: ["치의학", "구강", "임상"],
+      한의예과: ["한의학", "한방", "임상"],
+      수의예과: ["수의", "동물", "임상"],
+      약학과: ["약학", "약물", "제제"],
+      간호학과: ["간호", "임상", "보건"],
+      초등교육과: ["초등", "교육", "교과"],
+      보건행정학과: ["보건", "행정", "의료"],
+      수학교육과: ["수학", "교육", "교과"],
+      영어교육과: ["영어", "교육", "언어"],
+      한국어교육과: ["한국어", "교육", "언어"],
+      "반도체시스템공학과(계약)": ["반도체", "회로", "공정"],
+      "소프트웨어융합학과(계약)": ["소프트웨어", "융합", "개발"],
+      IT계약학과: ["IT", "계약", "실무"],
+      전산학부: ["전산", "알고리즘", "시스템"],
+      반도체공학과: ["반도체", "회로", "공정"],
+      인공지능학과: ["AI", "데이터", "학습"],
+      항공우주공학과: ["항공", "우주", "역학"],
+      전기전자공학과: ["전기", "전자", "회로"],
+      커뮤니케이션학부: ["미디어", "소통", "콘텐츠"],
+      경영학부: ["경영", "마케팅", "회계"],
+      기계공학부: ["기계", "설계", "제조"],
+      관광경영학과: ["관광", "경영", "서비스"],
+      경찰행정학부: ["경찰", "행정", "공공"],
+      "계약학과(삼성디스플레이)": ["계약", "산업", "실무"],
+    };
+    if (known[name]) return known[name];
+    const base = String(name || "").replace(/\([^)]*\)/g, "").trim();
+    if (known[base]) return known[base];
+    const parts = base.match(/.{1,3}/g) || [name || "전공"];
+    return parts.slice(0, 3);
+  }
+
+  function admitTypesForDemoUnit(item) {
+    const types = [];
+    if (Array.isArray(item?.교과) && item.교과.length) types.push("교과");
+    if (Array.isArray(item?.종합) && item.종합.length) types.push("종합");
+    if (Array.isArray(item?.논술) && item.논술.length) types.push("논술");
+    if (item?.jeongsi) types.push("정시");
+    return types;
+  }
+
+  function buildMajorExploreRowsFromDemo() {
+    const units = window.ADMIT_DEMO_UNITS || [];
+    const byName = new Map();
+    units.forEach((item) => {
+      const name = normalizeMajorExploreName(item.unit);
+      if (!name) return;
+      if (!byName.has(name)) {
+        const meta = majorExploreMetaFromUnit(item, name);
+        byName.set(name, {
+          track: meta.track,
+          subtrack: meta.subtrack,
+          name,
+          keywords: majorExploreKeywordsFor(name),
+        });
+      }
+    });
+    return [...byName.values()].sort((a, b) => {
+      if (a.track !== b.track) return a.track.localeCompare(b.track, "ko");
+      if (a.subtrack !== b.subtrack) return a.subtrack.localeCompare(b.subtrack, "ko");
+      return a.name.localeCompare(b.name, "ko");
+    });
+  }
+
+  function getMajorExploreRows() {
+    if (!getMajorExploreRows._cache) {
+      getMajorExploreRows._cache = buildMajorExploreRowsFromDemo();
+    }
+    return getMajorExploreRows._cache;
+  }
+
+  function majorExploreUniversitiesFor(majorName) {
+    return (window.ADMIT_DEMO_UNITS || [])
+      .filter((item) => normalizeMajorExploreName(item.unit) === majorName)
+      .map((item) => ({
+        region: item.region,
+        univ: item.univ,
+        unit: item.unit,
+        types: admitTypesForDemoUnit(item),
+      }));
+  }
+
+  function majorExploreOptionHtml(values) {
+    return values
+      .map((label) => `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`)
+      .join("");
+  }
+
+  function majorExploreHtml() {
+    const exploreRows = getMajorExploreRows();
+    const tracks = [...new Set(exploreRows.map((row) => row.track))];
+    const subtracks = [...new Set(exploreRows.map((row) => row.subtrack))];
+    const majors = exploreRows.map((row) => row.name);
+    const rows = exploreRows
+      .map((item, index, list) => {
+        const classes = [];
+        if (index % 2 === 1) classes.push("is-alt");
+        if (index === list.length - 1) classes.push("is-last-visible");
+        const cls = classes.length ? ` class="${classes.join(" ")}"` : "";
+        const keywords = (item.keywords || [])
+          .slice(0, 3)
+          .map((word) => `<span class="admit-major-tag">#${escapeHtml(word)}</span>`)
+          .join(" ");
+        return `<tr data-major-row data-track="${escapeHtml(item.track)}" data-subtrack="${escapeHtml(
+          item.subtrack
+        )}" data-major="${escapeHtml(item.name)}"${cls}>
+            <td>${escapeHtml(item.track)}</td>
+            <td>${escapeHtml(item.subtrack)}</td>
+            <td class="admit-data-name">${escapeHtml(item.name)}</td>
+            <td class="admit-major-keywords">${keywords}</td>
+            <td><button type="button" class="admit-data-view" data-major-view>보기</button></td>
+          </tr>`;
+      })
+      .join("");
+
+    return `<section class="admit-search" data-admit-search data-search-type="major-explore">
+      <div class="admit-search-bar">
+        <select class="admit-search-select" name="track" aria-label="전공 계열">
+          <option value="">전공 계열 전체</option>
+          ${majorExploreOptionHtml(tracks)}
+        </select>
+        <select class="admit-search-select" name="subtrack" aria-label="전공 세부계열">
+          <option value="">전공 세부계열 전체</option>
+          ${majorExploreOptionHtml(subtracks)}
+        </select>
+        <select class="admit-search-select" name="major" aria-label="전공">
+          <option value="">전공 전체</option>
+          ${majorExploreOptionHtml(majors)}
+        </select>
+      </div>
+      <div class="admit-list-head">
+        <h2 class="title-3 admit-list-title">전공 목록</h2>
+      </div>
+      <div class="admit-data-wrap">
+        <table class="admit-data-table comparison-table" data-major-table>
+          <thead>
+            <tr>
+              <th style="padding: 3mm 2mm !important; height: 12mm !important;">전공 계열</th>
+              <th style="padding: 3mm 2mm !important; height: 12mm !important;">전공 세부계열</th>
+              <th style="padding: 3mm 2mm !important; height: 12mm !important;">전공명</th>
+              <th style="padding: 3mm 2mm !important; height: 12mm !important;">핵심 키워드</th>
+              <th style="padding: 3mm 2mm !important; height: 12mm !important;">상세</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </section>`;
+  }
+
+  const MAJOR_BY_UNIV_ZONES = [
+    { id: "sudo", label: "수도권", regions: ["서울", "경기", "인천"] },
+    { id: "gangwon", label: "강원권", regions: ["강원"] },
+    { id: "chungcheong", label: "충청권", regions: ["대전", "세종", "충북", "충남"] },
+    { id: "honam", label: "호남권", regions: ["광주", "전북", "전남"] },
+    { id: "yeongnam", label: "영남권", regions: ["부산", "대구", "울산", "경북", "경남"] },
+    { id: "jeju", label: "제주권", regions: ["제주"] },
+  ];
+
+  function majorByUnivSource() {
+    return (window.ADMIT_DEMO_UNIVS || [])
+      .map((row) =>
+        Array.isArray(row)
+          ? { name: row[0], region: row[1] }
+          : { name: row.name, region: row.region }
+      )
+      .filter((item) => item.name)
+      .sort((a, b) => a.name.localeCompare(b.name, "ko"));
+  }
+
+  function majorByUnivHtml() {
+    const univs = majorByUnivSource();
+    const univCount = univs.length;
+    const materialCount = univCount * 42;
+    const zoneBlocks = MAJOR_BY_UNIV_ZONES.map((zone) => {
+      const items = univs.filter((item) => zone.regions.includes(item.region));
+      if (!items.length) return "";
+      const cells = items
+        .map(
+          (item) => `<button type="button" class="major-by-univ-item" data-univ="${escapeHtml(
+            item.name
+          )}" data-region="${escapeHtml(item.region)}" data-zone="${escapeHtml(zone.id)}">
+            <span class="major-by-univ-item-name">${escapeHtml(item.name)}</span>
+            <span class="major-by-univ-item-meta">
+              <span class="major-by-univ-item-region">${escapeHtml(item.region)}</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>`
+        )
+        .join("");
+      return `<section class="major-by-univ-zone" data-zone-block="${escapeHtml(zone.id)}">
+        <h3 class="major-by-univ-zone-head">
+          <span class="major-by-univ-zone-label">${escapeHtml(zone.label)}</span><span class="major-by-univ-zone-count" data-zone-count>(${items.length}개)</span>
+        </h3>
+        <div class="major-by-univ-grid">${cells}</div>
+      </section>`;
+    }).join("");
+
+    const regionPriority = ["서울", "경기"];
+    const regionOptions = [...new Set(univs.map((item) => item.region))]
+      .sort((a, b) => {
+        const ai = regionPriority.indexOf(a);
+        const bi = regionPriority.indexOf(b);
+        if (ai !== -1 || bi !== -1) {
+          if (ai === -1) return 1;
+          if (bi === -1) return -1;
+          return ai - bi;
+        }
+        return a.localeCompare(b, "ko");
+      })
+      .map((region) => `<option value="${escapeHtml(region)}">${escapeHtml(region)}</option>`)
+      .join("");
+
+    return `<section class="admit-search" data-admit-search data-search-type="major-by-univ">
+      <div class="major-by-univ-summary">
+        <div class="major-by-univ-stats">
+          <div class="major-by-univ-stat">
+            <span class="major-by-univ-stat-label">발표 대학</span>
+            <strong class="major-by-univ-stat-value" data-major-by-univ-univ-count>${univCount.toLocaleString("ko-KR")}개</strong>
+          </div>
+          <div class="major-by-univ-stat">
+            <span class="major-by-univ-stat-label">발표 자료</span>
+            <strong class="major-by-univ-stat-value" data-major-by-univ-material-count>${materialCount.toLocaleString("ko-KR")}건</strong>
+          </div>
+        </div>
+        <div class="major-by-univ-notice">
+          <p class="major-by-univ-notice-line">
+            <span class="admit-detail-note-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                <path d="M12 10.5v6M12 7.5h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span>한국대학교육협의회(대교협) 자료를 바탕으로 대학별 전공 연계 권장과목을 정리했습니다.</span>
+          </p>
+          <p class="major-by-univ-notice-line">
+            <span class="admit-detail-note-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                <path d="M12 10.5v6M12 7.5h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span>권장과목은 대학과 학년도에 따라 달라질 수 있으므로, 지원하려는 대학의 해당 학년도 모집요강도 함께 확인해 주세요.</span>
+          </p>
+        </div>
+      </div>
+      <div class="admit-search-bar">
+        <label class="admit-search-field">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m20 20-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <input type="search" name="keyword" placeholder="대학명 검색" aria-label="대학명 검색">
+        </label>
+        <select class="admit-search-select" name="zone" aria-label="권역">
+          <option value="">권역 전체</option>
+          ${MAJOR_BY_UNIV_ZONES.map(
+            (zone) => `<option value="${escapeHtml(zone.id)}">${escapeHtml(zone.label)}</option>`
+          ).join("")}
+        </select>
+        <select class="admit-search-select" name="region" aria-label="지역">
+          <option value="">지역 전체</option>
+          ${regionOptions}
+        </select>
+      </div>
+      <div class="admit-list-head major-by-univ-list-head">
+        <h2 class="title-3 admit-list-title">대학 목록(${univCount.toLocaleString("ko-KR")}건)</h2>
+      </div>
+      <div class="major-by-univ-list" data-major-by-univ-list>
+        ${zoneBlocks || `<p class="major-by-univ-empty">표시할 대학이 없습니다.</p>`}
+      </div>
+      <p class="major-by-univ-empty" data-major-by-univ-empty hidden>검색 조건에 맞는 대학이 없습니다.</p>
+    </section>`;
+  }
+
+  function closeMajorByUnivDetailModal() {
+    const root = document.getElementById("major-by-univ-detail-root");
+    if (!root) return;
+    root.hidden = true;
+    document.body.style.removeProperty("overflow");
+  }
+
+  function ensureMajorByUnivDetailModal() {
+    let root = document.getElementById("major-by-univ-detail-root");
+    if (root) return root;
+    root = document.createElement("div");
+    root.id = "major-by-univ-detail-root";
+    root.className = "admit-detail-root major-by-univ-detail-root";
+    root.hidden = true;
+    root.innerHTML = `
+      <button type="button" class="admit-detail-backdrop" data-major-by-univ-detail-close aria-label="상세 닫기"></button>
+      <div class="admit-detail-dialog major-by-univ-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="major-by-univ-detail-crumb">
+        <div class="admit-detail-head">
+          <div class="admit-detail-title-wrap">
+            <p class="admit-detail-crumb" id="major-by-univ-detail-crumb"></p>
+          </div>
+          <div class="admit-detail-head-actions">
+            <div class="admit-detail-tags" data-major-by-univ-detail-tags></div>
+            <button type="button" class="admit-detail-close" data-major-by-univ-detail-close aria-label="닫기">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="admit-detail-body major-by-univ-detail-body" data-major-by-univ-detail-body></div>
+      </div>`;
+    document.body.appendChild(root);
+    root.addEventListener("click", (event) => {
+      if (event.target.closest("[data-major-by-univ-detail-close]")) {
+        closeMajorByUnivDetailModal();
+      }
+    });
+    return root;
+  }
+
+  function resolveMajorByUnivRecommendRows(univName) {
+    const target = String(univName || "").trim();
+    const targetShort = shortUnivLabel(target);
+    const packs = window.ADMIT_UNIV_RECOMMEND || {};
+    const pack =
+      packs[target] ||
+      Object.entries(packs).find(([name]) => shortUnivLabel(name) === targetShort)?.[1] ||
+      null;
+    const demoUnits = (window.ADMIT_DEMO_UNITS || []).filter((item) => {
+      const name = String(item.univ || "").trim();
+      return name === target || shortUnivLabel(name) === targetShort;
+    });
+    if (Array.isArray(pack) && pack.length) {
+      const rows = pack.map((row) => ({ ...row }));
+      /* 수시·정시 데모 모집단위가 목록에 없으면 맨 앞에 보강 */
+      demoUnits.forEach((item) => {
+        const unit = String(item.unit || "").trim();
+        if (!unit) return;
+        if (rows.some((row) => row.unit === unit)) return;
+        rows.unshift({
+          unit,
+          core: "계열 구분 없이 자신의 진로 및 적성을 고려하여 교과목 선택 이수",
+          recommend: "-",
+          guide: "-",
+        });
+      });
+      return rows;
+    }
+    const rows = demoUnits.map((item) => ({
+      unit: item.unit,
+      core: "계열 구분 없이 자신의 진로 및 적성을 고려하여 교과목 선택 이수",
+      recommend: "-",
+      guide: "-",
+    }));
+    return rows.length
+      ? rows
+      : [
+          {
+            unit: "모집단위",
+            core: "계열 구분 없이 자신의 진로 및 적성을 고려하여 교과목 선택 이수",
+            recommend: "-",
+            guide: "-",
+          },
+        ];
+  }
+
+  function majorByUnivRecommendRowHtml(row, index, list) {
+    const classes = [];
+    if (index % 2 === 1) classes.push("is-alt");
+    if (index === list.length - 1) classes.push("is-last-visible");
+    const cls = classes.length ? ` class="${classes.join(" ")}"` : "";
+    const cells = [`<td>${escapeHtml(row.unit || "-")}</td>`];
+    if (!row.coreSkip) {
+      const rs = row.coreRowspan > 1 ? ` rowspan="${row.coreRowspan}"` : "";
+      const cs = row.coreColspan > 1 ? ` colspan="${row.coreColspan}"` : "";
+      cells.push(`<td${rs}${cs}>${escapeHtml(row.core || "-")}</td>`);
+    }
+    if (!(row.coreColspan > 1) && !row.recommendSkip) {
+      const rs = row.recommendRowspan > 1 ? ` rowspan="${row.recommendRowspan}"` : "";
+      cells.push(`<td${rs}>${escapeHtml(row.recommend || "-")}</td>`);
+    }
+    /* 비고: 우선 전부 하이픈 */
+    cells.push(`<td>-</td>`);
+    return `<tr${cls}>${cells.join("")}</tr>`;
+  }
+
+  function openMajorByUnivRecommendDetail(univName, meta = {}) {
+    const univ = String(univName || "").trim();
+    if (!univ) return;
+    /* 팝업 제목: 줄임말 없이 정식명(캠퍼스 포함) */
+    const label = univ;
+    const zoneLabel = String(meta.zoneLabel || "").trim();
+    const region = String(meta.region || "").trim();
+    const rows = resolveMajorByUnivRecommendRows(univ);
+    const root = ensureMajorByUnivDetailModal();
+    const crumb = root.querySelector("#major-by-univ-detail-crumb");
+    const tags = root.querySelector("[data-major-by-univ-detail-tags]");
+    const body = root.querySelector("[data-major-by-univ-detail-body]");
+
+    if (crumb) crumb.textContent = label;
+    if (tags) {
+      const metaTags = [
+        zoneLabel ? `<span class="admit-detail-tag">${escapeHtml(zoneLabel)}</span>` : "",
+        region ? `<span class="admit-detail-tag">${escapeHtml(region)}</span>` : "",
+      ]
+        .filter(Boolean)
+        .join("");
+      tags.innerHTML = `
+        ${metaTags}
+        <button type="button" class="admit-detail-link-btn is-unlinked" aria-disabled="true">
+          PDF 뷰어
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
+            <path d="M14 5h5v5M19 5l-9 9M10 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>`;
+    }
+
+    const tableRows = rows.map((row, index, list) => majorByUnivRecommendRowHtml(row, index, list)).join("");
+
+    if (body) {
+      body.innerHTML = `
+        <section class="admit-detail-section">
+          <div class="admit-detail-table-wrap">
+            <table class="admit-detail-table" data-major-by-univ-recommend-table>
+              <colgroup>
+                <col style="width:16%">
+                <col style="width:40%">
+                <col style="width:36%">
+                <col style="width:8%">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th scope="col" rowspan="2">모집단위</th>
+                  <th scope="col" colspan="2">반영과목</th>
+                  <th scope="col" rowspan="2">비고</th>
+                </tr>
+                <tr>
+                  <th scope="col">핵심과목</th>
+                  <th scope="col">권장과목</th>
+                </tr>
+              </thead>
+              <tbody>${tableRows}</tbody>
+            </table>
+          </div>
+        </section>`;
+    }
+
+    root.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  function bindMajorByUniv(root) {
+    if (!root || root.dataset.boundMajorByUniv === "1") return;
+    root.dataset.boundMajorByUniv = "1";
+    enhanceAdmitSelects(root);
+
+    const majorByUnivColCount = () => {
+      const w = window.innerWidth || 0;
+      if (w <= 560) return 1;
+      if (w <= 900) return 2;
+      if (w <= 1100) return 3;
+      return 4;
+    };
+
+    const markZoneLastRows = (block) => {
+      const items = [...block.querySelectorAll(".major-by-univ-item")];
+      const visibleItems = items.filter((item) => !item.hidden);
+      items.forEach((item) => item.classList.remove("is-zone-last-row"));
+      if (!visibleItems.length) return;
+      const cols = majorByUnivColCount();
+      const start = Math.floor((visibleItems.length - 1) / cols) * cols;
+      visibleItems.slice(start).forEach((item) => item.classList.add("is-zone-last-row"));
+    };
+
+    const apply = () => {
+      const keyword = (root.querySelector('input[name="keyword"]')?.value || "")
+        .trim()
+        .toLowerCase();
+      const zone = root.querySelector('select[name="zone"]')?.value || "";
+      const region = root.querySelector('select[name="region"]')?.value || "";
+      let visibleTotal = 0;
+      root.querySelectorAll("[data-zone-block]").forEach((block) => {
+        const items = [...block.querySelectorAll(".major-by-univ-item")];
+        let visible = 0;
+        items.forEach((item) => {
+          const name = (item.dataset.univ || "").toLowerCase();
+          const itemRegion = item.dataset.region || "";
+          const itemZone = item.dataset.zone || "";
+          const zoneOk = !zone || itemZone === zone;
+          const regionOk = !region || itemRegion === region;
+          const keywordOk = !keyword || name.includes(keyword);
+          const show = zoneOk && regionOk && keywordOk;
+          item.hidden = !show;
+          if (show) visible += 1;
+        });
+        block.hidden = visible === 0;
+        const countEl = block.querySelector("[data-zone-count]");
+        if (countEl) countEl.textContent = `(${visible}개)`;
+        markZoneLastRows(block);
+        visibleTotal += visible;
+      });
+      const empty = root.querySelector("[data-major-by-univ-empty]");
+      if (empty) empty.hidden = visibleTotal !== 0;
+      const list = root.querySelector("[data-major-by-univ-list]");
+      if (list) list.hidden = visibleTotal === 0;
+    };
+
+    root.querySelector('input[name="keyword"]')?.addEventListener("input", apply);
+    root.querySelector('select[name="zone"]')?.addEventListener("change", apply);
+    root.querySelector('select[name="region"]')?.addEventListener("change", apply);
+    window.addEventListener("resize", apply);
+    root.querySelector("[data-major-by-univ-list]")?.addEventListener("click", (event) => {
+      const item = event.target.closest(".major-by-univ-item");
+      if (!item) return;
+      const name = item.dataset.univ || "";
+      if (!name) return;
+      const zoneId = item.dataset.zone || "";
+      const zoneLabel =
+        MAJOR_BY_UNIV_ZONES.find((zone) => zone.id === zoneId)?.label || "";
+      openMajorByUnivRecommendDetail(name, {
+        zoneLabel,
+        region: item.dataset.region || "",
+      });
+    });
+    apply();
   }
 
   function admitSearchHtml(type) {
@@ -1606,15 +2203,84 @@ const Guide = (() => {
     renderJeongsiChart(root);
   }
 
+  function fillMajorExploreSelect(select, allLabel, values, current) {
+    if (!select) return;
+    const keep = values.includes(current) ? current : "";
+    select.innerHTML = [
+      `<option value="">${allLabel}</option>`,
+      ...values.map(
+        (value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`
+      ),
+    ].join("");
+    select.value = keep;
+    select.closest(".admit-select")?._rebuildAdmitSelect?.();
+  }
+
+  function syncMajorExploreSelects(root) {
+    const trackSelect = root.querySelector('select[name="track"]');
+    const subtrackSelect = root.querySelector('select[name="subtrack"]');
+    const majorSelect = root.querySelector('select[name="major"]');
+    if (!trackSelect || !subtrackSelect || !majorSelect) return;
+
+    const trackVal = trackSelect.value || "";
+    const subtrackVal = subtrackSelect.value || "";
+    const majorVal = majorSelect.value || "";
+
+    /* 드롭다운 후보 = 수시·정시 30건에서 만든 전공 목록 */
+    const allRows = getMajorExploreRows();
+    const byTrack = trackVal ? allRows.filter((row) => row.track === trackVal) : allRows;
+    const subtracks = [...new Set(byTrack.map((row) => row.subtrack))];
+    fillMajorExploreSelect(subtrackSelect, "전공 세부계열 전체", subtracks, subtrackVal);
+
+    const nextSubtrack = subtrackSelect.value || "";
+    const bySub = nextSubtrack
+      ? byTrack.filter((row) => row.subtrack === nextSubtrack)
+      : byTrack;
+    const majors = bySub.map((row) => row.name);
+    fillMajorExploreSelect(majorSelect, "전공 전체", majors, majorVal);
+  }
+
+  function applyMajorExploreFilters(root) {
+    const table = root.querySelector("[data-major-table]");
+    if (!table) return;
+    const tbody = table.tBodies[0];
+    if (!tbody) return;
+
+    syncMajorExploreSelects(root);
+    const trackVal = root.querySelector('select[name="track"]')?.value || "";
+    const subtrackVal = root.querySelector('select[name="subtrack"]')?.value || "";
+    const majorVal = root.querySelector('select[name="major"]')?.value || "";
+
+    const rows = [...tbody.querySelectorAll("tr[data-major-row]")];
+    let visible = 0;
+    rows.forEach((row) => {
+      const trackOk = !trackVal || row.dataset.track === trackVal;
+      const subtrackOk = !subtrackVal || row.dataset.subtrack === subtrackVal;
+      const majorOk = !majorVal || row.dataset.major === majorVal;
+      const show = trackOk && subtrackOk && majorOk;
+      row.hidden = !show;
+      if (show) visible += 1;
+    });
+    stripeVisibleRows(rows);
+    updateAdmitListCount(root, visible);
+  }
+
   function applyAdmitFilters(panel, sectionId) {
-    const root = panel.querySelector("[data-admit-search]");
+    const scoped = sectionId ? panel.querySelector(`#${sectionId} [data-admit-search]`) : null;
+    const root = scoped || panel.querySelector("[data-admit-search]");
     if (!root) return;
+    const rootBlock = root.closest(".guide-block");
+    if (sectionId && rootBlock && rootBlock.id !== sectionId) return;
     if (root.dataset.searchType === "university") {
       applyUniTableFilters(root);
       return;
     }
     if (root.dataset.searchType === "jeongsi") {
       applyJeongsiTableFilters(root);
+      return;
+    }
+    if (root.dataset.searchType === "major-explore") {
+      applyMajorExploreFilters(root);
       return;
     }
     if (root.dataset.searchType === "susi") {
@@ -2338,7 +3004,518 @@ const Guide = (() => {
     const root = document.getElementById("admit-detail-root");
     if (!root) return;
     root.hidden = true;
+    root.style.removeProperty("z-index");
+    delete root.dataset.stackedOverMajor;
+    const major = document.getElementById("major-detail-root");
+    if (!major || major.hidden) {
+      document.body.style.removeProperty("overflow");
+    }
+  }
+
+  const MAJOR_EXPLORE_DETAIL = {
+    소프트웨어공학: {
+      keywords: ["소프트웨어", "알고리즘", "데이터"],
+      intro: [
+        "컴퓨터과학은 컴퓨터 시스템의 원리와 구조를 이해하고, 소프트웨어를 설계·개발하는 학문입니다.",
+        "프로그래밍, 자료구조, 알고리즘, 운영체제, 데이터베이스 등 핵심 이론을 배우며 다양한 분야의 문제를 컴퓨터로 해결하는 능력을 키웁니다.",
+      ],
+      highSchool: [
+        "공통수학1",
+        "대수",
+        "미적분",
+        "확률과통계",
+        "인공지능수학",
+        "물리학",
+        "정보",
+        "데이터과학",
+      ],
+      college: [
+        "프로그래밍기초",
+        "자료구조",
+        "알고리즘",
+        "운영체제",
+        "데이터베이스",
+        "컴퓨터네트워크",
+        "인공지능",
+      ],
+      traits: [
+        "디지털 기기와 소프트웨어가 작동하는 원리에 관심이 있다.",
+        "복잡한 문제를 작은 단위로 나누어 해결하는 과정이 흥미롭다.",
+        "새로운 기술을 직접 시험하고 결과를 확인하는 것을 좋아한다.",
+        "수학적·논리적 사고를 바탕으로 원인을 추적하는 편이다.",
+      ],
+      careers: [
+        {
+          title: "IT·플랫폼",
+          body: "소프트웨어 개발사, 인터넷·플랫폼 기업, 클라우드·서비스 기업 등으로 진출할 수 있습니다.",
+        },
+        {
+          title: "데이터·AI",
+          body: "데이터 분석·인공지능 관련 기업, 연구소, 대기업 데이터 조직 등으로 진출할 수 있습니다.",
+        },
+        {
+          title: "정보보안",
+          body: "보안 솔루션 기업, 금융·공공 보안 조직, 보안 컨설팅 분야로 진출할 수 있습니다.",
+        },
+      ],
+      jobs: [
+        "웹·앱·서비스의 기능과 시스템을 설계하고 구현합니다.",
+        "데이터 처리 기반을 만들고 학습 모델을 개발·운영합니다.",
+        "시스템의 취약점을 분석하고 보안 체계를 구축합니다.",
+      ],
+      universities: [
+        { region: "경기", univ: "가천대학교", unit: "스마트보안학과", types: ["교과", "종합", "논술", "정시"] },
+        { region: "서울", univ: "건국대학교", unit: "컴퓨터공학부", types: ["교과", "종합", "논술", "정시"] },
+        { region: "서울", univ: "고려대학교", unit: "컴퓨터학과", types: ["교과", "종합", "정시"] },
+        { region: "서울", univ: "서강대학교", unit: "컴퓨터공학과", types: ["종합", "논술", "정시"] },
+        { region: "서울", univ: "서울대학교", unit: "컴퓨터공학부", types: ["종합", "정시"] },
+        { region: "서울", univ: "연세대학교", unit: "컴퓨터과학과", types: ["종합", "논술", "정시"] },
+        { region: "경기", univ: "성균관대학교", unit: "컴퓨터교육과", types: ["교과", "종합", "정시"] },
+        { region: "서울", univ: "한양대학교", unit: "컴퓨터소프트웨어학부", types: ["교과", "종합", "논술", "정시"] },
+        { region: "대전", univ: "KAIST", unit: "전산학부", types: ["종합"] },
+        { region: "경북", univ: "포항공과대학교", unit: "컴퓨터공학과", types: ["종합"] },
+        { region: "인천", univ: "인하대학교", unit: "컴퓨터공학과", types: ["교과", "종합", "논술", "정시"] },
+        { region: "서울", univ: "중앙대학교", unit: "소프트웨어학부", types: ["교과", "종합", "논술", "정시"] },
+        { region: "서울", univ: "숭실대학교", unit: "소프트웨어학부", types: ["교과", "종합", "정시"] },
+      ],
+    },
+    컴퓨터공학: {
+      keywords: ["컴퓨터", "프로그래밍", "시스템"],
+      intro: [
+        "컴퓨터공학은 컴퓨터 하드웨어와 소프트웨어의 원리·구조를 이해하고, 시스템을 설계·구현하는 학문입니다.",
+        "프로그래밍과 시스템 기초를 중심으로 네트워크, 임베디드, 인공지능 등 응용 영역으로 학습을 확장합니다.",
+      ],
+      highSchool: ["공통수학1", "대수", "미적분", "확률과통계", "물리학", "정보"],
+      college: ["프로그래밍기초", "자료구조", "컴퓨터구조", "운영체제", "네트워크", "임베디드시스템"],
+      traits: [
+        "디지털 기기와 소프트웨어가 작동하는 원리에 관심이 있다.",
+        "복잡한 문제를 작은 단위로 나누어 해결하는 과정이 흥미롭다.",
+        "새로운 기술을 직접 시험하고 결과를 확인하는 것을 좋아한다.",
+        "수학적·논리적 사고를 바탕으로 원인을 추적하는 편이다.",
+      ],
+      careers: [
+        {
+          title: "IT·플랫폼",
+          body: "소프트웨어 개발사, 인터넷·플랫폼 기업, 클라우드·서비스 기업 등으로 진출할 수 있습니다.",
+        },
+        {
+          title: "데이터·AI",
+          body: "데이터 분석·인공지능 관련 기업, 연구소, 대기업 데이터 조직 등으로 진출할 수 있습니다.",
+        },
+        {
+          title: "정보보안",
+          body: "보안 솔루션 기업, 금융·공공 보안 조직, 보안 컨설팅 분야로 진출할 수 있습니다.",
+        },
+      ],
+      jobs: [
+        "웹·앱·서비스의 기능과 시스템을 설계하고 구현합니다.",
+        "데이터 처리 기반을 만들고 학습 모델을 개발·운영합니다.",
+        "시스템의 취약점을 분석하고 보안 체계를 구축합니다.",
+      ],
+    },
+  };
+
+  function closeMajorDetailModal() {
+    const root = document.getElementById("major-detail-root");
+    if (!root) return;
+    root.hidden = true;
     document.body.style.removeProperty("overflow");
+  }
+
+  function ensureMajorDetailModal() {
+    let root = document.getElementById("major-detail-root");
+    if (root) return root;
+    root = document.createElement("div");
+    root.id = "major-detail-root";
+    root.className = "admit-detail-root major-detail-root";
+    root.hidden = true;
+    root.innerHTML = `
+      <button type="button" class="admit-detail-backdrop" data-major-detail-close aria-label="상세 닫기"></button>
+      <div class="admit-detail-dialog major-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="major-detail-crumb">
+        <div class="admit-detail-head">
+          <div class="admit-detail-title-wrap">
+            <p class="admit-detail-crumb" id="major-detail-crumb"></p>
+          </div>
+          <div class="admit-detail-head-actions">
+            <div class="major-detail-keywords" data-major-detail-keywords></div>
+            <button type="button" class="admit-detail-close" data-major-detail-close aria-label="닫기">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="admit-detail-body major-detail-body" data-major-detail-body></div>
+      </div>`;
+    document.body.appendChild(root);
+    root.addEventListener("click", (event) => {
+      if (event.target.closest("[data-major-detail-close]")) closeMajorDetailModal();
+    });
+    return root;
+  }
+
+  function majorDetailPill(label, tone) {
+    return `<span class="major-detail-pill is-${tone}">${escapeHtml(label)}</span>`;
+  }
+
+  function majorDetailTrait(text) {
+    return `<li class="major-detail-trait">
+      <span class="major-detail-trait-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" focusable="false">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          <path d="m8.2 12.2 2.4 2.4 5.2-5.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="major-detail-trait-text">${escapeHtml(text)}</span>
+    </li>`;
+  }
+
+  function resolveMajorExploreDetail(row) {
+    const track = row?.dataset.track || "";
+    const subtrack = row?.dataset.subtrack || "";
+    const name = row?.dataset.major || "";
+    const keywordText = row?.querySelector(".admit-major-keywords")?.textContent || "";
+    const keywords = keywordText
+      .split(/\s+/)
+      .map((item) => item.replace(/^#/, "").trim())
+      .filter(Boolean)
+      .slice(0, 3);
+    const pack = MAJOR_EXPLORE_DETAIL[name] || null;
+    return {
+      track,
+      subtrack,
+      name,
+      keywords: pack?.keywords || keywords,
+      intro:
+        pack?.intro ||
+        [
+          `${name}은(는) 관련 이론과 실습을 바탕으로 문제를 분석하고 해결하는 능력을 기르는 전공입니다.`,
+          "기초 개념을 탄탄히 다진 뒤 응용·융합 영역으로 학습을 확장하며, 현장과 맞닿은 프로젝트 경험을 쌓을 수 있습니다.",
+        ],
+      highSchool:
+        pack?.highSchool || ["공통수학1", "대수", "미적분", "확률과통계", "물리학", "정보"],
+      college:
+        pack?.college || ["전공기초", "핵심이론", "실험·실습", "캡스톤디자인", "현장실습"],
+      traits:
+        pack?.traits || [
+          "관련 현상과 원리를 스스로 탐구하는 편이다.",
+          "복잡한 문제를 단계적으로 나누어 해결하는 과정이 흥미롭다.",
+          "새로운 도구·기술을 직접 시험해 보고 결과를 확인하는 것을 좋아한다.",
+          "자료와 근거를 바탕으로 원인을 추적하는 편이다.",
+        ],
+      careers:
+        pack?.careers || [
+          {
+            title: "연구·개발",
+            body: "연구소·기업 R&D 조직에서 기초·응용 연구와 기술 개발을 담당할 수 있습니다.",
+          },
+          {
+            title: "산업·서비스",
+            body: "관련 산업 기업과 서비스 조직에서 기획·운영·품질 관리 업무를 수행할 수 있습니다.",
+          },
+          {
+            title: "공공·교육",
+            body: "공공기관·교육·컨설팅 분야에서 전문성을 활용한 정책·교육·자문 역할을 할 수 있습니다.",
+          },
+        ],
+      jobs:
+        pack?.jobs || [
+          "전공 지식을 바탕으로 문제 상황을 분석하고 해결 방안을 설계합니다.",
+          "데이터·자료·실험을 통해 가설을 검증하고 결과를 정리합니다.",
+          "팀 협업과 커뮤니케이션으로 프로젝트와 서비스를 완성합니다.",
+        ],
+      /* 전공 개설 대학 = 수시·정시 데모 30건 중 해당 전공 모집단위 */
+      universities: majorExploreUniversitiesFor(name),
+    };
+  }
+
+  function findAdmitDemoUnit(univ, unit) {
+    return (
+      (window.ADMIT_DEMO_UNITS || []).find((item) => item.univ === univ && item.unit === unit) ||
+      null
+    );
+  }
+
+  function buildSyntheticSusiRow(item, typeKey) {
+    const stats = item[typeKey] || ["-", "-", "-", "-", "-"];
+    const typeName = item[`${typeKey}명`] || typeKey;
+    const hasGrade = typeKey === "교과";
+    const reflect = inferSusiRecordReflect(typeKey, stats[2]);
+    const tr = document.createElement("tr");
+    tr.dataset.susiType = typeKey;
+    tr.dataset.reflect = susiReflectKey(reflect);
+    tr.dataset.theme = item.theme || inferAdmitTheme(item.unit);
+    tr.dataset.gradeMethod = admitGradeMethodAttr(reflect, item.gradeMethod, 0);
+    const gradeVal = hasGrade ? formatAdmitGrade(stats[3]) : "";
+    const minimum = hasGrade ? stats[4] : stats[3];
+    tr.innerHTML = `
+      <td>${escapeHtml(item.univ)}</td>
+      <td>${escapeHtml(item.region)}</td>
+      <td>${escapeHtml(item.track)}</td>
+      <td>${escapeHtml(typeName)}</td>
+      <td>${escapeHtml(item.unit)}</td>
+      <td>${escapeHtml(formatAdmitQuota(stats[0]))}</td>
+      <td>${escapeHtml(formatAdmitRate(stats[1]))}</td>
+      <td>${escapeHtml(stats[2] || "-")}</td>
+      <td>${escapeHtml(reflect)}</td>
+      <td${hasGrade ? "" : " hidden"}>${escapeHtml(gradeVal)}</td>
+      <td>${escapeHtml(minimum || "-")}</td>
+      <td></td>`;
+    return tr;
+  }
+
+  function buildSyntheticJeongsiRow(item) {
+    const j = item.jeongsi || {};
+    const reflect = j.reflect || inferJeongsiRecordReflect(j.method);
+    const tr = document.createElement("tr");
+    tr.dataset.group = j.groupKey || "ga";
+    tr.dataset.area = j.areaKey || "area-0";
+    tr.dataset.inquiry = String(j.inquiry ?? "2");
+    tr.dataset.reflect = susiReflectKey(reflect);
+    tr.dataset.theme = item.theme || inferAdmitTheme(item.unit);
+    tr.dataset.gradeMethod = admitGradeMethodAttr(reflect, item.gradeMethod, 0);
+    tr.innerHTML = `
+      <td>${escapeHtml(item.univ)}</td>
+      <td>${escapeHtml(item.region)}</td>
+      <td>${escapeHtml(item.track)}</td>
+      <td>${escapeHtml(String(j.group || "가군").replace(/군$/, ""))}</td>
+      <td>${escapeHtml(j.typeName || "일반전형(수능)")}</td>
+      <td>${escapeHtml(item.unit)}</td>
+      <td>${escapeHtml(formatAdmitQuota(j.quota))}</td>
+      <td>${escapeHtml(formatAdmitRate(j.rate))}</td>
+      <td>${escapeHtml(j.method || "수능 100%")}</td>
+      <td>${escapeHtml(reflect)}</td>
+      <td>${escapeHtml(j.area || "국·수·영·탐")}</td>
+      <td>${escapeHtml(String(j.inquiry ?? "2"))}</td>
+      <td></td>
+      <td></td>
+      <td></td>`;
+    return tr;
+  }
+
+  function openAdmitDetailFromMajorUniv(univ, unit, typeKey) {
+    const item = findAdmitDemoUnit(univ, unit);
+    if (!item) return;
+    if (typeKey === "정시") {
+      if (!item.jeongsi) return;
+      openJeongsiAdmitDetail(buildSyntheticJeongsiRow(item));
+    } else {
+      if (!Array.isArray(item[typeKey]) || !item[typeKey].length) return;
+      openSusiAdmitDetail(buildSyntheticSusiRow(item, typeKey));
+    }
+    const root = document.getElementById("admit-detail-root");
+    if (root) {
+      root.style.zIndex = "90";
+      root.dataset.stackedOverMajor = "1";
+    }
+  }
+
+  function openMajorExploreDetail(row) {
+    if (!row) return;
+    const data = resolveMajorExploreDetail(row);
+    const root = ensureMajorDetailModal();
+    const crumb = root.querySelector("#major-detail-crumb");
+    const keywordBox = root.querySelector("[data-major-detail-keywords]");
+    const body = root.querySelector("[data-major-detail-body]");
+
+    if (crumb) {
+      /* 수시 상세(대학 › 모집단위)와 동일 디자인 */
+      crumb.innerHTML = `${escapeHtml(data.track)}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(
+        data.subtrack
+      )}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(data.name)}`;
+    }
+    if (keywordBox) {
+      /* 수시 상세 팝업의 상단 태그(X 왼쪽)와 동일 디자인 */
+      keywordBox.innerHTML = (data.keywords || [])
+        .slice(0, 3)
+        .map((word) => `<span class="admit-detail-tag">#${escapeHtml(word)}</span>`)
+        .join("");
+    }
+
+    const introHtml = (data.intro || [])
+      .map((p) => `<p class="major-detail-intro">${escapeHtml(p)}</p>`)
+      .join("");
+    const highSchoolHtml = (data.highSchool || []).map((item) => majorDetailPill(item, "gray")).join("");
+    const collegeHtml = (data.college || []).map((item) => majorDetailPill(item, "accent")).join("");
+    const traitsHtml = (data.traits || []).map((item) => majorDetailTrait(item)).join("");
+    const careersHtml = (data.careers || [])
+      .map(
+        (item) => `<article class="major-detail-career-card">
+          <h4 class="major-detail-career-title">${escapeHtml(item.title)}</h4>
+          <p class="major-detail-career-body">${escapeHtml(item.body)}</p>
+        </article>`
+      )
+      .join("");
+    const jobsHtml = (data.jobs || [])
+      .map((item) => `<li>${escapeHtml(item)}</li>`)
+      .join("");
+
+    const typeOrder = ["교과", "종합", "논술", "정시"];
+    const univRows = (data.universities || [])
+      .map((item, index, list) => {
+        const classes = [];
+        if (index % 2 === 1) classes.push("is-alt");
+        if (index === list.length - 1) classes.push("is-last-visible");
+        const cls = classes.length ? ` class="${classes.join(" ")}"` : "";
+        const chips = typeOrder
+          .map((type) => {
+            const on = (item.types || []).includes(type);
+            const tone = type === "정시" ? "jeongsi" : "susi";
+            if (on) {
+              return `<button type="button" class="major-detail-admit-chip is-${tone} is-on" data-admit-type="${escapeHtml(
+                type
+              )}">${escapeHtml(type)}</button>`;
+            }
+            return `<span class="major-detail-admit-chip is-${tone}" aria-disabled="true">${escapeHtml(
+              type
+            )}</span>`;
+          })
+          .join("");
+        return `<tr data-major-univ-row data-region="${escapeHtml(item.region)}" data-univ="${escapeHtml(
+          item.univ
+        )}" data-unit="${escapeHtml(item.unit)}"${cls}>
+          <td>${escapeHtml(item.univ)}</td>
+          <td>${escapeHtml(item.region)}</td>
+          <td>${escapeHtml(item.unit)}</td>
+          <td><div class="major-detail-admit-chips">${chips}</div></td>
+        </tr>`;
+      })
+      .join("");
+
+    body.innerHTML = `
+      <section class="admit-detail-section">
+        <h3 class="admit-detail-section-title">어떤 전공인가요?</h3>
+        <div class="admit-detail-elig-box major-detail-intro-box">${introHtml}</div>
+      </section>
+      <section class="admit-detail-section">
+        <h3 class="admit-detail-section-title">무엇을 배우나요?</h3>
+        <div class="major-detail-learn-grid">
+          <article class="major-detail-learn-card">
+            <h4 class="major-detail-learn-title">관련 교과목(고교)</h4>
+            <div class="major-detail-pill-wrap">${highSchoolHtml}</div>
+          </article>
+          <article class="major-detail-learn-card">
+            <h4 class="major-detail-learn-title">배우는 내용(대학)</h4>
+            <div class="major-detail-pill-wrap">${collegeHtml}</div>
+          </article>
+        </div>
+      </section>
+      <section class="admit-detail-section">
+        <h3 class="admit-detail-section-title">어떤 학생에게 잘 맞을까요?</h3>
+        <ul class="major-detail-traits">${traitsHtml}</ul>
+      </section>
+      <section class="admit-detail-section">
+        <h3 class="admit-detail-section-title">어떤 분야로 진출하나요?</h3>
+        <div class="major-detail-career-grid">${careersHtml}</div>
+      </section>
+      <section class="admit-detail-section">
+        <h3 class="admit-detail-section-title">어떤 일을 하나요?</h3>
+        <div class="admit-record-box major-detail-jobs-box">
+          ${
+            jobsHtml
+              ? `<ul class="admit-record-list">${jobsHtml}</ul>`
+              : `<p class="admit-record-empty">-</p>`
+          }
+        </div>
+      </section>
+      <section class="admit-detail-section" data-major-univ-section>
+        <div class="admit-search" data-search-type="major-univ">
+          <div class="admit-list-head major-detail-univ-head">
+            <h3 class="admit-detail-section-title"><span class="major-detail-title-text">전공 개설 대학<span class="major-detail-count" data-major-univ-count></span></span></h3>
+          </div>
+          <div class="admit-search-bar">
+            <label class="admit-search-field">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                <path d="m20 20-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              <input type="search" name="major-univ-keyword" placeholder="대학명 또는 전공명 검색" aria-label="대학명 또는 전공명 검색">
+            </label>
+            <select class="admit-search-select" name="major-univ-region" aria-label="지역">
+              <option value="">지역 전체</option>
+              <option value="서울">서울</option>
+              <option value="경기">경기</option>
+              <option value="인천">인천</option>
+              <option value="대전">대전</option>
+              <option value="세종">세종</option>
+              <option value="광주">광주</option>
+              <option value="대구">대구</option>
+              <option value="부산">부산</option>
+              <option value="울산">울산</option>
+              <option value="강원">강원</option>
+              <option value="충북">충북</option>
+              <option value="충남">충남</option>
+              <option value="전북">전북</option>
+              <option value="전남">전남</option>
+              <option value="경북">경북</option>
+              <option value="경남">경남</option>
+              <option value="제주">제주</option>
+            </select>
+            <button type="button" class="admit-search-reset" data-major-univ-reset>검색조건 초기화</button>
+          </div>
+          <div class="admit-detail-table-wrap">
+            <table class="admit-detail-table" data-major-univ-table>
+              <thead>
+                <tr>
+                  <th>대학명(캠퍼스)</th>
+                  <th>지역</th>
+                  <th>전공명</th>
+                  <th>입시 정보</th>
+                </tr>
+              </thead>
+              <tbody>${univRows}</tbody>
+            </table>
+          </div>
+        </div>
+      </section>`;
+
+    enhanceAdmitSelects(body);
+    const section = body.querySelector("[data-major-univ-section]");
+    const applyUnivFilter = () => {
+      const keyword = (section.querySelector('input[name="major-univ-keyword"]')?.value || "")
+        .trim()
+        .toLowerCase();
+      const region = section.querySelector('select[name="major-univ-region"]')?.value || "";
+      const rows = [...section.querySelectorAll("tr[data-major-univ-row]")];
+      let visible = 0;
+      rows.forEach((tr) => {
+        const univ = (tr.dataset.univ || "").toLowerCase();
+        const unit = (tr.dataset.unit || "").toLowerCase();
+        const regionOk = !region || tr.dataset.region === region;
+        const keywordOk = !keyword || univ.includes(keyword) || unit.includes(keyword);
+        const show = regionOk && keywordOk;
+        tr.hidden = !show;
+        if (show) visible += 1;
+      });
+      stripeVisibleRows(rows);
+      const countEl = section.querySelector("[data-major-univ-count]");
+      if (countEl) countEl.textContent = `(${visible}개)`;
+    };
+    section.querySelector('input[name="major-univ-keyword"]')?.addEventListener("input", applyUnivFilter);
+    section.querySelector('select[name="major-univ-region"]')?.addEventListener("change", applyUnivFilter);
+    section.querySelector("[data-major-univ-reset]")?.addEventListener("click", () => {
+      const input = section.querySelector('input[name="major-univ-keyword"]');
+      const select = section.querySelector('select[name="major-univ-region"]');
+      if (input) input.value = "";
+      if (select) {
+        select.value = "";
+        select.closest(".admit-select")?._rebuildAdmitSelect?.();
+      }
+      applyUnivFilter();
+    });
+    section.querySelectorAll("button.major-detail-admit-chip.is-on[data-admit-type]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const tr = chip.closest("tr[data-major-univ-row]");
+        if (!tr) return;
+        openAdmitDetailFromMajorUniv(tr.dataset.univ || "", tr.dataset.unit || "", chip.dataset.admitType || "");
+      });
+    });
+    applyUnivFilter();
+
+    closeAdmitDetailModal();
+    root.hidden = false;
+    document.body.style.overflow = "hidden";
+    root.querySelector("[data-major-detail-close].admit-detail-close")?.focus();
   }
 
   function setAdmitDetailTabMode(root, mode) {
@@ -4192,6 +5369,8 @@ const Guide = (() => {
           openJeongsiAdmitDetail(viewBtn.closest("tr"));
         } else if (root.dataset.searchType === "university") {
           openUniversityAdmitDetail(viewBtn.closest("tr"));
+        } else if (root.dataset.searchType === "major-explore") {
+          openMajorExploreDetail(viewBtn.closest("tr"));
         }
         return;
       }
@@ -4231,9 +5410,15 @@ const Guide = (() => {
     root.addEventListener("change", (event) => {
       if (
         event.target.matches?.(
-          'select[name="region"], select[name="track"], select[name="reflect"], select[name="minimum"], select[name="founding"], select[name="year"], select[name="sort"], select[name="group"], select[name="area"], select[name="inquiry"]'
+          'select[name="region"], select[name="track"], select[name="subtrack"], select[name="major"], select[name="reflect"], select[name="minimum"], select[name="founding"], select[name="year"], select[name="sort"], select[name="group"], select[name="area"], select[name="inquiry"]'
         )
       ) {
+        if (
+          root.dataset.searchType === "major-explore" &&
+          event.target.matches?.('select[name="track"], select[name="subtrack"]')
+        ) {
+          /* 상위 필터 변경 시 하위 선택이 범위 밖이면 sync에서 비움 */
+        }
         refresh();
       }
     });
@@ -5955,6 +7140,8 @@ const Guide = (() => {
         if (block.id === "university-info") inner = admitSearchHtml("university");
         else if (block.id === "university-map") inner = campusMapHtml();
         else if (block.id === "university-roadview") inner = campusRoadviewHtml();
+        else if (block.id === "major-explore") inner = majorExploreHtml();
+        else if (block.id === "major-by-univ") inner = majorByUnivHtml();
         return `<section class="guide-block" id="${block.id}" data-chapter="${chapter || ""}"${slices}>
           ${inner}
         </section>`;
@@ -5972,6 +7159,10 @@ const Guide = (() => {
       ${blocks}`;
 
     if (guide.search) bindAdmitSearch(panel);
+    const majorExplore = panel.querySelector('[data-search-type="major-explore"]');
+    if (majorExplore) bindAdmitSearch(panel);
+    const majorByUniv = panel.querySelector('[data-search-type="major-by-univ"]');
+    if (majorByUniv) bindMajorByUniv(majorByUniv);
     const campusMap = panel.querySelector("[data-campus-map]");
     if (campusMap) bindCampusMap(campusMap);
     const roadview = panel.querySelector("[data-campus-roadview]");
@@ -6128,6 +7319,21 @@ const Guide = (() => {
     });
   }
 
+  function syncPanelHeading(panel, sectionId) {
+    const key = panel.dataset.guide;
+    const guide = guides[key];
+    const h1 = panel.querySelector(":scope > h1");
+    if (!guide || !h1) return;
+    /* 사이드 하위메뉴형(대학·전공): 메인 제목 = 현재 섹션명 */
+    if (guide.hideSectionNav) {
+      const block = guide.blocks.find((item) => item.id === sectionId);
+      const nav = guide.nav.find((item) => item.href === `#${sectionId}`);
+      h1.textContent = block?.heading || nav?.label || guide.title;
+      return;
+    }
+    h1.textContent = guide.title;
+  }
+
   function activate(panel, id, scroll) {
     const buttons = [...panel.querySelectorAll(".section-tab")];
     const known = new Set(buttons.map((button) => button.dataset.section));
@@ -6158,6 +7364,7 @@ const Guide = (() => {
       block.hidden = !on;
       if (on && typeof block.resetSlices === "function") block.resetSlices();
     });
+    syncPanelHeading(panel, id);
     applyAdmitFilters(panel, id);
     const key = panel.dataset.guide;
     if (key && typeof window.syncGuideHash === "function") {
@@ -6208,6 +7415,8 @@ const Guide = (() => {
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       closeAdmitDetailModal();
+      closeMajorDetailModal();
+      closeMajorByUnivDetailModal();
       closeAllAdmitSelects();
       closeGradeMethodExample();
     }
