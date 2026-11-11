@@ -1046,33 +1046,28 @@ input {
   background-color: #fafafa;
 }
 
-/* 수시·정시·대학: 숨긴 행이 있어도 보이는 행은 흰색 → 회색 순 */
+/* 수시·정시·대학·전공탐색: 숨긴 행이 있어도 보이는 행은 흰색 → 회색 순 */
 .admit-data-table[data-susi-unit-table] tbody tr:nth-child(even),
 .admit-data-table[data-jeongsi-unit-table] tbody tr:nth-child(even),
-.admit-data-table[data-uni-table] tbody tr:nth-child(even) {
+.admit-data-table[data-uni-table] tbody tr:nth-child(even),
+.admit-data-table[data-major-table] tbody tr:nth-child(even) {
   background-color: transparent;
 }
 
 .admit-data-table[data-susi-unit-table] tbody tr.is-alt,
 .admit-data-table[data-jeongsi-unit-table] tbody tr.is-alt,
-.admit-data-table[data-uni-table] tbody tr.is-alt {
+.admit-data-table[data-uni-table] tbody tr.is-alt,
+.admit-data-table[data-major-table] tbody tr.is-alt {
   background-color: #fafafa;
 }
 
+/* 표 외곽선과 겹치지 않게 — 보이는 마지막 행만 하단선 제거
+   (:last-child는 숨긴 행 때문에 어긋나므로 .is-last-visible 사용) */
 .admit-data-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-/* 숨긴 행 때문에 :last-child가 어긋나 이중 테두리 생기지 않게 */
-.admit-data-table[data-susi-unit-table] tbody tr:last-child td,
-.admit-data-table[data-jeongsi-unit-table] tbody tr:last-child td,
-.admit-data-table[data-uni-table] tbody tr:last-child td {
   border-bottom: 1px solid #e5e7eb;
 }
 
-.admit-data-table[data-susi-unit-table] tbody tr.is-last-visible td,
-.admit-data-table[data-jeongsi-unit-table] tbody tr.is-last-visible td,
-.admit-data-table[data-uni-table] tbody tr.is-last-visible td {
+.admit-data-table tbody tr.is-last-visible td {
   border-bottom: none;
 }
 
@@ -4449,7 +4444,12 @@ table.admit-detail-table td {
   min-height: 0;
 }
 
+/* 연도 필터로 숨긴 항목이 있어도 보이는 마지막만 하단선 제거 */
 .admit-detail-file:last-child {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admit-detail-file.is-last-visible {
   border-bottom: 0;
 }
 
@@ -7875,6 +7875,26 @@ button.major-detail-admit-chip.is-on.is-jeongsi:hover {
   text-align: center;
 }
 
+/* 태블릿·모바일: 좌(대학명)·우(지역>) 배치는 유지, 가로 폭만 화면에 맞춤 */
+@media (max-width: 1279px) {
+  .admit-search[data-search-type="major-by-univ"],
+  .major-by-univ-list,
+  .major-by-univ-zone,
+  .major-by-univ-grid {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .major-by-univ-item {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+}
+
 @media (max-width: 1100px) {
   .major-by-univ-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -7917,7 +7937,7 @@ button.major-detail-admit-chip.is-on.is-jeongsi:hover {
   }
 
   .major-by-univ-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .major-by-univ-item,

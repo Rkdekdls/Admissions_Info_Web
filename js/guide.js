@@ -2015,6 +2015,26 @@ const Guide = (() => {
     if (lastVisible) lastVisible.classList.add("is-last-visible");
   }
 
+  /* 파일 목록 등: 숨긴 항목 때문에 :last-child 하단선이 어긋나지 않게 */
+  function markLastVisibleItems(items) {
+    let lastVisible = null;
+    items.forEach((item) => {
+      item.classList.remove("is-last-visible");
+      if (!item.hidden) lastVisible = item;
+    });
+    if (lastVisible) lastVisible.classList.add("is-last-visible");
+  }
+
+  function applyAdmitFileYearFilter(root, selectAttr) {
+    if (!root) return;
+    const value = root.querySelector(`[${selectAttr}]`)?.value || "all";
+    const rows = [...root.querySelectorAll("[data-admit-file-year]")];
+    rows.forEach((row) => {
+      row.hidden = value !== "all" && row.dataset.admitFileYear !== value;
+    });
+    markLastVisibleItems(rows);
+  }
+
   function compareAdmitRows(a, b, mode, getters) {
     const key = mode.replace(/-(asc|desc)$/, "");
     if (key === "name") {
@@ -4281,9 +4301,10 @@ const Guide = (() => {
       .map((y, i) => `<option value="${y === "학년도 전체" ? "all" : y}"${i === 0 ? " selected" : ""}>${y}</option>`)
       .join("");
     const uniFileRows = uniFiles
-      .map(
-        (file) => `
-          <li class="admit-detail-file" data-admit-file-year="${escapeHtml(file.year)}">
+      .map((file, index, list) => {
+        const lastCls = index === list.length - 1 ? " is-last-visible" : "";
+        return `
+          <li class="admit-detail-file${lastCls}" data-admit-file-year="${escapeHtml(file.year)}">
             <span class="admit-detail-file-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="18" height="18" focusable="false">
                 <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.6"/>
@@ -4300,8 +4321,8 @@ const Guide = (() => {
                 ${extLinkIcon}
               </button>
             </span>
-          </li>`
-      )
+          </li>`;
+      })
       .join("");
 
     resultPanel.innerHTML = `
@@ -4344,11 +4365,8 @@ const Guide = (() => {
     root.querySelector("[data-admit-detail-close].admit-detail-close")?.focus();
 
     enhanceAdmitSelects(resultPanel);
-    resultPanel.querySelector("[data-admit-uni-year]")?.addEventListener("change", (event) => {
-      const value = event.target.value;
-      resultPanel.querySelectorAll("[data-admit-file-year]").forEach((row) => {
-        row.hidden = value !== "all" && row.dataset.admitFileYear !== value;
-      });
+    resultPanel.querySelector("[data-admit-uni-year]")?.addEventListener("change", () => {
+      applyAdmitFileYearFilter(resultPanel, "data-admit-uni-year");
     });
   }
 
@@ -4727,9 +4745,10 @@ const Guide = (() => {
           )
           .join("");
         const fileRows = materialsFiles
-          .map(
-            (file) => `
-          <li class="admit-detail-file" data-admit-file-year="${escapeHtml(file.year)}">
+          .map((file, index, list) => {
+            const lastCls = index === list.length - 1 ? " is-last-visible" : "";
+            return `
+          <li class="admit-detail-file${lastCls}" data-admit-file-year="${escapeHtml(file.year)}">
             <span class="admit-detail-file-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="18" height="18" focusable="false">
                 <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.6"/>
@@ -4747,8 +4766,8 @@ const Guide = (() => {
                 </svg>
               </button>
             </span>
-          </li>`
-          )
+          </li>`;
+          })
           .join("");
         materialsPanel.innerHTML = `
           <section class="admit-detail-section">
@@ -4817,11 +4836,8 @@ const Guide = (() => {
 
     if (materialsPanel && showMaterials) {
       enhanceAdmitSelects(materialsPanel);
-      materialsPanel.querySelector("[data-admit-materials-year]")?.addEventListener("change", (event) => {
-        const value = event.target.value;
-        materialsPanel.querySelectorAll("[data-admit-file-year]").forEach((row) => {
-          row.hidden = value !== "all" && row.dataset.admitFileYear !== value;
-        });
+      materialsPanel.querySelector("[data-admit-materials-year]")?.addEventListener("change", () => {
+        applyAdmitFileYearFilter(materialsPanel, "data-admit-materials-year");
       });
     }
   }
