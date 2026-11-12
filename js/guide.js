@@ -615,9 +615,18 @@ const Guide = (() => {
   function majorExploreMetaFromUnit(item, majorName) {
     const unit = String(item.unit || "");
     const theme = String(item.theme || "");
-    const blob = `${unit} ${majorName} ${theme}`;
+    const name = String(majorName || unit);
+    const blob = `${unit} ${name} ${theme}`;
     let track = "공학계열";
     let subtrack = "융합";
+    /* '계약학과' 안의 '약학' 부분문자열 오탐 방지 */
+    const isContract = /계약/.test(blob) || theme === "contract";
+    const isMed =
+      !isContract &&
+      (/의예|치의|한의|수의|간호/.test(blob) ||
+        /(^|[^계])약학(과|부)/.test(name) ||
+        theme === "med" ||
+        theme === "nurse");
     if (
       item.track === "인문" ||
       /교육|행정|경영|관광|경찰|커뮤니케이션|보건행정/.test(blob)
@@ -629,17 +638,18 @@ const Guide = (() => {
       else if (/행정|경찰/.test(blob)) subtrack = "사회과학";
       else if (/커뮤니케이션/.test(blob)) subtrack = "미디어";
       else subtrack = "인문일반";
-    } else if (/의예|치의|한의|약학|수의|간호|생명|med|nurse/.test(blob)) {
+    } else if (isMed || (/생명/.test(blob) && !isContract && !/반도체|소프트|전산|인공지능|IT/.test(blob))) {
       track = "자연과학계열";
-      if (/간호|보건|nurse/.test(blob)) subtrack = "간호보건";
-      else if (/의예|치의|한의|약학|수의|med/.test(blob)) subtrack = "의학약학";
+      if (/간호|보건|nurse/.test(blob) || theme === "nurse") subtrack = "간호보건";
+      else if (/의예|치의|한의|수의|(^|[^계])약학|med/.test(blob) || theme === "med") subtrack = "의학약학";
       else subtrack = "자연일반";
     } else {
       track = "공학계열";
-      if (/반도체|전기|전자|전산|소프트|인공지능|IT|계약|advanced|contract/.test(blob)) {
+      /* 기계·항공을 advanced 테마보다 먼저 판별 */
+      if (/기계|항공|우주/.test(blob)) subtrack = "기계";
+      else if (/반도체|전기|전자|전산|소프트|인공지능|IT|계약|contract/.test(blob) || theme === "advanced" || theme === "contract") {
         subtrack = "전기전자컴퓨터";
-      } else if (/기계|항공|우주/.test(blob)) subtrack = "기계";
-      else subtrack = "공학일반";
+      } else subtrack = "공학일반";
     }
     return { track, subtrack };
   }
@@ -795,6 +805,673 @@ const Guide = (() => {
         </table>
       </div>
     </section>`;
+  }
+
+  function majorByFieldSeed(text) {
+    let h = 0;
+    const s = String(text || "");
+    for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return h;
+  }
+
+  function majorByFieldSubjectCatalog(item) {
+    const track = item?.track || "";
+    const sub = item?.subtrack || "";
+    const name = item?.name || "";
+    if (/의예|치의|한의|약학|수의/.test(name) || sub === "의학약학") {
+      return [
+        { name: "미적분Ⅱ", tags: ["수학", "진로선택"] },
+        { name: "기하", tags: ["수학", "진로선택"] },
+        { name: "확률과 통계", tags: ["수학", "일반선택"] },
+        { name: "화학", tags: ["과학", "일반선택"] },
+        { name: "생명과학", tags: ["과학", "일반선택"] },
+        { name: "화학Ⅱ", tags: ["과학", "진로선택"] },
+        { name: "생명과학Ⅱ", tags: ["과학", "진로선택"] },
+        { name: "물리학", tags: ["과학", "일반선택"] },
+      ];
+    }
+    if (sub === "간호보건" || /간호/.test(name)) {
+      return [
+        { name: "생명과학", tags: ["과학", "일반선택"] },
+        { name: "화학", tags: ["과학", "일반선택"] },
+        { name: "확률과 통계", tags: ["수학", "일반선택"] },
+        { name: "생명과학Ⅱ", tags: ["과학", "진로선택"] },
+        { name: "화학Ⅱ", tags: ["과학", "진로선택"] },
+        { name: "영어", tags: ["영어", "공통"] },
+      ];
+    }
+    if (track === "공학계열" || /전산|컴퓨터|소프트|인공지능|반도체|전기|전자/.test(name)) {
+      return [
+        { name: "미적분Ⅱ", tags: ["수학", "진로선택"] },
+        { name: "기하", tags: ["수학", "진로선택"] },
+        { name: "확률과 통계", tags: ["수학", "일반선택"] },
+        { name: "물리학", tags: ["과학", "일반선택"] },
+        { name: "화학", tags: ["과학", "일반선택"] },
+        { name: "정보", tags: ["기술·가정", "일반선택"] },
+        { name: "인공지능 기초", tags: ["기술·가정", "진로선택"] },
+        { name: "프로그래밍", tags: ["기술·가정", "진로선택"] },
+      ];
+    }
+    if (track === "자연과학계열") {
+      return [
+        { name: "미적분Ⅱ", tags: ["수학", "진로선택"] },
+        { name: "기하", tags: ["수학", "진로선택"] },
+        { name: "확률과 통계", tags: ["수학", "일반선택"] },
+        { name: "물리학", tags: ["과학", "일반선택"] },
+        { name: "화학", tags: ["과학", "일반선택"] },
+        { name: "생명과학", tags: ["과학", "일반선택"] },
+        { name: "지구과학", tags: ["과학", "일반선택"] },
+      ];
+    }
+    if (sub === "경영경제") {
+      return [
+        { name: "확률과 통계", tags: ["수학", "일반선택"] },
+        { name: "미적분Ⅰ", tags: ["수학", "일반선택"] },
+        { name: "경제", tags: ["사회", "일반선택"] },
+        { name: "사회·문화", tags: ["사회", "일반선택"] },
+        { name: "영어", tags: ["영어", "공통"] },
+        { name: "한국사", tags: ["한국사", "공통"] },
+      ];
+    }
+    if (sub === "교육") {
+      return [
+        { name: "국어", tags: ["국어", "공통"] },
+        { name: "영어", tags: ["영어", "공통"] },
+        { name: "한국사", tags: ["한국사", "공통"] },
+        { name: "확률과 통계", tags: ["수학", "일반선택"] },
+        { name: "사회·문화", tags: ["사회", "일반선택"] },
+        { name: "생활과 윤리", tags: ["사회", "일반선택"] },
+      ];
+    }
+    return [
+      { name: "국어", tags: ["국어", "공통"] },
+      { name: "영어", tags: ["영어", "공통"] },
+      { name: "한국사", tags: ["한국사", "공통"] },
+      { name: "사회·문화", tags: ["사회", "일반선택"] },
+      { name: "생활과 윤리", tags: ["사회", "일반선택"] },
+      { name: "세계사", tags: ["사회", "일반선택"] },
+    ];
+  }
+
+  function isExcludedMajorByFieldUnit(unit) {
+    return /단과대학\s*공통|계열\s*공통|단과대\s*공통|^(공통)$/.test(String(unit || "").trim());
+  }
+
+  /* 기계공학부 ↔ 기계공학과 처럼 학부/학과만 다른 동일 모집단위 */
+  function majorByFieldUnitKey(name) {
+    return String(name || "")
+      .replace(/\([^)]*\)/g, "")
+      .replace(/\s+/g, "")
+      .replace(/계약$/g, "")
+      .replace(/(학부|학과|과)$/g, "");
+  }
+
+  function majorByFieldUnitMatches(unit, major) {
+    const u = String(unit || "").trim();
+    const m = String(major || "").trim();
+    if (!u || !m || isExcludedMajorByFieldUnit(u)) return false;
+    if (normalizeMajorExploreName(u) === m) return true;
+    const stripParen = (value) => String(value || "").replace(/\([^)]*\)/g, "").trim();
+    if (stripParen(u) === stripParen(m)) return true;
+    const uk = majorByFieldUnitKey(u);
+    const mk = majorByFieldUnitKey(m);
+    return Boolean(uk && mk && uk === mk);
+  }
+
+  /* 수시·정시에 없는 대학용: 계열 유사 모집단위 (의·치·한·약·수·간호·초등은 동일계만) */
+  function majorByFieldUnitSimilar(unit, major) {
+    if (majorByFieldUnitMatches(unit, major)) return true;
+    const u = String(unit || "").trim();
+    const m = String(major || "").trim();
+    if (!u || !m || isExcludedMajorByFieldUnit(u)) return false;
+    if (/의예|치의|한의|약학|수의|간호|초등/.test(m)) {
+      return false;
+    }
+    const families = [
+      /* 기계·항공 계열: 정보·AI 과목 발표는 컴·소프·AI 유사모집단위로도 연결 */
+      [
+        /기계|항공|우주|산업공학|로봇|자동차|조선/,
+        /기계|항공|우주|산업공학|로봇|자동차|조선|전산|컴퓨터|소프트|인공지능|데이터|정보통신|IT계약/,
+      ],
+      [
+        /전산|컴퓨터|소프트|인공지능|데이터|정보통신|IT계약|계약학과/,
+        /전산|컴퓨터|소프트|인공지능|데이터|정보통신|IT계약|계약학과/,
+      ],
+      [
+        /전기|전자|반도체|디스플레이|배터리|스마트팩토리/,
+        /전기|전자|반도체|디스플레이|배터리|스마트팩토리|전산|컴퓨터|소프트|인공지능|데이터|정보통신|IT계약/,
+      ],
+      [/경영|관광경영|호텔경영|경제|무역|회계|금융|통계/, /경영|관광|호텔|경제|무역|회계|금융|통계/],
+      [/경찰|행정/, /경찰|행정/],
+      [/커뮤니케이션|미디어/, /커뮤니케이션|미디어/],
+      [/보건행정|보건/, /보건/],
+      [/교육|수학교육|영어교육|한국어교육/, /교육/],
+    ];
+    return families.some(([majRe, unitRe]) => majRe.test(m) && unitRe.test(u));
+  }
+
+  function majorByFieldNormSubject(value) {
+    return String(value || "")
+      .replace(/Ⅱ/g, "2")
+      .replace(/Ⅰ/g, "1")
+      .replace(/Ⅲ/g, "3")
+      .replace(/II(?![a-z])/gi, "2")
+      .replace(/III(?![a-z])/gi, "3")
+      .replace(/[·･・／/\s(),\-]/g, "")
+      .toLowerCase();
+  }
+
+  function majorByFieldSubjectInText(text, subject) {
+    const raw = majorByFieldNormSubject(text);
+    const sub = majorByFieldNormSubject(subject);
+    if (!raw || !sub) return false;
+    if (raw.includes(sub)) return true;
+    /* 화학Ⅱ·생명과학Ⅱ 등은 발표문에 로마숫자 없이 적힌 경우가 많음 (미적분Ⅰ/Ⅱ는 구분 유지) */
+    if (/^(화학|생명과학|물리학|지구과학)[123]$/.test(sub)) {
+      const base = sub.replace(/[123]$/, "");
+      return raw.includes(base);
+    }
+    return false;
+  }
+
+  function majorByFieldRowBlob(row) {
+    return [row?.core, row?.recommend, row?.guide].filter(Boolean).join(" ");
+  }
+
+  function majorByFieldPickDiverseUnit(univ, major, candidates, seed) {
+    const list = [...new Set((candidates || []).map((name) => String(name || "").trim()).filter(Boolean))];
+    if (!list.length) return "";
+    const exact = list.filter((name) => normalizeMajorExploreName(name) === major);
+    const stem = list.filter((name) => majorByFieldUnitMatches(name, major) && !exact.includes(name));
+    const similar = list.filter((name) => !majorByFieldUnitMatches(name, major));
+    /* 수시·정시 외: 동일계 실제명(기계공학과 등) → 유사학과 → 선택전공명 순 */
+    const pool = stem.length ? stem : similar.length ? similar : exact.length ? exact : list;
+    return pool[majorByFieldSeed(`${seed}|${univ}|unit`) % pool.length];
+  }
+
+  function majorByFieldUnivCards(majorName, subjectName, count) {
+    const major = String(majorName || "").trim();
+    const subject = String(subjectName || "").trim();
+    const target = Math.max(1, Number(count) || 8);
+    const byUniv = new Map();
+    const seed = majorByFieldSeed(`${major}|${subject}`);
+    const packs = window.ADMIT_UNIV_RECOMMEND || {};
+    const demoMajors = new Set(
+      (window.ADMIT_DEMO_UNITS || [])
+        .filter((row) => normalizeMajorExploreName(row.unit) === major)
+        .map((row) => String(row.univ || "").trim())
+        .filter(Boolean)
+    );
+
+    const setCard = (univ, unit, score, fromDemo) => {
+      const u = String(univ || "").trim();
+      const un = String(unit || "").trim();
+      if (!u || !un || isExcludedMajorByFieldUnit(un)) return;
+      const prev = byUniv.get(u);
+      if (prev?.fromDemo && !fromDemo) return;
+      if (prev && prev.score >= score) return;
+      byUniv.set(u, { univ: u, unit: un, score, fromDemo: Boolean(fromDemo) });
+    };
+
+    /* 해당 과목이 핵심·권장에 실제로 있는 동일·유사 모집단위만 수집 */
+    Object.entries(packs).forEach(([univ, rows]) => {
+      if (!Array.isArray(rows)) return;
+      const withSubject = [];
+      rows.forEach((row) => {
+        const unit = String(row.unit || "").trim();
+        if (!majorByFieldUnitSimilar(unit, major)) return;
+        if (!majorByFieldSubjectInText(majorByFieldRowBlob(row), subject)) return;
+        withSubject.push(unit);
+      });
+      if (!withSubject.length) return;
+
+      /* 수시·정시 데모 대학은 선택 전공명 행을 우선 (과목이 있는 경우) */
+      const demoExact = demoMajors.has(univ)
+        ? withSubject.find((name) => normalizeMajorExploreName(name) === major)
+        : "";
+      const unit = demoExact || majorByFieldPickDiverseUnit(univ, major, withSubject, seed);
+      if (!unit) return;
+      const exact = normalizeMajorExploreName(unit) === major;
+      const stem = majorByFieldUnitMatches(unit, major);
+      const fromDemo = demoMajors.has(univ) && (exact || stem);
+      let score = 80;
+      if (exact) score = 120;
+      else if (stem) score = 100;
+      if (fromDemo) score += 200;
+      setCard(univ, unit, score, fromDemo);
+    });
+
+    return [...byUniv.values()]
+      .sort((a, b) => {
+        if (a.fromDemo !== b.fromDemo) return a.fromDemo ? -1 : 1;
+        if (b.score !== a.score) return b.score - a.score;
+        const ha = majorByFieldSeed(`${seed}|${a.univ}`);
+        const hb = majorByFieldSeed(`${seed}|${b.univ}`);
+        if (ha !== hb) return ha - hb;
+        return a.univ.localeCompare(b.univ, "ko");
+      })
+      .slice(0, Math.min(target, byUniv.size))
+      .map((card) => ({ univ: card.univ, unit: card.unit }));
+  }
+
+  const MAJOR_BY_FIELD_ANALYSIS = {
+    전산학부:
+      "전산학부 직접 모집단위와 적용이 확인된 공통 발표자료에서는 수학 교과의 언급이 가장 일관되게 나타나며, 구체 과목으로는 미적분Ⅱ, 기하, 확률과 통계가 여러 대학에서 반복됩니다. 과학은 교과 영역으로 넓게 제시되는 경우가 많고, 과목을 특정한 대학에서는 물리학과 일부 정보·프로그래밍 계열 과목이 확인됩니다. 핵심·권장 구분은 대학마다 달라 같은 과목도 핵심, 권장 또는 미구분으로 발표되므로 빈도만으로 필수 여부를 판단할 수 없습니다. 모집단위별 발표와 계열·단과대학 공통 발표의 범위도 서로 다르며, 특정 과목 대신 진로·적성과 교과 위계를 고려한 이수 방향만 안내한 대학도 있습니다.",
+    인공지능학과:
+      "인공지능학과 관련 발표자료에서는 수학 교과의 비중이 두드러지며, 미적분Ⅱ·기하·확률과 통계가 공통적으로 반복됩니다. 이와 함께 정보, 인공지능 기초, 프로그래밍 등 기술·가정 계열 과목을 구체적으로 명시한 대학이 확인됩니다. 과학은 물리학을 중심으로 제시되는 경우가 많지만, 교과명만 넓게 적시한 발표도 적지 않습니다. 대학마다 핵심·권장 표기가 다르고, 모집단위 단위 안내와 단과대학 공통 안내의 범위도 달라 발표 단위를 함께 확인할 필요가 있습니다.",
+    전기전자공학과:
+      "전기전자공학과 발표자료에서는 미적분Ⅱ, 기하, 확률과 통계 등 수학 과목의 언급이 가장 일관됩니다. 과학에서는 물리학이 반복적으로 나타나고, 일부 대학은 화학이나 물리 진로선택 과목까지 확장해 안내합니다. 정보·프로그래밍 계열 과목을 함께 제시한 대학도 있으나, 핵심과 권장의 구분은 대학마다 다르게 표기됩니다. 모집단위 직접 발표와 공과대학 공통 발표가 혼재하므로, 관심 대학의 발표 범위와 학년도 자료를 함께 보는 것이 좋습니다.",
+    반도체공학과:
+      "반도체공학과 관련 자료에서는 미적분Ⅱ·기하·확률과 통계 등 수학 과목이 공통적으로 강조됩니다. 과학 영역에서는 물리학과 화학이 함께 언급되는 비중이 높고, 일부 대학은 공정·회로 이해와 연계해 물리·화학 진로선택 과목을 안내합니다. 정보·프로그래밍을 병기한 발표도 있으나, 필수에 가까운 핵심 표기와 권장 수준의 표기가 혼재합니다. 계약학과·특화 모집단위 발표와 일반 공학계열 공통 발표의 범위가 다를 수 있어 단위를 구분해 확인할 필요가 있습니다.",
+    "반도체시스템공학과(계약)":
+      "반도체시스템공학과(계약) 발표에서는 수학의 미적분Ⅱ, 기하, 확률과 통계가 반복적으로 확인됩니다. 과학은 물리학·화학을 중심으로 제시되며, 산업 연계 특성을 반영해 회로·공정 기초와 연결되는 과목을 안내하는 대학이 있습니다. 정보·프로그래밍 과목을 포함한 경우도 있으나 표기 방식은 핵심·권장·미구분이 섞여 있습니다. 계약학과 특성상 일반 모집단위 자료와 별도 안내가 병행될 수 있으므로, 해당 학년도 계약학과 발표자료를 우선 확인하는 것이 좋습니다.",
+    "소프트웨어융합학과(계약)":
+      "소프트웨어융합학과(계약) 자료에서는 미적분Ⅱ, 기하, 확률과 통계 등 수학 과목이 공통적으로 나타납니다. 정보, 인공지능 기초, 프로그래밍처럼 소프트웨어 기초와 직결된 과목을 명시한 대학이 상대적으로 많습니다. 과학은 물리학을 중심으로 넓게 제시되거나, 교과명만 안내하는 경우도 확인됩니다. 계약학과 발표와 일반 소프트웨어·전산 계열 공통 발표의 범위가 다를 수 있어, 핵심·권장 표기와 함께 발표 단위를 구분해 볼 필요가 있습니다.",
+    IT계약학과:
+      "IT계약학과 관련 발표에서는 수학의 미적분Ⅱ·기하·확률과 통계가 반복적으로 언급됩니다. 정보·프로그래밍·인공지능 기초 등 실무 연계 과목을 함께 제시한 대학이 확인되며, 과학은 물리학을 중심으로 안내되는 경향이 있습니다. 같은 과목이라도 핵심·권장·미구분으로 표기가 갈리므로 빈도만으로 필수 여부를 단정하기 어렵습니다. 계약학과 전용 안내와 공과·IT 계열 공통 안내가 함께 있을 수 있어 모집단위별 자료를 우선 확인하는 것이 좋습니다.",
+    "계약학과(삼성디스플레이)":
+      "계약학과(삼성디스플레이) 발표자료에서는 미적분Ⅱ, 기하, 확률과 통계 등 수학 과목이 공통적으로 강조됩니다. 과학에서는 물리학과 화학이 함께 나타나는 비중이 높고, 디스플레이·공정 이해와 연결되는 과목을 안내하는 경우가 있습니다. 정보·프로그래밍을 포함한 발표도 있으나, 핵심과 권장의 구분은 대학·자료마다 다릅니다. 일반 공학계열 공통 발표와 계약학과 전용 발표의 범위가 다를 수 있으므로 해당 학년도 계약학과 자료를 기준으로 확인하는 것이 안전합니다.",
+    기계공학부:
+      "기계공학부 발표자료에서는 미적분Ⅱ, 기하, 확률과 통계 등 수학 과목의 언급이 가장 일관됩니다. 과학에서는 물리학이 중심이 되고, 일부 대학은 화학이나 물리 진로선택 과목까지 확장해 안내합니다. 핵심·권장 구분은 대학마다 달라 같은 과목도 표기 방식이 다르게 나타나며, 빈도만으로 필수 여부를 판단하기는 어렵습니다. 모집단위별 발표와 공과대학 공통 발표의 범위가 다를 수 있어, 관심 대학의 발표 단위를 함께 확인하는 것이 좋습니다.",
+    항공우주공학과:
+      "항공우주공학과 관련 자료에서는 미적분Ⅱ·기하·확률과 통계 등 수학 과목이 공통적으로 강조됩니다. 과학은 물리학이 가장 반복적으로 나타나고, 일부 대학은 역학·설계 기초와 연계해 물리 진로선택 과목을 안내합니다. 화학이나 정보 과목을 병기한 경우도 있으나 핵심·권장 표기는 혼재합니다. 모집단위 직접 발표와 공학계열 공통 발표의 범위가 다를 수 있으므로, 학년도별 자료를 구분해 확인하는 것이 필요합니다.",
+    의예과:
+      "의예과 관련 발표자료에서는 미적분Ⅱ, 기하, 확률과 통계 등 수학 과목과 함께 화학·생명과학의 언급이 두드러집니다. 화학Ⅱ·생명과학Ⅱ 같은 진로선택 과목을 구체적으로 제시한 대학이 많고, 물리학을 함께 안내하는 경우도 확인됩니다. 핵심·권장 구분은 대학마다 달라 같은 과목도 표기가 다르게 나타나며, 빈도만으로 필수 여부를 단정하기 어렵습니다. 의예 모집단위 직접 발표와 자연계열 공통 발표의 범위가 다를 수 있어 발표 단위를 함께 보는 것이 좋습니다.",
+    치의예과:
+      "치의예과 발표에서는 수학의 미적분Ⅱ·기하·확률과 통계와 함께 화학·생명과학이 공통적으로 반복됩니다. 화학Ⅱ·생명과학Ⅱ를 명시한 대학이 확인되며, 일부 자료에서는 물리학도 함께 안내됩니다. 핵심과 권장의 표기 방식이 대학마다 달라 동일 과목의 위상이 다르게 해석될 수 있습니다. 모집단위별 안내와 자연·의약학 계열 공통 안내의 범위가 혼재할 수 있으므로 해당 학년도 치의예 자료를 우선 확인하는 것이 좋습니다.",
+    한의예과:
+      "한의예과 관련 자료에서는 미적분Ⅱ, 기하, 확률과 통계 등 수학과 화학·생명과학의 언급이 함께 나타납니다. 화학Ⅱ·생명과학Ⅱ를 구체적으로 제시한 대학이 있으며, 물리학을 포함한 발표도 확인됩니다. 핵심·권장·미구분 표기가 혼재해 빈도만으로 필수 과목을 단정하기는 어렵습니다. 한의예 모집단위 발표와 자연계열 공통 발표의 범위가 다를 수 있어, 관심 대학의 발표 단위와 학년도를 함께 확인할 필요가 있습니다.",
+    수의예과:
+      "수의예과 발표자료에서는 미적분Ⅱ·기하·확률과 통계와 함께 화학·생명과학이 공통적으로 강조됩니다. 화학Ⅱ·생명과학Ⅱ를 명시한 대학이 많고, 일부는 물리학을 함께 안내합니다. 같은 과목이라도 핵심·권장 표기가 달라 해석에 주의가 필요합니다. 모집단위 직접 발표와 자연·생명 계열 공통 발표의 범위가 다를 수 있으므로, 해당 학년도 수의예 자료를 기준으로 확인하는 것이 좋습니다.",
+    약학과:
+      "약학과 관련 발표에서는 미적분Ⅱ, 기하, 확률과 통계 등 수학과 화학·생명과학의 비중이 높습니다. 화학Ⅱ·생명과학Ⅱ를 구체적으로 제시한 대학이 확인되며, 물리학을 포함한 경우도 있습니다. 핵심·권장 구분은 대학마다 달라 동일 과목의 위상이 다르게 나타날 수 있습니다. 약학 모집단위 발표와 자연계열 공통 발표가 혼재할 수 있어, 발표 범위와 학년도 자료를 함께 확인하는 것이 필요합니다.",
+    간호학과:
+      "간호학과 발표자료에서는 생명과학과 화학의 언급이 두드러지며, 확률과 통계도 반복적으로 확인됩니다. 생명과학Ⅱ·화학Ⅱ를 제시한 대학이 있고, 영어를 함께 안내하는 경우도 나타납니다. 핵심·권장 표기는 대학마다 달라 같은 과목도 위상이 다르게 해석될 수 있습니다. 간호 모집단위 발표와 보건·자연계열 공통 발표의 범위가 다를 수 있으므로 해당 학년도 자료를 구분해 확인하는 것이 좋습니다.",
+    보건행정학과:
+      "보건행정학과 관련 자료에서는 생명과학·화학과 확률과 통계가 함께 나타나는 경향이 있습니다. 영어를 포함한 발표도 확인되며, 과학 진로선택 과목을 명시한 대학과 교과 영역만 넓게 안내한 대학이 혼재합니다. 핵심·권장 구분이 일정하지 않아 빈도만으로 필수 여부를 판단하기는 어렵습니다. 모집단위별 안내와 보건·행정 계열 공통 안내의 범위가 다를 수 있어 발표 단위를 함께 볼 필요가 있습니다.",
+    경영학부:
+      "경영학부 발표자료에서는 확률과 통계, 미적분Ⅰ 등 수학 과목과 경제·사회·문화 등 사회 교과가 공통적으로 나타납니다. 영어와 한국사를 함께 안내하는 대학이 확인되며, 과목을 구체적으로 적시한 발표와 영역만 제시한 발표가 섞여 있습니다. 핵심·권장 표기는 대학마다 달라 같은 과목도 위상이 다르게 해석될 수 있습니다. 경영 모집단위 발표와 인문사회 계열 공통 발표의 범위가 다를 수 있으므로 관심 대학의 학년도 자료를 함께 확인하는 것이 좋습니다.",
+    관광경영학과:
+      "관광경영학과 관련 자료에서는 확률과 통계·미적분Ⅰ과 경제, 사회·문화 등 사회 교과의 언급이 확인됩니다. 영어·한국사를 함께 제시한 대학이 있으며, 서비스·관광 연계 특성을 반영해 과목을 넓게 안내하는 경우도 있습니다. 핵심과 권장의 구분은 대학마다 다르고, 미구분 발표도 적지 않습니다. 모집단위 직접 발표와 경영·사회 계열 공통 발표의 범위가 혼재할 수 있어 발표 단위를 구분해 확인할 필요가 있습니다.",
+    경찰행정학부:
+      "경찰행정학부 발표에서는 국어·영어·한국사와 함께 사회·문화, 생활과 윤리 등 사회 교과가 반복적으로 나타납니다. 확률과 통계를 포함한 대학도 확인되며, 과목을 구체적으로 명시한 자료와 영역만 제시한 자료가 섞여 있습니다. 핵심·권장 표기가 대학마다 달라 빈도만으로 필수 여부를 단정하기 어렵습니다. 모집단위별 안내와 사회과학·행정 계열 공통 안내의 범위가 다를 수 있으므로 해당 학년도 자료를 함께 보는 것이 좋습니다.",
+    커뮤니케이션학부:
+      "커뮤니케이션학부 관련 발표에서는 국어·영어와 사회·문화, 생활과 윤리 등 사회 교과의 언급이 두드러집니다. 한국사와 세계사를 함께 안내하는 대학이 있으며, 미디어·콘텐츠 특성을 반영해 과목을 넓게 제시한 경우도 확인됩니다. 핵심·권장·미구분 표기가 혼재해 동일 과목의 위상이 대학마다 다르게 나타날 수 있습니다. 모집단위 발표와 인문·사회 계열 공통 발표의 범위를 구분해 확인하는 것이 필요합니다.",
+    초등교육과:
+      "초등교육과 발표자료에서는 국어·영어·한국사의 공통 교과와 함께 확률과 통계, 사회·문화, 생활과 윤리 등이 반복적으로 확인됩니다. 교과를 폭넓게 안내하는 대학이 많아, 특정 심화 과목보다 기초 교과 이수를 강조하는 경향이 있습니다. 핵심·권장 구분은 대학마다 달라 같은 과목도 표기가 다르게 나타납니다. 초등교육 모집단위 발표와 교육계열 공통 발표의 범위가 다를 수 있어 학년도별 자료를 함께 확인할 필요가 있습니다.",
+    수학교육과:
+      "수학교육과 관련 자료에서는 미적분Ⅱ, 기하, 확률과 통계 등 수학 과목의 비중이 가장 높습니다. 국어·영어·한국사 등 공통 교과를 함께 안내하는 대학이 있으며, 교육계열 특성을 반영해 과목을 넓게 제시한 발표도 확인됩니다. 핵심·권장 표기는 대학마다 달라 빈도만으로 필수 여부를 판단하기 어렵습니다. 수학교육 모집단위 발표와 사범·교육 계열 공통 발표의 범위가 혼재할 수 있으므로 발표 단위를 구분해 보는 것이 좋습니다.",
+    영어교육과:
+      "영어교육과 발표에서는 영어와 국어·한국사의 언급이 두드러지며, 사회·문화·생활과 윤리 등 사회 교과가 함께 나타나는 경우가 많습니다. 확률과 통계를 포함한 대학도 확인되고, 과목을 구체적으로 명시한 자료와 영역만 안내한 자료가 섞여 있습니다. 핵심·권장 구분이 일정하지 않아 동일 과목의 위상이 대학마다 다르게 해석될 수 있습니다. 영어교육 모집단위 발표와 교육계열 공통 발표의 범위를 함께 확인할 필요가 있습니다.",
+    한국어교육과:
+      "한국어교육과 관련 자료에서는 국어·영어·한국사가 공통적으로 강조되고, 사회·문화·생활과 윤리 등 사회 교과가 함께 확인됩니다. 확률과 통계를 포함한 발표도 있으며, 언어·교육 특성을 반영해 과목을 넓게 안내하는 대학이 있습니다. 핵심·권장·미구분 표기가 혼재해 빈도만으로 필수 과목을 단정하기는 어렵습니다. 모집단위별 안내와 교육계열 공통 안내의 범위가 다를 수 있으므로 해당 학년도 자료를 기준으로 확인하는 것이 좋습니다.",
+  };
+
+  function majorByFieldAnalysisText(item, subjects) {
+    const named = MAJOR_BY_FIELD_ANALYSIS[item?.name];
+    if (named) return named;
+    const top = subjects
+      .slice(0, 4)
+      .map((s) => s.name)
+      .join(", ");
+    const mid = subjects
+      .slice(4, 7)
+      .map((s) => s.name)
+      .join(", ");
+    const second = mid
+      ? `${item.name} 관련 자료에서는 ${mid} 등도 함께 확인되며, 과목을 구체적으로 명시한 대학과 교과 영역만 넓게 제시한 대학이 혼재합니다.`
+      : `${item.name} 관련 자료에서는 과목을 구체적으로 명시한 대학과 교과 영역만 넓게 제시한 대학이 함께 확인됩니다.`;
+    return `${item.name} 직접 모집단위와 적용이 확인된 공통 발표자료에서는 ${top} 등의 언급이 반복적으로 나타납니다. ${second} 핵심·권장 구분은 대학마다 달라 같은 과목도 핵심, 권장 또는 미구분으로 발표되므로 빈도만으로 필수 여부를 판단할 수 없습니다. 모집단위별 발표와 계열·단과대학 공통 발표의 범위도 서로 다를 수 있어, 관심 대학의 해당 학년도 발표자료를 함께 확인하는 것이 좋습니다.`;
+  }
+
+  function majorByFieldResultData(item) {
+    const catalog = majorByFieldSubjectCatalog(item);
+    const subjects = catalog.map((subject, index) => {
+      const count = 8 + ((majorByFieldSeed(`${item.name}|${subject.name}`) + index) % 8);
+      const cards = majorByFieldUnivCards(item.name, subject.name, count);
+      return {
+        name: subject.name,
+        tags: subject.tags,
+        cards,
+        univs: cards.map((card) => card.univ),
+        count: cards.length,
+      };
+    });
+    return { subjects, analysis: majorByFieldAnalysisText(item, subjects) };
+  }
+
+  function majorByFieldHtml() {
+    const exploreRows = getMajorExploreRows();
+    const tracks = [...new Set(exploreRows.map((row) => row.track))];
+
+    return `<section class="admit-search" data-admit-search data-search-type="major-by-field">
+      <div class="admit-search-bar">
+        <select class="admit-search-select" name="track" aria-label="전공 계열">
+          <option value="">전공 계열 선택</option>
+          ${majorExploreOptionHtml(tracks)}
+        </select>
+        <select class="admit-search-select" name="subtrack" aria-label="전공 세부계열" disabled>
+          <option value="">전공 세부계열 선택</option>
+        </select>
+        <select class="admit-search-select" name="major" aria-label="전공" disabled>
+          <option value="">전공 선택</option>
+        </select>
+      </div>
+      <div class="major-by-field-hint" data-major-by-field-hint data-hint-step="1">
+        <div class="major-by-field-hint-inner">
+          <span class="major-by-field-hint-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" width="60" height="60" focusable="false">
+              <g transform="translate(1.5 0.5)">
+                <path d="M18 12h20l8 8v28a4 4 0 0 1-4 4H18a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/>
+                <path d="M38 12v8h8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M22 26h16M22 32h14M22 38h12M22 44h10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>
+                <circle cx="40.5" cy="43.5" r="8.5" fill="#fff" stroke="currentColor" stroke-width="2.6"/>
+                <path d="m46.5 49.5 6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+              </g>
+            </svg>
+          </span>
+          <p class="major-by-field-hint-title" data-major-by-field-hint-title>전공 계열을 먼저 선택해 주세요</p>
+          <p class="major-by-field-hint-desc" data-major-by-field-hint-desc>전공 계열 → 전공 세부계열 → 전공 순으로 선택할 수 있어요.</p>
+          <ol class="major-by-field-hint-steps">
+            <li data-hint-step-item="1" class="is-current">
+              <span class="major-by-field-step-dot"><i>1</i></span>
+              <em>전공 계열</em>
+            </li>
+            <li data-hint-step-item="2">
+              <span class="major-by-field-step-dot"><i>2</i></span>
+              <em>전공 세부계열</em>
+            </li>
+            <li data-hint-step-item="3">
+              <span class="major-by-field-step-dot"><i>3</i></span>
+              <em>전공</em>
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div class="major-by-field-result" data-major-by-field-result hidden>
+        <div class="major-by-univ-summary major-by-field-summary">
+          <div class="major-by-univ-stats is-single">
+            <div class="major-by-univ-stat">
+              <span class="major-by-univ-stat-label">선택 전공</span>
+              <strong class="major-by-univ-stat-value" data-major-by-field-name></strong>
+            </div>
+          </div>
+          <div class="major-by-univ-notice">
+            <p class="major-by-univ-notice-line">
+              <span class="admit-detail-note-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                  <path d="M12 10.5v6M12 7.5h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span>AI 종합 분석은 대학 공식 자료를 비교해, 전공별로 여러 대학이 공통으로 권장한 과목과 대학마다 어떤 과목까지 안내했는지 정리합니다.</span>
+            </p>
+            <p class="major-by-univ-notice-line">
+              <span class="admit-detail-note-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                  <path d="M12 10.5v6M12 7.5h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span>대학별 권장과목은 2028학년도 한국대학교육협의회(대교협) 취합 자료를 바탕으로, 선택한 전공에 대해 각 대학이 어떤 과목을 권장했는지 보여줍니다.</span>
+            </p>
+          </div>
+        </div>
+        <section class="major-by-field-block">
+          <div class="major-by-field-panel-head">
+            <h3 class="title-3 major-by-field-panel-title">AI 종합 분석</h3>
+          </div>
+          <div class="major-by-field-panel">
+            <p class="major-by-field-ai-text" data-major-by-field-ai></p>
+          </div>
+        </section>
+        <section class="major-by-field-block">
+          <div class="major-by-field-panel-head">
+            <h3 class="title-3 major-by-field-panel-title">권장과목 및 발표대학</h3>
+          </div>
+          <div class="major-by-field-panel">
+            <ul class="major-by-field-subject-list" data-major-by-field-subjects></ul>
+          </div>
+        </section>
+      </div>
+    </section>`;
+  }
+
+  function setAdmitSelectDisabled(select, disabled) {
+    if (!select) return;
+    select.disabled = Boolean(disabled);
+    const wrap = select.closest(".admit-select");
+    if (!wrap) return;
+    wrap.classList.toggle("is-disabled", Boolean(disabled));
+    const trigger = wrap.querySelector(".admit-select-trigger");
+    if (trigger) {
+      trigger.disabled = Boolean(disabled);
+      trigger.setAttribute("aria-disabled", disabled ? "true" : "false");
+    }
+  }
+
+  function bindMajorByField(root) {
+    if (!root || root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
+    enhanceAdmitSelects(root);
+
+    const trackSelect = root.querySelector('select[name="track"]');
+    const subtrackSelect = root.querySelector('select[name="subtrack"]');
+    const majorSelect = root.querySelector('select[name="major"]');
+    const hint = root.querySelector("[data-major-by-field-hint]");
+    const hintTitle = root.querySelector("[data-major-by-field-hint-title]");
+    const hintDesc = root.querySelector("[data-major-by-field-hint-desc]");
+    const result = root.querySelector("[data-major-by-field-result]");
+    const summaryEl = root.querySelector(".major-by-field-summary");
+    const nameEl = root.querySelector("[data-major-by-field-name]");
+    const aiEl = root.querySelector("[data-major-by-field-ai]");
+    const listEl = root.querySelector("[data-major-by-field-subjects]");
+    if (!trackSelect || !subtrackSelect || !majorSelect) return;
+
+    const syncSummaryLayout = () => {
+      /* PC는 항상 좌우. 위·아래 배치는 max-width:1279 CSS만 담당 */
+      summaryEl?.classList.remove("is-stacked");
+    };
+
+    const HINT_COPY = {
+      1: {
+        title: "전공 계열을 먼저 선택해 주세요",
+        desc: "전공 계열 → 전공 세부계열 → 전공 순으로 선택할 수 있어요.",
+      },
+      2: {
+        title: "전공 세부계열을 선택해 주세요",
+        desc: "선택한 전공 계열에 속한 전공 세부계열을 확인할 수 있어요.",
+      },
+      3: {
+        title: "전공을 선택해 주세요",
+        desc: "전공을 선택하면 AI 분석 및 대학별 권장과목이 표시됩니다.",
+      },
+    };
+
+    const fillSelect = (select, placeholder, values, current) => {
+      const keep = values.includes(current) ? current : "";
+      select.innerHTML = [
+        `<option value="">${placeholder}</option>`,
+        ...values.map(
+          (value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`
+        ),
+      ].join("");
+      select.value = keep;
+      select.closest(".admit-select")?._rebuildAdmitSelect?.();
+    };
+
+    const updateHint = (step) => {
+      const copy = HINT_COPY[step] || HINT_COPY[1];
+      if (hint) hint.dataset.hintStep = String(step);
+      if (hintTitle) hintTitle.textContent = copy.title;
+      if (hintDesc) hintDesc.textContent = copy.desc;
+      root.querySelectorAll("[data-hint-step-item]").forEach((item) => {
+        const n = Number(item.dataset.hintStepItem || 0);
+        item.classList.toggle("is-current", n === step);
+        item.classList.toggle("is-done", n < step);
+      });
+    };
+
+    const renderResult = (item) => {
+      const data = majorByFieldResultData(item);
+      if (nameEl) nameEl.textContent = item.name;
+      if (aiEl) {
+        aiEl.innerHTML = String(data.analysis || "")
+          .split(/(?<=\.)\s+/)
+          .map((part) => part.trim())
+          .filter(Boolean)
+          .map((part) => `<p>${escapeHtml(part)}</p>`)
+          .join("");
+      }
+      if (listEl) {
+        listEl.innerHTML = data.subjects
+          .map((subject) => {
+            const tags = (subject.tags || [])
+              .map((tag) => {
+                const isArea = /^(수학|과학|영어|국어|사회|한국사|기술·가정)$/.test(tag);
+                const cls = isArea ? "admit-detail-tag is-primary" : "admit-detail-tag";
+                return `<span class="${cls}">${escapeHtml(tag)}</span>`;
+              })
+              .join("");
+            const univText = (subject.univs || []).join(", ");
+            const cards = (subject.cards || [])
+              .map(
+                (card) => `<button type="button" class="major-by-field-univ-card" data-univ="${escapeHtml(
+                  card.univ
+                )}" data-unit="${escapeHtml(card.unit)}">
+                  <span class="major-by-field-univ-card-body">
+                    <strong class="major-by-field-univ-card-name">${escapeHtml(card.univ)}</strong>
+                    <span class="major-by-field-univ-card-unit">${escapeHtml(card.unit)}</span>
+                  </span>
+                  <svg viewBox="8 5 10 14" aria-hidden="true" focusable="false">
+                    <path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>`
+              )
+              .join("");
+            return `<li class="major-by-field-subject-item" data-subject-item>
+              <div class="major-by-field-subject-row">
+                <div class="major-by-field-subject-main">
+                  <div class="major-by-field-subject-title-row">
+                    <strong class="major-by-field-subject-name">${escapeHtml(subject.name)}</strong>
+                    <span class="major-by-field-tags">${tags}</span>
+                  </div>
+                  <p class="major-by-field-subject-univs">${escapeHtml(univText)}</p>
+                </div>
+                <button type="button" class="admit-data-view major-by-field-univ-count" aria-expanded="false">
+                  ${subject.count}개 대학
+                  <svg class="major-by-field-univ-count-arrow" viewBox="8 5 10 14" aria-hidden="true" focusable="false">
+                    <path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="major-by-field-univ-panel" hidden>
+                <div class="major-by-field-univ-cards">${cards}</div>
+              </div>
+            </li>`;
+          })
+          .join("");
+      }
+      if (hint) hint.hidden = true;
+      if (result) result.hidden = false;
+      syncSummaryLayout();
+    };
+
+    const showHint = (step) => {
+      updateHint(step);
+      if (hint) hint.hidden = false;
+      if (result) result.hidden = true;
+      if (nameEl) nameEl.textContent = "";
+      if (aiEl) aiEl.innerHTML = "";
+      if (listEl) listEl.innerHTML = "";
+      summaryEl?.classList.remove("is-stacked");
+    };
+
+    const sync = (changed) => {
+      const allRows = getMajorExploreRows();
+      const trackVal = trackSelect.value || "";
+      if (changed === "track") {
+        subtrackSelect.value = "";
+        majorSelect.value = "";
+      }
+      if (changed === "subtrack") {
+        majorSelect.value = "";
+      }
+
+      const byTrack = trackVal ? allRows.filter((row) => row.track === trackVal) : [];
+      const subtracks = [...new Set(byTrack.map((row) => row.subtrack))];
+      const subtrackEnabled = Boolean(trackVal);
+      fillSelect(
+        subtrackSelect,
+        "전공 세부계열 선택",
+        subtrackEnabled ? subtracks : [],
+        subtrackEnabled ? subtrackSelect.value : ""
+      );
+      setAdmitSelectDisabled(subtrackSelect, !subtrackEnabled);
+
+      const subtrackVal = subtrackSelect.value || "";
+      const bySub = subtrackVal
+        ? byTrack.filter((row) => row.subtrack === subtrackVal)
+        : [];
+      const majors = bySub.map((row) => row.name);
+      const majorEnabled = Boolean(trackVal && subtrackVal);
+      fillSelect(
+        majorSelect,
+        "전공 선택",
+        majorEnabled ? majors : [],
+        majorEnabled ? majorSelect.value : ""
+      );
+      setAdmitSelectDisabled(majorSelect, !majorEnabled);
+
+      const majorVal = majorSelect.value || "";
+      if (trackVal && subtrackVal && majorVal) {
+        const item = bySub.find((row) => row.name === majorVal);
+        if (item) {
+          renderResult(item);
+          return;
+        }
+      }
+      if (!trackVal) showHint(1);
+      else if (!subtrackVal) showHint(2);
+      else showHint(3);
+    };
+
+    trackSelect.addEventListener("change", () => sync("track"));
+    subtrackSelect.addEventListener("change", () => sync("subtrack"));
+    majorSelect.addEventListener("change", () => sync("major"));
+
+    root.addEventListener("click", (event) => {
+      const card = event.target.closest(".major-by-field-univ-card");
+      if (card && root.contains(card)) {
+        const univ = card.dataset.univ || "";
+        const unit = card.dataset.unit || "";
+        if (univ) {
+          openMajorByUnivRecommendDetail(univ, { highlightUnit: unit });
+        }
+        return;
+      }
+      const toggle = event.target.closest(".major-by-field-univ-count");
+      if (!toggle || !root.contains(toggle)) return;
+      const item = toggle.closest("[data-subject-item]");
+      if (!item) return;
+      const panel = item.querySelector(".major-by-field-univ-panel");
+      const open = !item.classList.contains("is-open");
+      root.querySelectorAll("[data-subject-item].is-open").forEach((el) => {
+        if (el === item) return;
+        el.classList.remove("is-open");
+        const btn = el.querySelector(".major-by-field-univ-count");
+        const otherPanel = el.querySelector(".major-by-field-univ-panel");
+        if (btn) btn.setAttribute("aria-expanded", "false");
+        if (otherPanel) otherPanel.hidden = true;
+      });
+      item.classList.toggle("is-open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      if (panel) panel.hidden = !open;
+    });
+
+    setAdmitSelectDisabled(subtrackSelect, true);
+    setAdmitSelectDisabled(majorSelect, true);
+    showHint(1);
   }
 
   const MAJOR_BY_UNIV_ZONES = [
@@ -1011,12 +1688,15 @@ const Guide = (() => {
         ];
   }
 
-  function majorByUnivRecommendRowHtml(row, index, list) {
+  function majorByUnivRecommendRowHtml(row, index, list, highlightUnit) {
+    const unit = String(row.unit || "").trim();
+    const focus = String(highlightUnit || "").trim();
     const classes = [];
     if (index % 2 === 1) classes.push("is-alt");
     if (index === list.length - 1) classes.push("is-last-visible");
+    if (focus && unit === focus) classes.push("is-focus-unit");
     const cls = classes.length ? ` class="${classes.join(" ")}"` : "";
-    const cells = [`<td>${escapeHtml(row.unit || "-")}</td>`];
+    const cells = [`<td>${escapeHtml(unit || "-")}</td>`];
     if (!row.coreSkip) {
       const rs = row.coreRowspan > 1 ? ` rowspan="${row.coreRowspan}"` : "";
       const cs = row.coreColspan > 1 ? ` colspan="${row.coreColspan}"` : "";
@@ -1028,7 +1708,17 @@ const Guide = (() => {
     }
     /* 비고: 우선 전부 하이픈 */
     cells.push(`<td>-</td>`);
-    return `<tr${cls}>${cells.join("")}</tr>`;
+    return `<tr data-unit="${escapeHtml(unit)}"${cls}>${cells.join("")}</tr>`;
+  }
+
+  function majorByUnivMetaFor(univName) {
+    const univ = String(univName || "").trim();
+    const hit =
+      majorByUnivSource().find((item) => item.name === univ) ||
+      (window.ADMIT_DEMO_UNITS || []).find((item) => String(item.univ || "").trim() === univ);
+    const region = String(hit?.region || "").trim();
+    const zone = MAJOR_BY_UNIV_ZONES.find((item) => item.regions.includes(region));
+    return { region, zoneLabel: zone?.label || "" };
   }
 
   function openMajorByUnivRecommendDetail(univName, meta = {}) {
@@ -1036,9 +1726,21 @@ const Guide = (() => {
     if (!univ) return;
     /* 팝업 제목: 줄임말 없이 정식명(캠퍼스 포함) */
     const label = univ;
-    const zoneLabel = String(meta.zoneLabel || "").trim();
-    const region = String(meta.region || "").trim();
+    const fallbackMeta = majorByUnivMetaFor(univ);
+    const zoneLabel = String(meta.zoneLabel || fallbackMeta.zoneLabel || "").trim();
+    const region = String(meta.region || fallbackMeta.region || "").trim();
+    const highlightUnit = String(meta.highlightUnit || "").trim();
     const rows = resolveMajorByUnivRecommendRows(univ);
+    const focusUnit =
+      (highlightUnit && rows.some((row) => String(row.unit || "").trim() === highlightUnit)
+        ? highlightUnit
+        : "") ||
+      (highlightUnit
+        ? String(
+            rows.find((row) => majorByFieldUnitMatches(String(row.unit || "").trim(), highlightUnit))
+              ?.unit || ""
+          ).trim()
+        : "");
     const root = ensureMajorByUnivDetailModal();
     const crumb = root.querySelector("#major-by-univ-detail-crumb");
     const tags = root.querySelector("[data-major-by-univ-detail-tags]");
@@ -1062,7 +1764,9 @@ const Guide = (() => {
         </button>`;
     }
 
-    const tableRows = rows.map((row, index, list) => majorByUnivRecommendRowHtml(row, index, list)).join("");
+    const tableRows = rows
+      .map((row, index, list) => majorByUnivRecommendRowHtml(row, index, list, focusUnit))
+      .join("");
 
     if (body) {
       body.innerHTML = `
@@ -1094,6 +1798,12 @@ const Guide = (() => {
 
     root.hidden = false;
     document.body.style.overflow = "hidden";
+    if (focusUnit) {
+      requestAnimationFrame(() => {
+        const focusRow = root.querySelector("tr.is-focus-unit");
+        focusRow?.scrollIntoView({ block: "center", behavior: "smooth" });
+      });
+    }
   }
 
   function bindMajorByUniv(root) {
@@ -2366,6 +3076,10 @@ const Guide = (() => {
           li.classList.toggle("is-selected", on);
           li.setAttribute("aria-selected", on ? "true" : "false");
         });
+        const off = Boolean(select.disabled);
+        wrap.classList.toggle("is-disabled", off);
+        trigger.disabled = off;
+        trigger.setAttribute("aria-disabled", off ? "true" : "false");
       };
 
       const rebuildOptions = () => {
@@ -2392,6 +3106,7 @@ const Guide = (() => {
       trigger.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+        if (select.disabled || wrap.classList.contains("is-disabled")) return;
         const willOpen = !wrap.classList.contains("is-open");
         closeAllAdmitSelects(wrap);
         if (!willOpen) {
@@ -5341,13 +6056,14 @@ const Guide = (() => {
     });
   }
 
-  function bindAdmitSearch(panel) {
-    const root = panel.querySelector("[data-admit-search]");
+  function bindAdmitSearch(panel, rootOverride) {
+    const root = rootOverride || panel.querySelector("[data-admit-search]");
     if (!root || root.dataset.bound === "1") return;
     root.dataset.bound = "1";
 
     enhanceAdmitSelects(root);
-    const refresh = () => applyAdmitFilters(panel);
+    const sectionId = root.closest(".guide-block")?.id || "";
+    const refresh = () => applyAdmitFilters(panel, sectionId || undefined);
 
     const toggle = root.querySelector("[data-admit-toggle]");
     const body = root.querySelector("[data-admit-body]");
@@ -7157,6 +7873,7 @@ const Guide = (() => {
         else if (block.id === "university-map") inner = campusMapHtml();
         else if (block.id === "university-roadview") inner = campusRoadviewHtml();
         else if (block.id === "major-explore") inner = majorExploreHtml();
+        else if (block.id === "major-by-field") inner = majorByFieldHtml();
         else if (block.id === "major-by-univ") inner = majorByUnivHtml();
         return `<section class="guide-block" id="${block.id}" data-chapter="${chapter || ""}"${slices}>
           ${inner}
@@ -7176,7 +7893,9 @@ const Guide = (() => {
 
     if (guide.search) bindAdmitSearch(panel);
     const majorExplore = panel.querySelector('[data-search-type="major-explore"]');
-    if (majorExplore) bindAdmitSearch(panel);
+    if (majorExplore) bindAdmitSearch(panel, majorExplore);
+    const majorByField = panel.querySelector('[data-search-type="major-by-field"]');
+    if (majorByField) bindMajorByField(majorByField);
     const majorByUniv = panel.querySelector('[data-search-type="major-by-univ"]');
     if (majorByUniv) bindMajorByUniv(majorByUniv);
     const campusMap = panel.querySelector("[data-campus-map]");

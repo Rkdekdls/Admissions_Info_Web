@@ -189,13 +189,28 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
     return kept.length ? kept.join(", ") : "-";
   }
 
+  function isTechUnit(unit) {
+    return /컴퓨터|소프트웨어|인공|데이터|전산|정보통신|IT계약/.test(String(unit || ""));
+  }
+
   function pickRecommend(unit, style, idx, core = "") {
-    if (style === "empty") return "-";
     if (style === "colspan") return null;
+    /* empty여도 IT·AI 계열은 정보/인공지능 기초/프로그래밍을 남겨 전공별 권장과목과 맞춤 */
+    if (style === "empty" && !isTechUnit(unit)) return "-";
     let raw = "-";
-    if (/컴퓨터|소프트웨어|인공|데이터|전산|정보/.test(unit)) raw = idx % 2 ? "정보, 인공지능 수학" : "정보";
-    else if (/기계|전자|전기|항공|반도체|화공|소재/.test(unit)) raw = idx % 2 ? "물리학" : "물리학, 화학";
-    else if (/의예|치의|한의|수의|약학|간호|생명/.test(unit)) raw = idx % 3 ? "물리학" : "기하";
+    if (isTechUnit(unit)) {
+      const opts = [
+        "정보, 인공지능 기초",
+        "인공지능 기초, 프로그래밍",
+        "정보, 프로그래밍",
+        "인공지능 기초",
+        "프로그래밍, 정보",
+      ];
+      raw = opts[idx % opts.length];
+    } else if (/기계|전자|전기|항공|반도체|화공|소재|산업공학|계약|팩토리|배터리|디스플레이/.test(unit)) {
+      const opts = ["물리학", "물리학, 화학", "물리학, 정보", "정보"];
+      raw = opts[idx % opts.length];
+    } else if (/의예|치의|한의|수의|약학|간호|생명/.test(unit)) raw = idx % 3 ? "물리학" : "기하";
     else if (/경영|경제/.test(unit)) raw = idx % 2 ? "경제" : "사회";
     else if (/교육|초등|유아|특수/.test(unit)) raw = idx % 2 ? "제2외국어/한문" : "사회, 과학";
     else if (/국어|영어|사학|철학|중어|일어/.test(unit)) raw = idx % 2 ? "제2외국어/한문" : "지리";
@@ -373,9 +388,23 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
     "동국대학교(서울)": ["경찰행정학부"],
   };
 
+  function ensureTechRecommend(rows) {
+    return (rows || []).map((row, idx) => {
+      if (!isTechUnit(row.unit)) return row;
+      const rec = String(row.recommend ?? "").trim();
+      if (rec && rec !== "-" && !row.recommendSkip) return row;
+      const core = row.coreSkip ? "" : row.core || "";
+      return {
+        ...row,
+        recommend: pickRecommend(row.unit, "sep", idx, core),
+        recommendSkip: false,
+      };
+    });
+  }
+
   const packs = {};
   UNIV_META.forEach((meta) => {
-    packs[meta.name] = buildRows(meta, DEMO_UNIT_BY_UNIV[meta.name] || []);
+    packs[meta.name] = ensureTechRecommend(buildRows(meta, DEMO_UNIT_BY_UNIV[meta.name] || []));
   });
 
   /* 데모 목록 외 보강 대학 */
@@ -386,7 +415,7 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
     { name: "전북대학교", theme: "med", bias: ["hum", "biz", "stem", "health", "edu"] },
     { name: "강원대학교", theme: "edu-elem", bias: ["edu", "hum", "stem", "health", "biz"] },
   ].forEach((meta) => {
-    packs[meta.name] = buildRows(meta, DEMO_UNIT_BY_UNIV[meta.name] || []);
+    packs[meta.name] = ensureTechRecommend(buildRows(meta, DEMO_UNIT_BY_UNIV[meta.name] || []));
   });
 
   return packs;

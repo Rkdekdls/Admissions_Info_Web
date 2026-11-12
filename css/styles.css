@@ -663,7 +663,8 @@ input {
   margin: 0;
 }
 
-.admit-search[data-search-type="major-explore"] .admit-search-bar {
+.admit-search[data-search-type="major-explore"] .admit-search-bar,
+.admit-search[data-search-type="major-by-field"] .admit-search-bar {
   grid-template-columns: repeat(3, minmax(140px, 1fr));
   margin: 0;
 }
@@ -720,7 +721,9 @@ input {
 }
 
 .admit-search[data-search-type="major-explore"] .admit-list-head .admit-list-title,
-.admit-search[data-search-type="major-explore"] .admit-list-head .admit-list-title.title-3 {
+.admit-search[data-search-type="major-explore"] .admit-list-head .admit-list-title.title-3,
+.admit-search[data-search-type="major-by-field"] .admit-list-head .admit-list-title,
+.admit-search[data-search-type="major-by-field"] .admit-list-head .admit-list-title.title-3 {
   padding-right: 0;
 }
 
@@ -745,6 +748,506 @@ input {
 .admit-search[data-search-type="major-explore"] .admit-data-table th:nth-child(5),
 .admit-search[data-search-type="major-explore"] .admit-data-table td:nth-child(5) {
   width: 10%;
+}
+
+.major-by-field-hint {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 0;
+  margin: 18px 0 0;
+  padding: 40px 28px;
+  border: 1px dashed #d1d5db;
+  background:
+    linear-gradient(180deg, #f8fafc 0%, #f3f6fb 100%);
+  text-align: center;
+  overflow: hidden;
+}
+
+.major-by-field-hint-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: min(640px, 100%);
+}
+
+.major-by-field-hint-icon {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  margin: 0 0 35px;
+  border: 1px solid #e5e7eb;
+  border-radius: 50% !important;
+  background: #fff;
+  color: #1a4796;
+  box-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  outline: none;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.major-by-field-hint-icon svg {
+  display: block;
+  width: 60px;
+  height: 60px;
+  margin: 0;
+  filter: none;
+}
+
+.major-by-field-hint-title {
+  margin: 0 0 15px;
+  color: rgb(107, 114, 128);
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.3;
+}
+
+.major-by-field-hint-desc {
+  margin: 0 0 35px;
+  color: #6b7280;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.55;
+}
+
+.major-by-field-hint-steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(560px, 100%);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* 원 중심을 잇는 기본 회색 선 */
+.major-by-field-hint-steps::before {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 16.666%;
+  width: 66.666%;
+  height: 2px;
+  background: #d1d5db;
+  z-index: 0;
+}
+
+/* 진행된 구간만 남색으로 채움 */
+.major-by-field-hint-steps::after {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 16.666%;
+  height: 2px;
+  background: #1a4796;
+  z-index: 0;
+  transition: width 0.28s ease;
+  width: 0;
+}
+
+.major-by-field-hint[data-hint-step="1"] .major-by-field-hint-steps::after {
+  width: 0;
+}
+
+.major-by-field-hint[data-hint-step="2"] .major-by-field-hint-steps::after {
+  width: 33.333%;
+}
+
+.major-by-field-hint[data-hint-step="3"] .major-by-field-hint-steps::after {
+  width: 66.666%;
+}
+
+.major-by-field-hint-steps li {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  color: #9ca3af;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.major-by-field-hint-steps li em {
+  font-style: normal;
+  font-weight: inherit;
+}
+
+.major-by-field-step-dot {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: 2px solid #d1d5db;
+  border-radius: 50% !important;
+  background: #fff;
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 0;
+  aspect-ratio: 1 / 1;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.major-by-field-step-dot i {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  transform: translateY(0.5px);
+}
+
+.major-by-field-hint-steps li.is-done,
+.major-by-field-hint-steps li.is-current {
+  color: #1a4796;
+  font-weight: 600;
+}
+
+.major-by-field-hint-steps li.is-done .major-by-field-step-dot,
+.major-by-field-hint-steps li.is-current .major-by-field-step-dot {
+  border-color: #1a4796;
+  background: #1a4796;
+  color: #fff;
+}
+
+.major-by-field-result {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 18px;
+}
+
+.major-by-field-result[hidden],
+.major-by-field-hint[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 1279px) {
+  .major-by-field-hint {
+    padding: 28px 16px;
+  }
+
+  .major-by-field-hint-icon {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+  }
+
+  .major-by-field-hint-icon svg {
+    width: 54px;
+    height: 54px;
+  }
+
+  .major-by-field-hint-title {
+    font-size: 23px;
+  }
+
+  .major-by-field-hint-desc {
+    font-size: 15px;
+  }
+
+  .major-by-field-step-dot {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.major-by-field-panel {
+  box-sizing: border-box;
+  padding: 18px 20px;
+  border: 1px solid #e5e7eb;
+  border-top: 4px solid #1a4796;
+  background: #fff;
+}
+
+/* 과목 목록: 패널 패딩 제거 → 행마다 위·아래 여백 동일 (맨 위·맨 아래 포함) */
+.major-by-field-panel:has(> .major-by-field-subject-list) {
+  padding: 0;
+}
+
+.major-by-field-summary .major-by-univ-stats.is-single {
+  grid-template-columns: minmax(140px, auto);
+}
+
+.major-by-field-summary .major-by-univ-stat {
+  min-width: 160px;
+}
+
+.major-by-field-summary .major-by-univ-stat-value {
+  word-break: keep-all;
+}
+
+/* PC: 전공명 길이와 관계없이 항상 좌우. 위·아래는 태블릿·모바일만 */
+@media (max-width: 1279px) {
+  .major-by-field-result > .major-by-univ-summary.major-by-field-summary,
+  .major-by-field-result > .major-by-univ-summary.major-by-field-summary.is-stacked {
+    grid-template-columns: 1fr;
+  }
+
+  .major-by-field-summary .major-by-univ-stats.is-single,
+  .major-by-field-summary .major-by-univ-stat {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+}
+
+.major-by-field-block {
+  min-width: 0;
+}
+
+.major-by-field-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  /* 다른 탭 .admit-list-title / .title-3 과 동일 상하 18px */
+  margin: 18px 0;
+}
+
+.major-by-field-panel-title.title-3 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #1f2937;
+  font-family: "Noto Sans KR", Pretendard, "Segoe UI", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  line-height: 1.4;
+}
+
+.major-by-field-ai-text {
+  margin: 0;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.major-by-field-ai-text p {
+  margin: 0 0 6px;
+}
+
+.major-by-field-ai-text p:last-child {
+  margin-bottom: 0;
+}
+
+.major-by-field-subject-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.major-by-field-subject-item {
+  padding: 16px 20px; /* 맨 위·중간·맨 아래 행 모두 동일 */
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.major-by-field-subject-item:last-child {
+  border-bottom: 0;
+}
+
+.major-by-field-subject-row {
+  display: flex;
+  align-items: center; /* N개 대학 버튼 → 행 상하 중앙 */
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.major-by-field-subject-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.major-by-field-subject-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center; /* 과목명 ↔ 태그 상하 중앙 */
+  gap: 8px;
+  margin: 0 0 6px;
+}
+
+.major-by-field-subject-name {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px; /* admit-detail-tag 높이와 맞춤 */
+  color: #1a4796;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.major-by-field-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.major-by-field-subject-univs {
+  margin: 0;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.major-by-field-univ-count.admit-data-view {
+  flex: 0 0 auto;
+  align-self: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 92px;
+  height: 24px;
+  padding-left: 10px;
+  padding-right: 10px; /* 글자 왼쪽 = 화살표 오른쪽 */
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.major-by-field-univ-count.admit-data-view svg,
+.major-by-field-univ-count-arrow {
+  display: block;
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  margin: 0;
+  transition: transform 0.2s ease;
+}
+
+.major-by-field-subject-item.is-open .major-by-field-univ-count-arrow {
+  transform: rotate(90deg); /* 오른쪽 → 아래 */
+}
+
+.major-by-field-univ-panel {
+  margin: 14px 0 0;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  background: #f3f6fb;
+}
+
+.major-by-field-univ-panel[hidden] {
+  display: none !important;
+}
+
+.major-by-field-univ-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.major-by-field-univ-card {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 64px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  background: #fff;
+  color: #1f2937;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.major-by-field-univ-card:hover {
+  border-color: #1a4796;
+  background: #f8fafc;
+}
+
+.major-by-field-univ-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.major-by-field-univ-card-name {
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+
+.major-by-field-univ-card-unit {
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.major-by-field-univ-card svg {
+  display: block;
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  color: #9ca3af;
+}
+
+@media (max-width: 1279px) {
+  .major-by-field-panel-head {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .major-by-field-subject-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .major-by-field-univ-count.admit-data-view {
+    align-self: flex-start; /* 태블릿·모바일: 좌측 배치 */
+  }
+
+  .major-by-field-univ-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .major-by-field-univ-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .admit-major-keywords {
@@ -777,8 +1280,38 @@ input {
 .admit-search[data-search-type="university"],
 .admit-search[data-search-type="susi"],
 .admit-search[data-search-type="jeongsi"],
-.admit-search[data-search-type="major-explore"] {
+.admit-search[data-search-type="major-explore"],
+.admit-search[data-search-type="major-by-field"] {
   margin-bottom: 0;
+}
+
+/* 전공별 권장과목 빈 상태: 스크롤 없이 남은 화면만 채움(하단=.main padding) */
+.main:has([data-major-by-field-hint]:not([hidden])) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.main:has([data-major-by-field-hint]:not([hidden])) > .panel[data-guide="major"] {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.main:has([data-major-by-field-hint]:not([hidden])) #major-by-field:not([hidden]) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.main:has([data-major-by-field-hint]:not([hidden])) .admit-search[data-search-type="major-by-field"] {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 /* 수시·정시: 콘텐츠는 검색·표만 사용 — 빈 guide-block이 하단을 늘리지 않게 */
@@ -1046,18 +1579,20 @@ input {
   background-color: #fafafa;
 }
 
-/* 수시·정시·대학·전공탐색: 숨긴 행이 있어도 보이는 행은 흰색 → 회색 순 */
+/* 수시·정시·대학·전공탐색·전공별: 숨긴 행이 있어도 보이는 행은 흰색 → 회색 순 */
 .admit-data-table[data-susi-unit-table] tbody tr:nth-child(even),
 .admit-data-table[data-jeongsi-unit-table] tbody tr:nth-child(even),
 .admit-data-table[data-uni-table] tbody tr:nth-child(even),
-.admit-data-table[data-major-table] tbody tr:nth-child(even) {
+.admit-data-table[data-major-table] tbody tr:nth-child(even),
+.admit-data-table[data-major-field-table] tbody tr:nth-child(even) {
   background-color: transparent;
 }
 
 .admit-data-table[data-susi-unit-table] tbody tr.is-alt,
 .admit-data-table[data-jeongsi-unit-table] tbody tr.is-alt,
 .admit-data-table[data-uni-table] tbody tr.is-alt,
-.admit-data-table[data-major-table] tbody tr.is-alt {
+.admit-data-table[data-major-table] tbody tr.is-alt,
+.admit-data-table[data-major-field-table] tbody tr.is-alt {
   background-color: #fafafa;
 }
 
@@ -1123,7 +1658,8 @@ input {
 }
 
 .admit-data-table .admit-data-view,
-.campus-roadview-view {
+.campus-roadview-view,
+.major-by-field-univ-count.admit-data-view {
   appearance: none;
   display: inline-flex;
   align-items: center;
@@ -1152,12 +1688,14 @@ input {
 }
 
 .admit-data-table .admit-data-view:hover,
-.campus-roadview-view:hover:not(:disabled) {
+.campus-roadview-view:hover:not(:disabled),
+.major-by-field-univ-count.admit-data-view:hover {
   border-color: #1a4796;
 }
 
 .admit-data-table .admit-data-view:active,
-.campus-roadview-view:active:not(:disabled) {
+.campus-roadview-view:active:not(:disabled),
+.major-by-field-univ-count.admit-data-view:active {
   border-color: #1a4796;
   background: #f8fafc;
   color: #1a4796;
@@ -1283,6 +1821,22 @@ input {
 .admit-select-trigger:focus {
   border-color: #1a4796;
   background-color: #fff;
+}
+
+.admit-select.is-disabled .admit-select-trigger,
+.admit-select-trigger:disabled {
+  border-color: #e5e7eb;
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.admit-select.is-disabled .admit-select-trigger:hover,
+.admit-select.is-disabled .admit-select-trigger:focus,
+.admit-select-trigger:disabled:hover,
+.admit-select-trigger:disabled:focus {
+  border-color: #e5e7eb;
+  background-color: #f3f4f6;
 }
 
 .admit-select.is-open .admit-select-trigger {
@@ -2075,7 +2629,8 @@ input {
   .admit-search[data-search-type="jeongsi"] .admit-search-bar,
   .admit-search[data-search-type="university"] .admit-search-bar,
   .admit-search[data-search-type="susi"] .admit-search-bar,
-  .admit-search[data-search-type="major-explore"] .admit-search-bar {
+  .admit-search[data-search-type="major-explore"] .admit-search-bar,
+  .admit-search[data-search-type="major-by-field"] .admit-search-bar {
     grid-template-columns: minmax(0, 1fr);
     width: 100%;
     max-width: 100%;
@@ -3005,7 +3560,8 @@ input {
   .admit-search[data-search-type="jeongsi"] .admit-search-bar,
   .admit-search[data-search-type="university"] .admit-search-bar,
   .admit-search[data-search-type="susi"] .admit-search-bar,
-  .admit-search[data-search-type="major-explore"] .admit-search-bar {
+  .admit-search[data-search-type="major-explore"] .admit-search-bar,
+  .admit-search[data-search-type="major-by-field"] .admit-search-bar {
     grid-template-columns: minmax(0, 1fr);
     width: 100%;
     max-width: 100%;
@@ -7638,6 +8194,11 @@ button.major-detail-admit-chip.is-on.is-jeongsi:hover {
   background: #fff;
 }
 
+.major-by-univ-detail-root .admit-detail-table[data-major-by-univ-recommend-table] tbody tr.is-focus-unit td,
+.major-by-univ-detail-root .admit-detail-table[data-major-by-univ-recommend-table] tbody tr.is-alt.is-focus-unit td {
+  background: rgba(220, 38, 38, 0.05);
+}
+
 .major-by-univ-detail-root .admit-detail-table[data-major-by-univ-recommend-table] td {
   text-align: center;
 }
@@ -7654,6 +8215,11 @@ button.major-detail-admit-chip.is-on.is-jeongsi:hover {
   align-items: stretch;
   /* 페이지 제목(h1)→필터와 같은 22px 리듬 */
   margin: 0 0 22px;
+}
+
+/* 전공별: 요약↓소제목 간격은 panel-head 상하 18px만 사용 */
+.major-by-field-result > .major-by-univ-summary.major-by-field-summary {
+  margin: 0;
 }
 
 .major-by-univ-stats {
@@ -7712,8 +8278,8 @@ button.major-detail-admit-chip.is-on.is-jeongsi:hover {
 
 .major-by-univ-notice-line {
   display: flex;
-  align-items: center; /* 아이콘 ↔ 글자 상하 중앙 */
-  gap: 8px;
+  align-items: flex-start; /* 여러 줄일 때 아이콘·첫 줄 정렬 */
+  gap: 18px; /* i 왼쪽(박스 패딩)과 i→글자 간격 동일 */
   margin: 0;
   min-width: 0;
 }
@@ -7725,18 +8291,11 @@ button.major-detail-admit-chip.is-on.is-jeongsi:hover {
   flex: 0 0 auto;
   width: 18px;
   height: 18px;
-  margin: 0;
+  margin: 1px 0 0; /* 첫 줄 글자와 광학 맞춤 */
   color: #1a4796;
   line-height: 0;
-  align-self: center;
-}
-
-.major-by-univ-notice-line:first-child .admit-detail-note-icon {
-  transform: translateY(-1px); /* 위 줄 아이콘 살짝 위로 */
-}
-
-.major-by-univ-notice-line:last-child .admit-detail-note-icon {
-  transform: translateY(0px); /* 아래 줄 아이콘 살짝 아래로 */
+  align-self: flex-start;
+  transform: none;
 }
 
 .major-by-univ-notice-line .admit-detail-note-icon svg {
