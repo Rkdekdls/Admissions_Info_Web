@@ -1688,6 +1688,38 @@ const Guide = (() => {
         ];
   }
 
+  /* 강조 행이 rowspan 중간이면 해당 구간을 풀어 한 행의 칸이 모두 칠해지게 함 */
+  function expandRecommendRowsForFocus(rows, focusUnit) {
+    const focus = String(focusUnit || "").trim();
+    if (!focus || !Array.isArray(rows) || !rows.length) return rows;
+    const list = rows.map((row) => ({ ...row }));
+    const focusIdx = list.findIndex((row) => String(row.unit || "").trim() === focus);
+    if (focusIdx < 0) return list;
+
+    const splitSpan = (rowspanKey, skipKey, valueKey) => {
+      for (let i = 0; i < list.length; i += 1) {
+        const span = Number(list[i][rowspanKey] || 1);
+        if (span <= 1) continue;
+        const start = i;
+        const end = i + span - 1;
+        if (focusIdx < start || focusIdx > end) continue;
+        const value = list[start][valueKey];
+        for (let j = start; j <= end; j += 1) {
+          list[j] = {
+            ...list[j],
+            [skipKey]: false,
+            [rowspanKey]: 1,
+            [valueKey]: value,
+          };
+        }
+      }
+    };
+
+    splitSpan("coreRowspan", "coreSkip", "core");
+    splitSpan("recommendRowspan", "recommendSkip", "recommend");
+    return list;
+  }
+
   function majorByUnivRecommendRowHtml(row, index, list, highlightUnit) {
     const unit = String(row.unit || "").trim();
     const focus = String(highlightUnit || "").trim();
@@ -1764,7 +1796,8 @@ const Guide = (() => {
         </button>`;
     }
 
-    const tableRows = rows
+    const displayRows = expandRecommendRowsForFocus(rows, focusUnit);
+    const tableRows = displayRows
       .map((row, index, list) => majorByUnivRecommendRowHtml(row, index, list, focusUnit))
       .join("");
 
@@ -1774,10 +1807,10 @@ const Guide = (() => {
           <div class="admit-detail-table-wrap">
             <table class="admit-detail-table" data-major-by-univ-recommend-table>
               <colgroup>
-                <col style="width:16%">
-                <col style="width:40%">
-                <col style="width:36%">
-                <col style="width:8%">
+                <col style="width:15%">
+                <col style="width:38%">
+                <col style="width:35%">
+                <col style="width:12%">
               </colgroup>
               <thead>
                 <tr>

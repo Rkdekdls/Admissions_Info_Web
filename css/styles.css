@@ -8196,7 +8196,7 @@ button.major-detail-admit-chip.is-on.is-jeongsi:hover {
 
 .major-by-univ-detail-root .admit-detail-table[data-major-by-univ-recommend-table] tbody tr.is-focus-unit td,
 .major-by-univ-detail-root .admit-detail-table[data-major-by-univ-recommend-table] tbody tr.is-alt.is-focus-unit td {
-  background: rgba(220, 38, 38, 0.05);
+  background: rgba(220, 38, 38, 0.05) !important;
 }
 
 .major-by-univ-detail-root .admit-detail-table[data-major-by-univ-recommend-table] td {
