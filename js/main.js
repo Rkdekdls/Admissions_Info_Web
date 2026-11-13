@@ -103,6 +103,20 @@ function setRoute(tab, section) {
   if (location.hash !== next) history.replaceState(null, "", next);
 }
 
+/* 탭·섹션 전환 후 본문 스크롤 리셋 — 레이아웃/해시 스크롤이 한 프레임 늦는 경우까지 맞춤 */
+function resetMainScroll() {
+  const main = document.querySelector(".main");
+  if (!main) return;
+  main.scrollTop = 0;
+  requestAnimationFrame(() => {
+    main.scrollTop = 0;
+    requestAnimationFrame(() => {
+      main.scrollTop = 0;
+    });
+  });
+}
+window.resetMainScroll = resetMainScroll;
+
 function sectionLabelFor(tab, section) {
   if (!section) return "";
   const panel = document.querySelector(`#panel-${tab}`);
@@ -206,8 +220,7 @@ function selectTab(name, updateHash, targetId) {
   });
 
   setCrumb(key, activeSection);
-  const main = document.querySelector(".main");
-  if (main) main.scrollTop = 0;
+  resetMainScroll();
 
   if (isHome) {
     groups.forEach((group) => setGroupOpen(group.dataset.group, false));

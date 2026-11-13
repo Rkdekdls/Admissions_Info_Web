@@ -1048,6 +1048,26 @@ body.page-title-body {
   -webkit-overflow-scrolling: touch;
   /* 상하 간격은 웹 임베드 JS(18px)가 담당 — 여기서 넣으면 이중 여백 */
   margin: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.table-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 .table-scroll > table {

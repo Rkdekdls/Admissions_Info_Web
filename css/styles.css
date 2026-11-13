@@ -20,6 +20,100 @@
   --pc-table-min: 924px;
   /* 팝업 본문폭(1100 - 좌우 22*2). 본문 표와 같이 줄이지 않고 가로 스크롤 */
   --admit-detail-pc-min: 1056px;
+  /* 공통 스크롤바 */
+  --scroll-size: 6px;
+  --scroll-thumb: #d1d5db;
+  --scroll-thumb-hover: #9ca3af;
+  --scroll-track: transparent;
+}
+
+/* 가로·세로 스크롤 영역 공통 스크롤바 */
+.main,
+.admit-jeongsi-chart-scroll,
+.admit-detail-uni-chart-scroll,
+.admit-detail-dialog,
+.admit-detail-table-wrap,
+.admit-data-wrap,
+.info-table-wrap,
+.step-flow,
+.campus-map-input,
+.campus-map-suggest,
+.campus-map-route-body,
+.campus-map-result-scroll,
+.campus-roadview-list,
+.home-guide-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
+
+.main::-webkit-scrollbar,
+.admit-jeongsi-chart-scroll::-webkit-scrollbar,
+.admit-detail-uni-chart-scroll::-webkit-scrollbar,
+.admit-detail-dialog::-webkit-scrollbar,
+.admit-detail-table-wrap::-webkit-scrollbar,
+.admit-data-wrap::-webkit-scrollbar,
+.info-table-wrap::-webkit-scrollbar,
+.step-flow::-webkit-scrollbar,
+.campus-map-input::-webkit-scrollbar,
+.campus-map-suggest::-webkit-scrollbar,
+.campus-map-route-body::-webkit-scrollbar,
+.campus-map-result-scroll::-webkit-scrollbar,
+.campus-roadview-list::-webkit-scrollbar,
+.home-guide-list::-webkit-scrollbar {
+  width: var(--scroll-size);
+  height: var(--scroll-size);
+}
+
+.main::-webkit-scrollbar-track,
+.admit-jeongsi-chart-scroll::-webkit-scrollbar-track,
+.admit-detail-uni-chart-scroll::-webkit-scrollbar-track,
+.admit-detail-dialog::-webkit-scrollbar-track,
+.admit-detail-table-wrap::-webkit-scrollbar-track,
+.admit-data-wrap::-webkit-scrollbar-track,
+.info-table-wrap::-webkit-scrollbar-track,
+.step-flow::-webkit-scrollbar-track,
+.campus-map-input::-webkit-scrollbar-track,
+.campus-map-suggest::-webkit-scrollbar-track,
+.campus-map-route-body::-webkit-scrollbar-track,
+.campus-map-result-scroll::-webkit-scrollbar-track,
+.campus-roadview-list::-webkit-scrollbar-track,
+.home-guide-list::-webkit-scrollbar-track {
+  background: var(--scroll-track);
+}
+
+.main::-webkit-scrollbar-thumb,
+.admit-jeongsi-chart-scroll::-webkit-scrollbar-thumb,
+.admit-detail-uni-chart-scroll::-webkit-scrollbar-thumb,
+.admit-detail-dialog::-webkit-scrollbar-thumb,
+.admit-detail-table-wrap::-webkit-scrollbar-thumb,
+.admit-data-wrap::-webkit-scrollbar-thumb,
+.info-table-wrap::-webkit-scrollbar-thumb,
+.step-flow::-webkit-scrollbar-thumb,
+.campus-map-input::-webkit-scrollbar-thumb,
+.campus-map-suggest::-webkit-scrollbar-thumb,
+.campus-map-route-body::-webkit-scrollbar-thumb,
+.campus-map-result-scroll::-webkit-scrollbar-thumb,
+.campus-roadview-list::-webkit-scrollbar-thumb,
+.home-guide-list::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 3px;
+}
+
+.main::-webkit-scrollbar-thumb:hover,
+.admit-jeongsi-chart-scroll::-webkit-scrollbar-thumb:hover,
+.admit-detail-uni-chart-scroll::-webkit-scrollbar-thumb:hover,
+.admit-detail-dialog::-webkit-scrollbar-thumb:hover,
+.admit-detail-table-wrap::-webkit-scrollbar-thumb:hover,
+.admit-data-wrap::-webkit-scrollbar-thumb:hover,
+.info-table-wrap::-webkit-scrollbar-thumb:hover,
+.step-flow::-webkit-scrollbar-thumb:hover,
+.campus-map-input::-webkit-scrollbar-thumb:hover,
+.campus-map-suggest::-webkit-scrollbar-thumb:hover,
+.campus-map-route-body::-webkit-scrollbar-thumb:hover,
+.campus-map-result-scroll::-webkit-scrollbar-thumb:hover,
+.campus-roadview-list::-webkit-scrollbar-thumb:hover,
+.home-guide-list::-webkit-scrollbar-thumb:hover {
+  background: var(--scroll-thumb-hover);
 }
 
 * {
@@ -320,6 +414,7 @@ input {
   height: 100%;
   min-height: 0;
   overflow: auto;
+  overflow-anchor: none;
   background: var(--page);
   padding: 0 48px 48px;
 }
@@ -403,8 +498,11 @@ input {
   padding-top: 30px;
 }
 
-.panel[hidden] {
-  display: none;
+/* hidden·비활성 패널은 무조건 제거 — .panel-home { display:flex } 등이 UA [hidden]을 덮어
+   빈 패널 padding(30px)만 남아 수시 제목이 아래로 밀리는 현상 방지 */
+.panel[hidden],
+.panel:not(.is-active) {
+  display: none !important;
 }
 
 .kicker {
@@ -529,7 +627,7 @@ input {
 }
 
 .guide-block[hidden] {
-  display: none;
+  display: none !important;
 }
 
 .guide-block {
@@ -1285,14 +1383,15 @@ input {
   margin-bottom: 0;
 }
 
-/* 전공별 권장과목 빈 상태: 스크롤 없이 남은 화면만 채움(하단=.main padding) */
-.main:has([data-major-by-field-hint]:not([hidden])) {
+/* 전공별 권장과목 빈 상태: 스크롤 없이 남은 화면만 채움(하단=.main padding)
+   .guide-block만 대상 — section-tab/sidebar button의 data-section까지 :has 되면 다른 전공 탭이 overflow:hidden 됨 */
+.main:has(#panel-major:not([hidden]) .guide-block[data-section="major-by-field"]:not([hidden]) [data-major-by-field-hint]:not([hidden])) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.main:has([data-major-by-field-hint]:not([hidden])) > .panel[data-guide="major"] {
+.main:has(#panel-major:not([hidden]) .guide-block[data-section="major-by-field"]:not([hidden]) [data-major-by-field-hint]:not([hidden])) > .panel[data-guide="major"] {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
@@ -1300,14 +1399,14 @@ input {
   overflow: hidden;
 }
 
-.main:has([data-major-by-field-hint]:not([hidden])) #major-by-field:not([hidden]) {
+.main:has(#panel-major:not([hidden]) .guide-block[data-section="major-by-field"]:not([hidden]) [data-major-by-field-hint]:not([hidden])) .guide-block[data-section="major-by-field"]:not([hidden]) {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
-.main:has([data-major-by-field-hint]:not([hidden])) .admit-search[data-search-type="major-by-field"] {
+.main:has(#panel-major:not([hidden]) .guide-block[data-section="major-by-field"]:not([hidden]) [data-major-by-field-hint]:not([hidden])) .admit-search[data-search-type="major-by-field"] {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
@@ -1434,25 +1533,6 @@ input {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 5px;
-  scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
-}
-
-.admit-jeongsi-chart-scroll::-webkit-scrollbar {
-  height: 6px;
-}
-
-.admit-jeongsi-chart-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.admit-jeongsi-chart-scroll::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 3px;
-}
-
-.admit-jeongsi-chart-scroll::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
 }
 
 .admit-jeongsi-chart-empty {
@@ -3893,9 +3973,191 @@ input {
   width: 100%;
   min-width: 0;
   margin-bottom: 12px;
-  padding: 16px 8px 12px;
+  padding: 18px 8px 16px;
   border: 1px solid #e5e7eb;
   background: #fff;
+}
+
+.admit-detail-uni-hs-filter {
+  margin: 0 0 12px;
+}
+
+/* 전공 탐색 상세 팝업 셀렉트(.admit-select-trigger)와 동일 */
+.admit-detail-uni-hs-filter .admit-search {
+  margin: 0;
+}
+
+.admit-detail-uni-hs-filter .admit-search[data-search-type="major-univ"] .admit-search-bar {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  margin: 0;
+}
+
+.admit-detail-uni-hs-filter .admit-select {
+  width: 100%;
+  max-width: 100%;
+}
+
+.admit-detail-uni-hs-filter .admit-select-trigger {
+  width: 100%;
+  max-width: 100%;
+  height: var(--admit-control-h);
+  padding: 0 36px 0 16px;
+  border: 1px solid #d1d5db;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+  color: var(--admit-text);
+  font-family: var(--admit-font);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.admit-detail-uni-hs-filter .admit-select.is-open .admit-select-trigger {
+  border-color: #1a4796;
+  background-color: #f8fafc;
+}
+
+.admit-detail-uni-hs-filter .admit-select-menu {
+  z-index: 80;
+}
+
+.admit-detail-uni-hs-card {
+  box-sizing: border-box;
+  padding: 16px 18px 14px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.admit-detail-hs-n,
+.admit-detail-hs-p {
+  display: block;
+  text-align: center;
+}
+
+.admit-detail-hs-n {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.admit-detail-hs-p {
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.admit-detail-uni-hs-card-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: 12px;
+  margin: 0 0 14px;
+}
+
+.admit-detail-uni-hs-card-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.admit-detail-uni-hs-card-type,
+.admit-detail-uni-hs-card-sep,
+.admit-detail-uni-hs-card-name {
+  color: #1f2937;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.admit-detail-uni-hs-card-total {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.admit-detail-uni-hs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 라벨 | 막대 | 수치 — 좌우 동일 간격, 제목·총입학자와 좌우 끝선 일치 */
+.admit-detail-uni-hs-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 122px;
+  column-gap: 16px;
+  align-items: center;
+}
+
+.admit-detail-uni-hs-label {
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  word-break: keep-all;
+  white-space: nowrap;
+}
+
+.admit-detail-uni-hs-track {
+  display: block;
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  background: #eef2f6;
+}
+
+.admit-detail-uni-hs-fill {
+  display: block;
+  height: 100%;
+  min-width: 0;
+}
+
+.admit-detail-uni-hs-meta {
+  display: grid;
+  grid-template-columns: 58px 52px;
+  column-gap: 12px;
+  align-items: baseline;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.admit-detail-uni-hs-pct {
+  display: block;
+  width: 100%;
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.admit-detail-uni-hs-count {
+  display: block;
+  width: 100%;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .admit-detail-uni-chart-frame {
@@ -3926,21 +4188,6 @@ input {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
-  scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
-}
-
-.admit-detail-uni-chart-scroll::-webkit-scrollbar {
-  height: 6px;
-}
-
-.admit-detail-uni-chart-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.admit-detail-uni-chart-scroll::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 3px;
 }
 
 .admit-detail-uni-chart-svg {
@@ -4063,8 +4310,8 @@ input {
   flex: 1 0 auto;
   min-height: auto;
   overflow: visible;
-  /* 하단 20 = 헤더 상단 여백과 동일하게 보이게 */
-  padding: 18px 22px 20px;
+  /* 좌·하단 여백 동일(22) — 표 왼쪽과 표 아래 맞춤 */
+  padding: 18px 22px 22px;
   box-sizing: border-box;
 }
 
@@ -4160,6 +4407,23 @@ input {
   }
 }
 
+/* 전체 전형 상세: 이 표 래퍼만 가로 스크롤 (팝업·다른 표는 그대로) */
+.admit-detail-table-wrap.admit-detail-table-wrap-hs-detail {
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  max-width: 100%;
+  /* 스크롤바 바로 위에 흰 틈·이중 선 안 나게 */
+  border-bottom: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail tbody tr:last-child > th,
+table.admit-detail-table.admit-detail-table-uni-hs-detail tbody tr:last-child > td {
+  border-bottom: 0;
+}
+
 .admit-detail-table {
   /* PC: 팝업 폭에 맞춤(스크롤 없음) */
   width: 100%;
@@ -4173,6 +4437,105 @@ input {
   background: #fff;
   font-family: "Noto Sans KR", Pretendard, "Segoe UI", sans-serif;
   font-size: 13px;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail {
+  width: max-content !important;
+  min-width: 100% !important;
+  max-width: none !important;
+  table-layout: auto !important;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail thead th,
+table.admit-detail-table.admit-detail-table-uni-hs-detail tbody th,
+table.admit-detail-table.admit-detail-table-uni-hs-detail tbody td {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail thead th {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail tbody th {
+  background: #fafafa;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail .is-sticky-col {
+  position: sticky;
+  z-index: 2;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail thead .is-sticky-col {
+  z-index: 4;
+  background: #f3f6fb;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail tbody .is-sticky-col {
+  z-index: 3;
+  background: #fafafa;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail .is-sticky-1 {
+  left: 0;
+  width: 80px;
+  min-width: 80px;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail .is-sticky-2 {
+  left: 80px;
+  width: 148px;
+  min-width: 148px;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail .is-sticky-3 {
+  left: 228px;
+  width: 128px;
+  min-width: 128px;
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail thead th:not(.is-sticky-col),
+table.admit-detail-table.admit-detail-table-uni-hs-detail tbody td {
+  min-width: max-content;
+  width: auto;
+}
+
+/* 모바일·태블릿: 고정 열 해제 — 좁은 화면에서 본문이 가려지지 않게 */
+@media (max-width: 1279px) {
+  table.admit-detail-table.admit-detail-table-uni-hs-detail .is-sticky-col,
+  table.admit-detail-table.admit-detail-table-uni-hs-detail thead .is-sticky-col,
+  table.admit-detail-table.admit-detail-table-uni-hs-detail tbody .is-sticky-col {
+    position: static;
+    left: auto;
+    z-index: auto;
+  }
+
+  table.admit-detail-table.admit-detail-table-uni-hs-detail .is-sticky-1,
+  table.admit-detail-table.admit-detail-table-uni-hs-detail .is-sticky-2,
+  table.admit-detail-table.admit-detail-table-uni-hs-detail .is-sticky-3 {
+    left: auto;
+    width: auto;
+    min-width: max-content;
+    max-width: none;
+  }
+}
+
+table.admit-detail-table.admit-detail-table-uni-hs-detail td.admit-detail-hs-stack {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 10px;
+  padding-right: 10px;
+  line-height: 1.35;
+  vertical-align: middle;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
 }
 
 /* 태블릿·모바일: PC 최소폭 유지 + 가로 스크롤 */
@@ -7587,76 +7950,77 @@ table.admit-detail-table td {
   display: none !important;
 }
 
-/* 캠퍼스 지도·로드뷰가 보이는 동안에만 본문 높이를 채움. 숨긴 대학 패널은 건드리지 않음 */
+/* 캠퍼스 지도·로드뷰가 보이는 동안에만 본문 높이를 채움. 숨긴 대학 패널은 건드리지 않음
+   .guide-block만 대상 — section-tab의 data-section까지 :has 되면 대학별 현황도 flex로 깨짐 */
 @media (min-width: 1280px) {
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])),
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) {
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])),
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) {
     display: flex;
     flex-direction: column;
   }
 
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) > .main-top,
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) #panel-university > h1,
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) #panel-university > .section-nav,
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) .campus-roadview-tools,
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) .campus-roadview-head,
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) > .main-top,
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) #panel-university > h1,
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) #panel-university > .section-nav,
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) .campus-map-tools {
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) > .main-top,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) #panel-university > h1,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) #panel-university > .section-nav,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) .campus-roadview-tools,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) .campus-roadview-head,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) > .main-top,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) #panel-university > h1,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) #panel-university > .section-nav,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) .campus-map-tools {
     flex: 0 0 auto;
   }
 
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) #panel-university:not([hidden]),
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) #university-roadview,
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) .campus-roadview,
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) .campus-roadview-layout,
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) #panel-university:not([hidden]),
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) #university-map,
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) .campus-map {
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) #panel-university:not([hidden]),
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) .guide-block[data-section="university-roadview"],
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) .campus-roadview,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) .campus-roadview-layout,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) #panel-university:not([hidden]),
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) .guide-block[data-section="university-map"],
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) .campus-map {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
     min-height: 0;
   }
 
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) .campus-map-layout {
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) .campus-map-layout {
     display: grid;
     flex: 1 1 auto;
     min-height: 0;
     grid-template-rows: minmax(0, 1fr);
   }
 
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) .campus-map-panel,
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) .campus-map-result {
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) .campus-map-panel,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) .campus-map-result {
     min-height: 0;
     height: 100%;
   }
 
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) .campus-map-stage {
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) .campus-map-stage {
     display: flex;
     flex-direction: column;
     min-height: 0;
     height: 100%;
   }
 
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) .campus-roadview-layout {
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) .campus-roadview-layout {
     display: grid;
     min-height: 0;
     height: auto;
     grid-template-rows: minmax(0, 1fr);
   }
 
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) .campus-roadview-list,
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) .campus-roadview-stage {
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) .campus-roadview-list,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) .campus-roadview-stage {
     max-height: none;
     min-height: 0;
     height: 100%;
   }
 
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) .campus-roadview-viewer,
-  .main:has(#panel-university:not([hidden]) #university-roadview:not([hidden])) .campus-roadview-frame,
-  .main:has(#panel-university:not([hidden]) #university-map:not([hidden])) .campus-map-canvas {
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) .campus-roadview-viewer,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-roadview"]:not([hidden])) .campus-roadview-frame,
+  .main:has(#panel-university:not([hidden]) .guide-block[data-section="university-map"]:not([hidden])) .campus-map-canvas {
     flex: 1 1 auto;
     min-height: 0;
     height: auto;

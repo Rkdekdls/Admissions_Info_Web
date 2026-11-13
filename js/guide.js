@@ -3029,11 +3029,13 @@ const Guide = (() => {
   }
 
   function applyAdmitFilters(panel, sectionId) {
-    const scoped = sectionId ? panel.querySelector(`#${sectionId} [data-admit-search]`) : null;
+    const scoped = sectionId
+      ? panel.querySelector(`[data-section="${sectionId}"] [data-admit-search]`)
+      : null;
     const root = scoped || panel.querySelector("[data-admit-search]");
     if (!root) return;
     const rootBlock = root.closest(".guide-block");
-    if (sectionId && rootBlock && rootBlock.id !== sectionId) return;
+    if (sectionId && rootBlock && rootBlock.dataset.section !== sectionId) return;
     if (root.dataset.searchType === "university") {
       applyUniTableFilters(root);
       return;
@@ -3565,6 +3567,10 @@ const Guide = (() => {
       table.dataset.declaredColWidths = "8,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,14";
       return;
     }
+    if (table.classList.contains("admit-detail-table-uni-hs-detail")) {
+      /* sticky 3열 + 가로 스크롤 — CSS 고정폭 사용 */
+      return;
+    }
     if (table.dataset.declaredColWidths) return;
     /* uni-trend·연도형 기타: 측정 후 PC는 컨테이너에 맞춤 */
   }
@@ -3635,6 +3641,7 @@ const Guide = (() => {
   function fitAdmitDetailTables(root) {
     if (!root) return;
     root.querySelectorAll("table.admit-detail-table").forEach((table) => {
+      if (table.classList.contains("admit-detail-table-uni-hs-detail")) return;
       assignAdmitDetailColWidths(table);
       table.style.setProperty("table-layout", "fixed", "important");
       table.style.setProperty("overflow", "hidden", "important");
@@ -4300,7 +4307,12 @@ const Guide = (() => {
         infoTab.setAttribute("aria-selected", "true");
       }
       if (csatTab) csatTab.hidden = true;
-      if (recordTab) recordTab.hidden = true;
+      if (recordTab) {
+        recordTab.textContent = "출신 고교 유형";
+        recordTab.hidden = false;
+        recordTab.classList.remove("is-active");
+        recordTab.setAttribute("aria-selected", "false");
+      }
       if (resultTab) {
         resultTab.textContent = "대학발표 자료";
         resultTab.hidden = false;
@@ -4724,8 +4736,8 @@ const Guide = (() => {
 
   function uniRateChartGeometry(points, plotOuterW) {
     const yAxisW = 44;
-    const h = 280;
-    const pad = { t: 36, r: 20, b: 42, l: 12 };
+    const h = 360;
+    const pad = { t: 40, r: 20, b: 48, l: 12 };
     const dataMax = Math.max(...points.map((p) => p.value), 0);
     const maxY = Math.max(30, Math.ceil(dataMax / 10) * 10);
     const plotW = plotOuterW - pad.l - pad.r;
@@ -4987,11 +4999,356 @@ const Guide = (() => {
             <tbody>${trendRows}</tbody>
           </table>
         </div>
-      </section>
+      </section>`;
 
+    const typeStatusYears = ["2026", "2025", "2024"];
+    const typeStatusDefault = "2026";
+    const typeStatusChips = typeStatusYears
+      .map(
+        (year) =>
+          `<button type="button" class="admit-detail-year-chip${
+            year === typeStatusDefault ? " is-active" : ""
+          }" data-uni-type-status-year="${year}">${year}</button>`
+      )
+      .join("");
+    const typeDetailChips = typeStatusYears
+      .map(
+        (year) =>
+          `<button type="button" class="admit-detail-year-chip${
+            year === typeStatusDefault ? " is-active" : ""
+          }" data-uni-type-detail-year="${year}">${year}</button>`
+      )
+      .join("");
+
+    const hsYearIndex = { 2024: 1, 2025: 2, 2026: 3 };
+    /* 상세검색·학과유형 톤(파스텔·남색 제외) */
+    const hsBarColors = [
+      "#0284c7", /* 성취도 합산 sky */
+      "#4f46e5", /* 유리한 지표 indigo */
+      "#db2777", /* 성취도 대체 pink */
+      "#475569", /* 석차등급 slate */
+      "#dc2626", /* 의·치·한 red */
+      "#ea580c", /* 교대 orange */
+      "#16a34a", /* 간호 green */
+      "#7c3aed", /* 사범 purple */
+      "#ca8a04", /* 계약 yellow */
+      "#0f766e", /* 첨단 teal */
+    ];
+    const demoForUniv = (window.ADMIT_DEMO_UNITS || []).filter(
+      (item) => String(item.univ || "").trim() === univ
+    );
+    const typeCatLabel = (kind) => {
+      if (kind === "교과") return "학생부위주(교과)";
+      if (kind === "종합") return "학생부위주(종합)";
+      if (kind === "논술") return "논술위주";
+      if (kind === "실기") return "실기·실적위주";
+      return "수능위주";
+    };
+    const typeOptLabel = (quotaBucket, typeCat, typeName) =>
+      `${quotaBucket} > ${typeCat} > ${typeName}`;
+
+    const detailTypeRows = [];
+    const pushDetailRow = (row) => {
+      if (detailTypeRows.some((r) => r.value === row.value)) return;
+      detailTypeRows.push(row);
+    };
+    demoForUniv.forEach((item) => {
+      if (Array.isArray(item.교과) && item.교과.length) {
+        pushDetailRow({
+          value: `교과|${item.교과명 || "교과"}`,
+          quotaBucket: "정원내",
+          kind: "교과",
+          typeCat: typeCatLabel("교과"),
+          typeName: item.교과명 || "교과전형",
+          quotaRaw: parseAdmitStatNumber(item.교과[0]),
+        });
+      }
+      if (Array.isArray(item.종합) && item.종합.length) {
+        pushDetailRow({
+          value: `종합|${item.종합명 || "종합"}`,
+          quotaBucket: "정원내",
+          kind: "종합",
+          typeCat: typeCatLabel("종합"),
+          typeName: item.종합명 || "종합전형",
+          quotaRaw: parseAdmitStatNumber(item.종합[0]),
+        });
+      }
+      if (Array.isArray(item.논술) && item.논술.length) {
+        pushDetailRow({
+          value: `논술|${item.논술명 || "논술"}`,
+          quotaBucket: "정원내",
+          kind: "논술",
+          typeCat: typeCatLabel("논술"),
+          typeName: item.논술명 || "논술전형",
+          quotaRaw: parseAdmitStatNumber(item.논술[0]),
+        });
+      }
+      if (item.jeongsi) {
+        pushDetailRow({
+          value: `정시|${item.jeongsi.typeName || "정시"}`,
+          quotaBucket: "정원내",
+          kind: "정시",
+          typeCat: typeCatLabel("정시"),
+          typeName: item.jeongsi.typeName || "일반전형",
+          quotaRaw: parseAdmitStatNumber(item.jeongsi.quota),
+        });
+      }
+    });
+    if (!detailTypeRows.length) {
+      pushDetailRow({
+        value: "종합|일반전형",
+        quotaBucket: "정원내",
+        kind: "종합",
+        typeCat: typeCatLabel("종합"),
+        typeName: "일반전형",
+        quotaRaw: 100,
+      });
+      pushDetailRow({
+        value: "교과|교과전형",
+        quotaBucket: "정원내",
+        kind: "교과",
+        typeCat: typeCatLabel("교과"),
+        typeName: "교과전형",
+        quotaRaw: 80,
+      });
+      pushDetailRow({
+        value: "정시|일반전형",
+        quotaBucket: "정원내",
+        kind: "정시",
+        typeCat: typeCatLabel("정시"),
+        typeName: "일반전형",
+        quotaRaw: 90,
+      });
+    }
+    /* 정원외 보조 행 — 대학 시드 기반 */
+    {
+      const seed = admitMinSeedHash(`${univ}|정원외`);
+      pushDetailRow({
+        value: `정원외|재외국민`,
+        quotaBucket: "정원외",
+        kind: "종합",
+        typeCat: typeCatLabel("종합"),
+        typeName: "재외국민전형",
+        quotaRaw: 20 + (seed % 40),
+      });
+      pushDetailRow({
+        value: `정원외|특성화고`,
+        quotaBucket: "정원외",
+        kind: "교과",
+        typeCat: typeCatLabel("교과"),
+        typeName: "특성화고졸재직자",
+        quotaRaw: 10 + (seed % 25),
+      });
+      pushDetailRow({
+        value: `정원외|특기자`,
+        quotaBucket: "정원외",
+        kind: "실기",
+        typeCat: typeCatLabel("실기"),
+        typeName: "특기자",
+        quotaRaw: 8 + (seed % 18),
+      });
+    }
+
+    const typeStatusOptions = detailTypeRows.map((row) => ({
+      value: row.value,
+      label: typeOptLabel(row.quotaBucket, row.typeCat, row.typeName),
+    }));
+    const typeStatusDefaultOpt = typeStatusOptions[0].value;
+
+    const hsDetailLabels =
+      (hsSource || []).map((row) => String(row?.[0] || "").trim()).filter(Boolean).length > 0
+        ? (hsSource || []).map((row) => String(row?.[0] || "").trim()).filter(Boolean)
+        : [
+            "일반고",
+            "특수목적고",
+            "특성화고",
+            "자율고(사립)",
+            "자율고(공립)",
+            "영재학교",
+            "외국인학교",
+            "외국고등학교",
+            "검정고시",
+            "그 외 기타",
+          ];
+
+    /* 차트·표 공통: 동일 연도·동일 전형이면 수치 일치 */
+    const getUniTypeYearEnroll = (year) => {
+      const y = String(year || typeStatusDefault);
+      const yearData = uniExtra?.years?.[y] || uniExtra?.years?.["2026"] || null;
+      return yearData?.enrolled || enrolledN || Math.round((yearData?.quota || 1000) * 0.99);
+    };
+
+    const getUniTypeTotalsByYear = (year) => {
+      const totalEnroll = getUniTypeYearEnroll(year);
+      const innerRows = detailTypeRows.filter((r) => r.quotaBucket === "정원내");
+      const outerRows = detailTypeRows.filter((r) => r.quotaBucket === "정원외");
+      const innerWeight = innerRows.reduce((acc, r) => acc + Math.max(1, r.quotaRaw || 1), 0) || 1;
+      const outerWeight = outerRows.reduce((acc, r) => acc + Math.max(1, r.quotaRaw || 1), 0) || 1;
+      const innerTotal = Math.max(1, Math.round(totalEnroll * 0.92));
+      const outerTotal = Math.max(1, totalEnroll - innerTotal);
+      const totals = new Map();
+      detailTypeRows.forEach((row) => {
+        const pool = row.quotaBucket === "정원내" ? innerTotal : outerTotal;
+        const weightSum = row.quotaBucket === "정원내" ? innerWeight : outerWeight;
+        totals.set(
+          row.value,
+          Math.max(1, Math.round((pool * Math.max(1, row.quotaRaw || 1)) / weightSum))
+        );
+      });
+      return totals;
+    };
+
+    const buildUniTypeHsShares = (year, typeKind, typeValue) => {
+      const y = String(year || typeStatusDefault);
+      const col = hsYearIndex[y] || 3;
+      const seed = admitMinSeedHash(`${univ}|${typeValue}|${y}|detail`);
+      const kind = String(typeKind || "");
+      const rows = hsDetailLabels.map((label, i) => {
+        const src = (hsSource || []).find((row) => String(row?.[0] || "").trim() === label);
+        let pct = parseAdmitNumber(String(src?.[col] ?? "").replace(/%/g, ""));
+        if (!Number.isFinite(pct)) pct = 0;
+        pct = Math.max(0, pct);
+        let bias = 1 + ((((seed + i * 13) % 11) - 5) / 120);
+        if (kind === "교과") {
+          if (label === "일반고") bias *= 1.18;
+          else if (/특수|영재|외고|외국|예술|자율/.test(label)) bias *= 0.55;
+        } else if (kind === "종합") {
+          if (label === "일반고") bias *= 0.88;
+          else if (/특수|영재|외국|자율/.test(label)) bias *= 1.2;
+        } else if (kind === "논술") {
+          if (label === "일반고") bias *= 0.95;
+          else if (/특수|자율/.test(label)) bias *= 1.08;
+        } else if (kind === "실기") {
+          if (label === "일반고") bias *= 0.7;
+          else if (/특성화|기타/.test(label)) bias *= 1.6;
+          else bias *= 0.6;
+        } else if (label === "일반고") {
+          bias *= 1.05;
+        }
+        return { label, raw: pct * bias };
+      });
+      const sum = rows.reduce((acc, row) => acc + row.raw, 0) || 1;
+      return rows.map((row) => ({ label: row.label, pct: (row.raw / sum) * 100 }));
+    };
+
+    const buildUniTypeHsParts = (year, typeRow, total) => {
+      const shares = buildUniTypeHsShares(year, typeRow.kind, typeRow.value);
+      const parts = shares.map((share, i) => ({
+        label: share.label,
+        pct: share.pct,
+        count: Math.round((total * share.pct) / 100),
+        i,
+      }));
+      let countSum = parts.reduce((acc, part) => acc + part.count, 0);
+      if (parts.length && countSum !== total) {
+        parts[0].count = Math.max(0, parts[0].count + (total - countSum));
+      }
+      return parts;
+    };
+
+    const buildUniTypeHsChart = (year, typeValue) => {
+      const y = String(year || typeStatusDefault);
+      const typeKey = String(typeValue || typeStatusDefaultOpt);
+      const selectedRow =
+        detailTypeRows.find((row) => row.value === typeKey) || detailTypeRows[0] || null;
+      const chartTitle = selectedRow
+        ? `${selectedRow.typeCat} · ${selectedRow.typeName}`
+        : "선택 전형";
+      const totals = getUniTypeTotalsByYear(y);
+      const total =
+        (selectedRow && totals.get(selectedRow.value)) ||
+        totals.get(typeKey) ||
+        1;
+      const normalized = selectedRow
+        ? buildUniTypeHsParts(y, selectedRow, total)
+        : [];
+      const bars = normalized
+        .map((row) => {
+          const color = hsBarColors[row.i % hsBarColors.length];
+          const width = Math.min(100, Math.max(row.pct > 0 ? 1.2 : 0, row.pct));
+          return `<div class="admit-detail-uni-hs-row">
+            <span class="admit-detail-uni-hs-label">${escapeHtml(row.label)}</span>
+            <span class="admit-detail-uni-hs-track" aria-hidden="true">
+              <span class="admit-detail-uni-hs-fill" style="width:${width.toFixed(2)}%;background:${color}"></span>
+            </span>
+            <span class="admit-detail-uni-hs-meta">
+              <strong class="admit-detail-uni-hs-pct">${row.pct.toFixed(2)}%</strong>
+              <span class="admit-detail-uni-hs-count">${escapeHtml(formatAdmitCount(row.count))}</span>
+            </span>
+          </div>`;
+        })
+        .join("");
+      return `<div class="admit-detail-uni-hs-card" data-uni-type-hs-card>
+        <div class="admit-detail-uni-hs-card-head">
+          <p class="admit-detail-uni-hs-card-title">
+            <span class="admit-detail-uni-hs-card-type">${escapeHtml(selectedRow?.typeCat || chartTitle)}</span>
+            <span class="admit-detail-uni-hs-card-sep" aria-hidden="true">·</span>
+            <span class="admit-detail-uni-hs-card-name">${escapeHtml(selectedRow?.typeName || "")}</span>
+          </p>
+          <p class="admit-detail-uni-hs-card-total">총 입학자 ${escapeHtml(formatAdmitCount(total))}</p>
+        </div>
+        <div class="admit-detail-uni-hs-list">${bars}</div>
+      </div>`;
+    };
+
+    const buildUniTypeHsDetailTable = (year) => {
+      const y = String(year || typeStatusDefault);
+      const totals = getUniTypeTotalsByYear(y);
+
+      const enriched = detailTypeRows.map((row) => {
+        const total = totals.get(row.value) || 1;
+        const hsParts = buildUniTypeHsParts(y, row, total);
+        return { ...row, total, hsParts };
+      });
+
+      const hsCell = (part) =>
+        `<td class="admit-detail-hs-stack"><span class="admit-detail-hs-n">${escapeHtml(
+          formatAdmitCount(part.count)
+        )}</span><span class="admit-detail-hs-p">${part.pct.toFixed(2)}%</span></td>`;
+
+      const html = enriched
+        .map(
+          (row) => `<tr data-uni-type-detail-row="${escapeHtml(row.value)}">
+            <th scope="row" class="is-sticky-col is-sticky-1">${escapeHtml(row.quotaBucket)}</th>
+            <th scope="row" class="is-sticky-col is-sticky-2">${escapeHtml(row.typeCat)}</th>
+            <th scope="row" class="is-sticky-col is-sticky-3">${escapeHtml(row.typeName)}</th>
+            <td>${escapeHtml(formatAdmitCount(row.total))}</td>
+            ${row.hsParts.map((part) => hsCell(part)).join("")}
+          </tr>`
+        )
+        .join("");
+
+      const hsHead = hsDetailLabels
+        .map((label) => `<th scope="col">${escapeHtml(label)}</th>`)
+        .join("");
+
+      return `<div class="admit-detail-table-wrap admit-detail-table-wrap-hs-detail">
+        <table class="admit-detail-table admit-detail-table-uni-hs-detail">
+          <thead>
+            <tr>
+              <th scope="col" class="is-sticky-col is-sticky-1">정원 구분</th>
+              <th scope="col" class="is-sticky-col is-sticky-2">전형 유형</th>
+              <th scope="col" class="is-sticky-col is-sticky-3">전형 구분</th>
+              <th scope="col">총 입학자</th>
+              ${hsHead}
+            </tr>
+          </thead>
+          <tbody>${html}</tbody>
+        </table>
+      </div>`;
+    };
+
+    const typeStatusSelectOpts = typeStatusOptions
+      .map(
+        (opt, i) =>
+          `<option value="${escapeHtml(opt.value)}"${i === 0 ? " selected" : ""}>${escapeHtml(opt.label)}</option>`
+      )
+      .join("");
+
+    const hsPanelHtml = `
       <section class="admit-detail-section">
         <div class="admit-detail-section-head">
-          <h3 class="admit-detail-section-title">출신 고교 유형</h3>
+          <h3 class="admit-detail-section-title">학년도별 출신 고교 비율</h3>
           <span class="admit-detail-section-meta">출처: 대학알리미</span>
         </div>
         <div class="admit-detail-table-wrap">
@@ -5007,6 +5364,31 @@ const Guide = (() => {
             <tbody>${hsRows}</tbody>
           </table>
         </div>
+      </section>
+
+      <section class="admit-detail-section">
+        <div class="admit-detail-section-head">
+          <h3 class="admit-detail-section-title">선택 전형 입학자 현황</h3>
+          <div class="admit-detail-year-chips" role="tablist" aria-label="선택 전형 입학자 현황 연도">${typeStatusChips}</div>
+        </div>
+        <div class="admit-detail-uni-hs-filter">
+          <div class="admit-search" data-search-type="major-univ">
+            <div class="admit-search-bar">
+              <select class="admit-search-select" data-uni-type-status-select aria-label="전형 선택">
+                ${typeStatusSelectOpts}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div data-uni-type-hs-wrap>${buildUniTypeHsChart(typeStatusDefault, typeStatusDefaultOpt)}</div>
+      </section>
+
+      <section class="admit-detail-section">
+        <div class="admit-detail-section-head">
+          <h3 class="admit-detail-section-title">전형별 출신 고교 현황</h3>
+          <div class="admit-detail-year-chips" role="tablist" aria-label="전형별 출신 고교 현황 연도">${typeDetailChips}</div>
+        </div>
+        <div data-uni-type-detail-wrap>${buildUniTypeHsDetailTable(typeStatusDefault)}</div>
       </section>`;
 
     const shortUniv = univ.replace(/\(.*?\)/g, "").trim();
@@ -5093,8 +5475,50 @@ const Guide = (() => {
     }
     const recordPanel = root.querySelector('[data-admit-detail-panel="record"]');
     if (recordPanel) {
-      recordPanel.innerHTML = "";
+      recordPanel.innerHTML = hsPanelHtml;
       recordPanel.hidden = true;
+      const refreshTypeHsChart = () => {
+        const year =
+          recordPanel.querySelector("[data-uni-type-status-year].is-active")?.dataset.uniTypeStatusYear ||
+          typeStatusDefault;
+        const typeValue =
+          recordPanel.querySelector("[data-uni-type-status-select]")?.value || typeStatusDefaultOpt;
+        const wrap = recordPanel.querySelector("[data-uni-type-hs-wrap]");
+        if (wrap) wrap.innerHTML = buildUniTypeHsChart(year, typeValue);
+      };
+      const refreshTypeHsDetail = () => {
+        const year =
+          recordPanel.querySelector("[data-uni-type-detail-year].is-active")?.dataset.uniTypeDetailYear ||
+          typeStatusDefault;
+        const detailWrap = recordPanel.querySelector("[data-uni-type-detail-wrap]");
+        if (detailWrap) {
+          detailWrap.innerHTML = buildUniTypeHsDetailTable(year);
+          fitAdmitDetailTables(root);
+        }
+      };
+      recordPanel.querySelectorAll("[data-uni-type-status-year]").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          recordPanel.querySelectorAll("[data-uni-type-status-year]").forEach((node) => {
+            node.classList.toggle("is-active", node === chip);
+          });
+          refreshTypeHsChart();
+        });
+      });
+      recordPanel.querySelectorAll("[data-uni-type-detail-year]").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          recordPanel.querySelectorAll("[data-uni-type-detail-year]").forEach((node) => {
+            node.classList.toggle("is-active", node === chip);
+          });
+          refreshTypeHsDetail();
+        });
+      });
+      enhanceAdmitSelects(recordPanel);
+      recordPanel.querySelector("[data-uni-type-status-select]")?.addEventListener("change", refreshTypeHsChart);
+    }
+    const csatPanel = root.querySelector('[data-admit-detail-panel="csat"]');
+    if (csatPanel) {
+      csatPanel.innerHTML = "";
+      csatPanel.hidden = true;
     }
     root.querySelectorAll("[data-admit-detail-tab]").forEach((btn) => {
       const on = btn.dataset.admitDetailTab === "info";
@@ -6095,7 +6519,7 @@ const Guide = (() => {
     root.dataset.bound = "1";
 
     enhanceAdmitSelects(root);
-    const sectionId = root.closest(".guide-block")?.id || "";
+    const sectionId = root.closest(".guide-block")?.dataset.section || "";
     const refresh = () => applyAdmitFilters(panel, sectionId || undefined);
 
     const toggle = root.querySelector("[data-admit-toggle]");
@@ -7665,7 +8089,7 @@ const Guide = (() => {
   function openCampusUniversityDetail(name) {
     const target = String(name || "").replace(/\s+/g, " ").trim();
     if (!target) return;
-    const row = [...document.querySelectorAll('#university-info tr[data-uni-row]')].find((tr) => {
+    const row = [...document.querySelectorAll('[data-section="university-info"] tr[data-uni-row]')].find((tr) => {
       const label = (tr.cells[0]?.textContent || "").replace(/\s+/g, " ").trim();
       return label === target;
     });
@@ -7892,27 +8316,33 @@ const Guide = (() => {
         const selected = index === 0 ? "true" : "false";
         const active = index === 0 ? " is-active" : "";
         const label = numbered ? `${index + 1}. ${item.label}` : item.label;
-        return `<button type="button" class="section-tab${active}" role="tab" data-section="${id}" aria-selected="${selected}" aria-controls="${id}">${label}</button>`;
+        /* aria-controls는 guide- 접두 id — 라우트 섹션명과 같은 raw id는 해시 스크롤을 유발함 */
+        return `<button type="button" class="section-tab${active}" role="tab" data-section="${id}" aria-selected="${selected}" aria-controls="guide-${id}">${label}</button>`;
       })
       .join("");
 
     const searchInBlock = guide.search === "university";
-    const blocks = guide.blocks
-      .map((block) => {
-        const chapter = chapterOf(block.id);
-        const slices = block.slices ? ' data-slices="1"' : "";
-        let inner = `<div class="book-stack">${pageMounts(block.pages)}</div>`;
-        if (block.id === "university-info") inner = admitSearchHtml("university");
-        else if (block.id === "university-map") inner = campusMapHtml();
-        else if (block.id === "university-roadview") inner = campusRoadviewHtml();
-        else if (block.id === "major-explore") inner = majorExploreHtml();
-        else if (block.id === "major-by-field") inner = majorByFieldHtml();
-        else if (block.id === "major-by-univ") inner = majorByUnivHtml();
-        return `<section class="guide-block" id="${block.id}" data-chapter="${chapter || ""}"${slices}>
+    /* 수시·정시처럼 검색 UI만 쓰는 가이드는 빈 guide-block을 만들지 않음.
+       id=susi-subject 등이 DOM에 있으면 해시/스크롤이 본문을 아래로 밀어 내릴 수 있음 */
+    const skipEmptyBlocks = guide.search && !searchInBlock;
+    const blocks = skipEmptyBlocks
+      ? ""
+      : guide.blocks
+          .map((block) => {
+            const chapter = chapterOf(block.id);
+            const slices = block.slices ? ' data-slices="1"' : "";
+            let inner = `<div class="book-stack">${pageMounts(block.pages)}</div>`;
+            if (block.id === "university-info") inner = admitSearchHtml("university");
+            else if (block.id === "university-map") inner = campusMapHtml();
+            else if (block.id === "university-roadview") inner = campusRoadviewHtml();
+            else if (block.id === "major-explore") inner = majorExploreHtml();
+            else if (block.id === "major-by-field") inner = majorByFieldHtml();
+            else if (block.id === "major-by-univ") inner = majorByUnivHtml();
+            return `<section class="guide-block" id="guide-${block.id}" data-section="${block.id}" data-chapter="${chapter || ""}"${slices}>
           ${inner}
         </section>`;
-      })
-      .join("");
+          })
+          .join("");
 
     const sectionNav = guide.nav.length
       ? `<div class="section-nav" role="tablist" aria-label="${guide.title} 안의 항목"${guide.hideSectionNav ? " hidden" : ""}>${nav}</div>`
@@ -8082,8 +8512,11 @@ const Guide = (() => {
       const button = event.target.closest(".slice-tab");
       if (!button || !nav.contains(button)) return;
       show(button.dataset.slice);
-      const main = block.closest(".main");
-      if (main) main.scrollTop = 0;
+      if (typeof window.resetMainScroll === "function") window.resetMainScroll();
+      else {
+        const main = block.closest(".main");
+        if (main) main.scrollTop = 0;
+      }
     });
   }
 
@@ -8113,8 +8546,11 @@ const Guide = (() => {
         window.syncGuideHash(key, "");
       }
       if (scroll) {
-        const main = panel.closest(".main") || document.querySelector(".main");
-        if (main) main.scrollTop = 0;
+        if (typeof window.resetMainScroll === "function") window.resetMainScroll();
+        else {
+          const main = panel.closest(".main") || document.querySelector(".main");
+          if (main) main.scrollTop = 0;
+        }
       }
       return;
     }
@@ -8127,8 +8563,9 @@ const Guide = (() => {
       button.setAttribute("aria-selected", on ? "true" : "false");
     });
     panel.querySelectorAll(".guide-block").forEach((block) => {
-      const linked = known.has(block.id);
-      const on = linked ? block.id === id : id === first;
+      const section = block.dataset.section || "";
+      const linked = known.has(section);
+      const on = linked ? section === id : id === first;
       block.hidden = !on;
       if (on && typeof block.resetSlices === "function") block.resetSlices();
     });
@@ -8158,8 +8595,11 @@ const Guide = (() => {
       }
     }
     if (!scroll) return;
-    const main = panel.closest(".main") || document.querySelector(".main");
-    if (main) main.scrollTop = 0;
+    if (typeof window.resetMainScroll === "function") window.resetMainScroll();
+    else {
+      const main = panel.closest(".main") || document.querySelector(".main");
+      if (main) main.scrollTop = 0;
+    }
   }
 
   function open(key, targetId) {
