@@ -95,12 +95,47 @@ function parseRoute() {
   const raw = location.hash.replace(/^#/, "").trim();
   if (!raw) return { tab: "", section: "" };
   const [tab, section = ""] = raw.split("/");
+  /* 구형 단일 해시(#susi-subject 등) → 탭/섹션으로 복원 */
+  if (!section && tab && !document.querySelector(`#panel-${tab}`)) {
+    const legacy = {
+      "susi-subject": ["susi", "susi-subject"],
+      "susi-holistic": ["susi", "susi-holistic"],
+      "susi-essay": ["susi", "susi-essay"],
+      "university-info": ["university", "university-info"],
+      "university-map": ["university", "university-map"],
+      "university-roadview": ["university", "university-roadview"],
+      "major-explore": ["major", "major-explore"],
+      "major-by-field": ["major", "major-by-field"],
+      "major-by-univ": ["major", "major-by-univ"],
+      "life-system": ["curriculum", "life-system"],
+      "curriculum-credit": ["curriculum", "curriculum-credit"],
+      "curriculum-subject": ["curriculum", "curriculum-subject"],
+      "curriculum-grade": ["curriculum", "curriculum-grade"],
+      "record-role": ["record", "record-role"],
+      "record-form": ["record", "record-form"],
+      "exam-csat": ["exam", "exam-csat"],
+      "exam-score": ["exam", "exam-score"],
+      "exam-mock": ["exam", "exam-mock"],
+      "screening-compare": ["screening", "screening-compare"],
+      "screening-subject": ["screening", "screening-subject"],
+      "screening-holistic": ["screening", "screening-holistic"],
+      "screening-essay": ["screening", "screening-essay"],
+      "screening-csat": ["screening", "screening-csat"],
+      "life-roadmap": ["screening", "life-roadmap"],
+      "schedule-plan": ["schedule", "schedule-plan"],
+      "schedule-after": ["schedule", "schedule-after"],
+    };
+    const mapped = legacy[tab];
+    if (mapped) return { tab: mapped[0], section: mapped[1] };
+  }
   return { tab, section };
 }
 
 function setRoute(tab, section) {
   const next = section ? `#${tab}/${section}` : `#${tab}`;
-  if (location.hash !== next) history.replaceState(null, "", next);
+  if (location.hash === next) return;
+  /* pushState로 뒤로가기 지원 — popstate에서 UI 동기화 */
+  history.pushState(null, "", next);
 }
 
 /* 탭·섹션 전환 후 본문 스크롤 리셋 — 레이아웃/해시 스크롤이 한 프레임 늦는 경우까지 맞춤 */
@@ -326,6 +361,11 @@ groups.forEach((group) => setGroupOpen(group.dataset.group, false));
   const initial = resolveInitialRoute();
   selectTab(initial.tab, true, initial.section || undefined);
 }
+
+window.addEventListener("popstate", () => {
+  const { tab, section } = resolveInitialRoute();
+  selectTab(tab, false, section || undefined);
+});
 
 const brandHome = document.getElementById("brand-home");
 if (brandHome) {

@@ -1956,13 +1956,18 @@ const Guide = (() => {
           if (index % 2 === 1) classes.push("is-alt");
           if (index === list.length - 1) classes.push("is-last-visible");
           const cls = classes.length ? ` class="${classes.join(" ")}"` : "";
-          return `<tr data-uni-row data-year="2024"${cls}>
+          /* 목록·상세 팝업이 같은 2026 기준을 쓰도록 ADMIT_UNI_DETAIL 우선 */
+          const latest = window.ADMIT_UNI_DETAIL?.[item.name]?.years?.["2026"];
+          const quota = latest ? formatAdmitQuota(latest.quota) : formatAdmitQuota(item.quota);
+          const rate = latest ? formatAdmitRate(latest.rate) : formatAdmitRate(item.rate);
+          const fill = latest ? formatAdmitFill(latest.fill) : formatAdmitFill(item.fill);
+          return `<tr data-uni-row data-year="2026"${cls}>
               <td class="admit-data-name">${escapeHtml(item.name)}</td>
               <td>${escapeHtml(item.region)}</td>
               <td>${escapeHtml(item.founding)}</td>
-              <td>${formatAdmitQuota(item.quota)}</td>
-              <td>${formatAdmitRate(item.rate)}</td>
-              <td>${formatAdmitFill(item.fill)}</td>
+              <td>${quota}</td>
+              <td>${rate}</td>
+              <td>${fill}</td>
               <td><button type="button" class="admit-data-view">보기</button></td>
             </tr>`;
         })
@@ -2091,13 +2096,15 @@ const Guide = (() => {
 
     const gradeMethodBlock =
       type === "susi" || type === "jeongsi"
-        ? `<div class="admit-theme-head">
-            <div class="admit-theme-title">
-              <p class="admit-theme-label is-marked">성적 반영 방식</p>
+        ? `<div class="admit-grade-method-block" data-susi-grade-method-block>
+            <div class="admit-theme-head">
+              <div class="admit-theme-title">
+                <p class="admit-theme-label is-marked">성적 반영 방식</p>
+              </div>
             </div>
-          </div>
-          <div class="admit-grade-method-cards" role="group" aria-label="성적 반영 방식">
-            ${admitGradeMethodCards()}
+            <div class="admit-grade-method-cards" role="group" aria-label="성적 반영 방식">
+              ${admitGradeMethodCards()}
+            </div>
           </div>`
         : "";
 
@@ -2823,7 +2830,7 @@ const Guide = (() => {
       const name = row.cells[0]?.textContent.trim() || "";
       const region = row.cells[1]?.textContent.trim() || "";
       const founding = row.cells[2]?.textContent.trim() || "";
-      const yearOk = !yearVal || row.dataset.year === yearVal || row.dataset.year === "2024";
+      const yearOk = !yearVal || row.dataset.year === yearVal;
       const keywordOk = !keyword || name.toLowerCase().includes(keyword);
       const regionOk = !regionLabel || region === regionLabel;
       const foundingOk = !foundingLabel || founding === foundingLabel;
@@ -2844,6 +2851,16 @@ const Guide = (() => {
     table.querySelectorAll("[data-susi-grade-col]").forEach((cell) => {
       cell.hidden = !showGrade;
     });
+    /* 성적 반영 방식은 교과(정량) 전용 — 종합·논술로 넘어갈 때 선택·블록 초기화 */
+    const gradeMethodBlock = root.querySelector("[data-susi-grade-method-block]");
+    if (gradeMethodBlock) gradeMethodBlock.hidden = !showGrade;
+    if (!showGrade) {
+      root.querySelectorAll(".admit-grade-method-card[aria-pressed='true'], .admit-grade-method-card.is-active").forEach((card) => {
+        card.classList.remove("is-active");
+        card.setAttribute("aria-pressed", "false");
+      });
+      closeGradeMethodExample();
+    }
     const sort = root.querySelector("[data-susi-sort]");
     if (sort) {
       sort.querySelectorAll("[data-susi-grade-sort]").forEach((opt) => {
@@ -5556,10 +5573,11 @@ const Guide = (() => {
     const rate = textAt(6);
     const method = textAt(7);
     const reflectLabel = textAt(8) || inferSusiRecordReflect(typeKey, method);
+    /* 등급 칸(9)은 종합·논술에서도 DOM에 남아 hidden만 됨 — 수능 최저는 항상 10 */
     const gradeTd = cells[9];
     const gradeVisible = gradeTd && !gradeTd.hidden && getComputedStyle(gradeTd).display !== "none";
     const grade = gradeVisible ? textAt(9) : "";
-    const minimum = textAt(gradeVisible ? 10 : 9);
+    const minimum = textAt(10);
 
     const root = ensureAdmitDetailModal();
     const crumb = root.querySelector("#admit-detail-crumb");
