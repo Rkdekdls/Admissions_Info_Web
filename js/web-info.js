@@ -773,7 +773,7 @@ const WebInfo = (() => {
       box-shadow: none !important;
       margin: 0 !important;
     }
-    /* 표: PC 본문 폭(924px)까지는 양끝 맞춤, 그보다 좁으면 가로 스크롤 */
+    /* 표: PC는 본문 양끝 맞춤(스크롤 없음), 태블릿·모바일만 PC 폭 유지 + 가로 스크롤 */
     .page {
       min-width: 0 !important;
       max-width: 100% !important;
@@ -790,6 +790,15 @@ const WebInfo = (() => {
       width: 100% !important;
       min-width: var(--pc-table-min, 924px) !important;
       max-width: none !important;
+    }
+    @media (min-width: 1280px) {
+      .page .table-scroll {
+        overflow-x: hidden !important;
+      }
+      .page .table-scroll > table {
+        min-width: 0 !important;
+        max-width: 100% !important;
+      }
     }
     .page-footer,
     .main-title,
@@ -1585,6 +1594,7 @@ li::before {
       return widths.map((w) => Math.max(36, w || 36));
     };
     const fitColumnsToContent = (table) => {
+      const isPc = window.matchMedia("(min-width: 1280px)").matches;
       /* 마크업에 적힌 % 열 비율 유지 (예: 이전/현행 교육과정 50·50) */
       const saved = String(table.dataset.declaredColWidths || "")
         .split(",")
@@ -1596,7 +1606,13 @@ li::before {
           saved.map((w) => `${w}%`)
         );
         table.style.setProperty("width", "100%", "important");
-        table.style.setProperty("min-width", "var(--pc-table-min, 924px)", "important");
+        if (isPc) {
+          table.style.setProperty("min-width", "0", "important");
+          table.style.setProperty("max-width", "100%", "important");
+        } else {
+          table.style.setProperty("min-width", "var(--pc-table-min, 924px)", "important");
+          table.style.setProperty("max-width", "none", "important");
+        }
         return;
       }
       /* 표별 전용 비율이 없으면 내용 길이 비율만 적용 (여분 몰아넣기 없음) */
@@ -1608,7 +1624,13 @@ li::before {
         pxWidths.map((w) => `${((w / total) * 100).toFixed(4)}%`)
       );
       table.style.setProperty("width", "100%", "important");
-      table.style.setProperty("min-width", `${Math.max(924, Math.ceil(total + 2))}px`, "important");
+      if (isPc) {
+        table.style.setProperty("min-width", "0", "important");
+        table.style.setProperty("max-width", "100%", "important");
+      } else {
+        table.style.setProperty("min-width", `${Math.max(924, Math.ceil(total + 2))}px`, "important");
+        table.style.setProperty("max-width", "none", "important");
+      }
     };
 
     page.querySelectorAll("table").forEach((table) => {
@@ -1704,7 +1726,25 @@ li::before {
         table.dataset.declaredColWidths = "14,86";
       }
       if (table.classList.contains("glossary-terms-table")) {
-        table.dataset.declaredColWidths = "30,70";
+        const colCount =
+          table.querySelector("thead tr")?.cells?.length ||
+          table.querySelector("tr")?.cells?.length ||
+          0;
+        /* 용어 정리집(2열)에만 적용 — 다른 표에 클래스가 잘못 붙은 경우 레이아웃 붕괴 방지 */
+        if (colCount === 2) {
+          table.dataset.declaredColWidths = "30,70";
+        } else {
+          table.classList.remove("glossary-terms-table");
+        }
+      }
+      if (
+        table.classList.contains("subject-design-guide-table") ||
+        (/계열/.test(headText) &&
+          /기본/.test(headText) &&
+          (/심화/.test(headText) || /진로/.test(headText)))
+      ) {
+        table.classList.add("subject-design-guide-table");
+        table.dataset.declaredColWidths = "16,34,50";
       }
 
       /* containCells가 width를 지우기 전에 헤더 % 비율 보관 */
@@ -1837,6 +1877,15 @@ li::before {
   width: 100% !important;
   min-width: var(--pc-table-min, 924px) !important;
   max-width: none !important;
+}
+@media (min-width: 1280px) {
+  .page .table-scroll {
+    overflow-x: hidden !important;
+  }
+  .page .table-scroll > table {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
 }
 /* 대입 용어 정리집: 다른 표와 동일하게 min-width 유지 → 모바일·태블릿 좌우 스크롤 */
 .page .table-scroll > table.glossary-terms-table th,

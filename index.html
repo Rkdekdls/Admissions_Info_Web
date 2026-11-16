@@ -849,7 +849,7 @@
     </div>
     
     <!-- 비교 테이블 -->
-    <table class="comparison-table glossary-terms-table">
+    <table class="comparison-table">
       <thead>
         <tr>
           <th style="width: 50%;">이전 교육과정</th>
@@ -2418,6 +2418,36 @@
     .comparison-table td:nth-child(3) {
       width: 40% !important;
     }
+
+    /* 3-3 계열별 과목 설계 가이드 — 공통 comparison-table 디자인 유지 + 열 비율만 지정 */
+    .subject-design-guide-table {
+      width: 100% !important;
+      table-layout: fixed !important;
+      margin: 2mm 0 0 !important;
+    }
+    .subject-design-guide-table thead th,
+    .subject-design-guide-table tbody td {
+      height: auto !important;
+      min-height: 0 !important;
+      vertical-align: middle !important;
+      text-align: center !important;
+    }
+    .subject-design-guide-table tbody tr:nth-child(even) {
+      background-color: #fafafa !important;
+    }
+    .subject-design-guide-table th:nth-child(1),
+    .subject-design-guide-table td:nth-child(1) {
+      width: 16% !important;
+      font-weight: 600 !important;
+    }
+    .subject-design-guide-table th:nth-child(2),
+    .subject-design-guide-table td:nth-child(2) {
+      width: 34% !important;
+    }
+    .subject-design-guide-table th:nth-child(3),
+    .subject-design-guide-table td:nth-child(3) {
+      width: 50% !important;
+    }
   </style>
 <div class="page">
     <!-- 중제목 (연속) -->
@@ -2547,7 +2577,7 @@
     <h3 class="title-3">3-3. 계열별 과목 설계 가이드</h3>
     
     <!-- 계열별 과목 설계 가이드 표 -->
-    <table class="comparison-table glossary-terms-table" style="margin-top: 2mm;">
+    <table class="comparison-table subject-design-guide-table" style="margin-top: 2mm;">
       <thead>
         <tr>
           <th>계열</th>
@@ -23022,7 +23052,7 @@
     </template>
   </div>
   <!-- page-source:end -->
-  <script src="js/web-info.js?v=184"></script>
+  <script src="js/web-info.js?v=185"></script>
   <script src="js/admit-demo-units.js?v=3"></script>
   <script src="js/admit-univ-recommend.js?v=6"></script>
   <script src="js/admit-uni-data.js?v=6"></script>

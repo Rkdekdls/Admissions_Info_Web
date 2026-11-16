@@ -230,6 +230,36 @@
     .comparison-table td:nth-child(3) {
       width: 40% !important;
     }
+
+    /* 3-3 계열별 과목 설계 가이드 — 공통 comparison-table 디자인 유지 + 열 비율만 지정 */
+    .subject-design-guide-table {
+      width: 100% !important;
+      table-layout: fixed !important;
+      margin: 2mm 0 0 !important;
+    }
+    .subject-design-guide-table thead th,
+    .subject-design-guide-table tbody td {
+      height: auto !important;
+      min-height: 0 !important;
+      vertical-align: middle !important;
+      text-align: center !important;
+    }
+    .subject-design-guide-table tbody tr:nth-child(even) {
+      background-color: #fafafa !important;
+    }
+    .subject-design-guide-table th:nth-child(1),
+    .subject-design-guide-table td:nth-child(1) {
+      width: 16% !important;
+      font-weight: 600 !important;
+    }
+    .subject-design-guide-table th:nth-child(2),
+    .subject-design-guide-table td:nth-child(2) {
+      width: 34% !important;
+    }
+    .subject-design-guide-table th:nth-child(3),
+    .subject-design-guide-table td:nth-child(3) {
+      width: 50% !important;
+    }
   </style>
 </head>
 <body>
@@ -361,7 +391,7 @@
     <h3 class="title-3">3-3. 계열별 과목 설계 가이드</h3>
     
     <!-- 계열별 과목 설계 가이드 표 -->
-    <table class="comparison-table" style="margin-top: 2mm;">
+    <table class="comparison-table subject-design-guide-table" style="margin-top: 2mm;">
       <thead>
         <tr>
           <th>계열</th>
