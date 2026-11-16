@@ -4405,7 +4405,7 @@ const Guide = (() => {
     const materialsTab = root.querySelector('[data-admit-detail-tab="materials"]');
     if (mode === "university") {
       if (infoTab) {
-        infoTab.textContent = "대학 개요";
+        infoTab.textContent = "대학 주요 지표";
         infoTab.hidden = false;
         infoTab.classList.add("is-active");
         infoTab.setAttribute("aria-selected", "true");
