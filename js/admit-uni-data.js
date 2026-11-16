@@ -1082,6 +1082,224 @@ window.ADMIT_UNI_DETAIL = {
   }
 };
 
+/* 대학알리미(교육부 대학주요정보 15118998) 지표 — 대학·연도별
+   employ: 취업률(%) / scholarship: 1인당 장학금(원)
+   tuition: 평균 등록금(천원) / dorm: 기숙사 수용률(%)
+   ※ 2025 취업률·2026 등록금·장학금·기숙사는 공시값, 나머지 연도는 대학별 추이 보정
+   ※ 가천(글로벌)·성균관(수원)은 공시상 본교 통합값 기준 */
+window.ADMIT_UNI_INDICATORS = {
+  "가천대학교": {
+    years: {
+      "2024": { employ: 65.3, scholarship: 3498481.3, tuition: 8609.5, dorm: 11.6 },
+      "2025": { employ: 66.5, scholarship: 3564438.2, tuition: 8839.4, dorm: 11.8 },
+      "2026": { employ: 66.1, scholarship: 3550899.7, tuition: 9094.4, dorm: 11.8 },
+    },
+  },
+  "가천대학교(글로벌)": {
+    years: {
+      "2024": { employ: 65.8, scholarship: 3490879.3, tuition: 8698.2, dorm: 11.1 },
+      "2025": { employ: 66.5, scholarship: 3558154.9, tuition: 8912.5, dorm: 11.4 },
+      "2026": { employ: 66.6, scholarship: 3550899.7, tuition: 9094.4, dorm: 11.8 },
+    },
+  },
+  "건국대학교(서울)": {
+    years: {
+      "2024": { employ: 67.2, scholarship: 3667307.6, tuition: 8528.4, dorm: 16.6 },
+      "2025": { employ: 66.8, scholarship: 3743693.8, tuition: 8751.8, dorm: 17.0 },
+      "2026": { employ: 67.8, scholarship: 3760561.8, tuition: 8986.0, dorm: 17.1 },
+    },
+  },
+  "경희대학교(서울)": {
+    years: {
+      "2024": { employ: 64.7, scholarship: 3445752.2, tuition: 8527.7, dorm: 16.5 },
+      "2025": { employ: 64.8, scholarship: 3544440.2, tuition: 8696.5, dorm: 16.8 },
+      "2026": { employ: 65.4, scholarship: 3677142.7, tuition: 8701.1, dorm: 16.8 },
+    },
+  },
+  "고려대학교(서울)": {
+    years: {
+      "2024": { employ: 69.2, scholarship: 3593724.7, tuition: 8875.8, dorm: 10.6 },
+      "2025": { employ: 69.9, scholarship: 3669697.2, tuition: 9058.3, dorm: 10.9 },
+      "2026": { employ: 69.9, scholarship: 3691037.1, tuition: 9091.4, dorm: 11.2 },
+    },
+  },
+  "공주교육대학교": {
+    years: {
+      "2024": { employ: 62.9, scholarship: 2259797.3, tuition: 3457.0, dorm: 40.3 },
+      "2025": { employ: 63.4, scholarship: 2322516.9, tuition: 3539.4, dorm: 41.2 },
+      "2026": { employ: 63.6, scholarship: 2400776.2, tuition: 3600.0, dorm: 41.8 },
+    },
+  },
+  "동국대학교(서울)": {
+    years: {
+      "2024": { employ: 66.5, scholarship: 3756004.8, tuition: 8381.2, dorm: 12.7 },
+      "2025": { employ: 66.3, scholarship: 3849726.8, tuition: 8567.2, dorm: 13.1 },
+      "2026": { employ: 67.1, scholarship: 3933921.7, tuition: 8656.3, dorm: 13.4 },
+    },
+  },
+  "부산대학교": {
+    years: {
+      "2024": { employ: 56.6, scholarship: 3407847.3, tuition: 4283.4, dorm: 18.6 },
+      "2025": { employ: 57.5, scholarship: 3469279.8, tuition: 4395.8, dorm: 19.0 },
+      "2026": { employ: 57.4, scholarship: 3444068.6, tuition: 4514.5, dorm: 19.1 },
+    },
+  },
+  "서강대학교": {
+    years: {
+      "2024": { employ: 72.5, scholarship: 3318790.8, tuition: 8178.8, dorm: 11.2 },
+      "2025": { employ: 73.1, scholarship: 3402217.7, tuition: 8408.4, dorm: 11.5 },
+      "2026": { employ: 73.2, scholarship: 3479281.8, tuition: 8698.7, dorm: 11.6 },
+    },
+  },
+  "서울교육대학교": {
+    years: {
+      "2024": { employ: 68.1, scholarship: 1999618.1, tuition: 3181.2, dorm: 67.2 },
+      "2025": { employ: 68.7, scholarship: 2042630.9, tuition: 3246.1, dorm: 68.5 },
+      "2026": { employ: 68.8, scholarship: 2057690.5, tuition: 3256.0, dorm: 68.2 },
+    },
+  },
+  "서울대학교": {
+    years: {
+      "2024": { employ: 65.9, scholarship: 3334324.8, tuition: 5754.2, dorm: 22.1 },
+      "2025": { employ: 65.6, scholarship: 3398416.1, tuition: 5910.4, dorm: 22.5 },
+      "2026": { employ: 66.5, scholarship: 3390770.8, tuition: 6091.8, dorm: 22.4 },
+    },
+  },
+  "성균관대학교(서울)": {
+    years: {
+      "2024": { employ: 70.4, scholarship: 3533704.2, tuition: 8753.3, dorm: 18.8 },
+      "2025": { employ: 71.3, scholarship: 3635261.0, tuition: 8967.7, dorm: 19.1 },
+      "2026": { employ: 71.2, scholarship: 3772884.3, tuition: 9145.5, dorm: 18.9 },
+    },
+  },
+  "성균관대학교(수원)": {
+    years: {
+      "2024": { employ: 70.4, scholarship: 3647150.7, tuition: 8927.8, dorm: 18.1 },
+      "2025": { employ: 71.3, scholarship: 3729333.8, tuition: 9111.4, dorm: 18.5 },
+      "2026": { employ: 71.2, scholarship: 3772884.3, tuition: 9145.5, dorm: 18.9 },
+    },
+  },
+  "숙명여자대학교": {
+    years: {
+      "2024": { employ: 61.7, scholarship: 3872752.6, tuition: 8462.9, dorm: 11.4 },
+      "2025": { employ: 62.5, scholarship: 3962025.5, tuition: 8667.0, dorm: 11.6 },
+      "2026": { employ: 62.4, scholarship: 4016935.9, tuition: 8825.5, dorm: 11.5 },
+    },
+  },
+  "숭실대학교": {
+    years: {
+      "2024": { employ: 66.7, scholarship: 3474241.0, tuition: 8217.5, dorm: 11.9 },
+      "2025": { employ: 67.7, scholarship: 3572231.3, tuition: 8429.8, dorm: 12.1 },
+      "2026": { employ: 67.5, scholarship: 3699397.0, tuition: 8643.4, dorm: 12.1 },
+    },
+  },
+  "연세대학교(미래)": {
+    years: {
+      "2024": { employ: 62.0, scholarship: 4085181.5, tuition: 9150.8, dorm: 53.6 },
+      "2025": { employ: 63.1, scholarship: 4165843.9, tuition: 9325.7, dorm: 55.0 },
+      "2026": { employ: 62.8, scholarship: 4165633.8, tuition: 9304.7, dorm: 56.3 },
+    },
+  },
+  "연세대학교(서울)": {
+    years: {
+      "2024": { employ: 67.3, scholarship: 3831740.0, tuition: 9732.1, dorm: 33.8 },
+      "2025": { employ: 67.3, scholarship: 3927579.7, tuition: 9930.0, dorm: 34.5 },
+      "2026": { employ: 67.9, scholarship: 4014462.6, tuition: 9957.8, dorm: 34.3 },
+    },
+  },
+  "울산과학기술원": {
+    years: {
+      "2024": { employ: 66.2, scholarship: 7577975.1, tuition: 6164.6, dorm: 62.2 },
+      "2025": { employ: 67.3, scholarship: 7767941.9, tuition: 6337.4, dorm: 63.5 },
+      "2026": { employ: 67.0, scholarship: 7941619.4, tuition: 6554.9, dorm: 63.9 },
+    },
+  },
+  "이화여자대학교": {
+    years: {
+      "2024": { employ: 64.4, scholarship: 3468066.4, tuition: 8754.3, dorm: 19.6 },
+      "2025": { employ: 64.6, scholarship: 3554030.9, tuition: 9000.2, dorm: 20.1 },
+      "2026": { employ: 65.1, scholarship: 3629283.9, tuition: 9311.4, dorm: 20.8 },
+    },
+  },
+  "인하대학교": {
+    years: {
+      "2024": { employ: 68.3, scholarship: 3753457.5, tuition: 8027.8, dorm: 11.5 },
+      "2025": { employ: 68.5, scholarship: 3850564.7, tuition: 8244.1, dorm: 11.8 },
+      "2026": { employ: 69.0, scholarship: 3949700.9, tuition: 8490.4, dorm: 12.2 },
+    },
+  },
+  "전남대학교": {
+    years: {
+      "2024": { employ: 57.0, scholarship: 3528390.5, tuition: 4028.3, dorm: 20.9 },
+      "2025": { employ: 57.6, scholarship: 3606147.6, tuition: 4129.7, dorm: 21.4 },
+      "2026": { employ: 57.7, scholarship: 3640731.2, tuition: 4222.8, dorm: 21.8 },
+    },
+  },
+  "제주대학교": {
+    years: {
+      "2024": { employ: 59.2, scholarship: 3444236.0, tuition: 3970.7, dorm: 24.8 },
+      "2025": { employ: 59.6, scholarship: 3510484.0, tuition: 4051.0, dorm: 25.5 },
+      "2026": { employ: 59.9, scholarship: 3502775.4, tuition: 4060.6, dorm: 26.3 },
+    },
+  },
+  "중앙대학교(서울)": {
+    years: {
+      "2024": { employ: 67.7, scholarship: 3439679.3, tuition: 8079.5, dorm: 11.1 },
+      "2025": { employ: 67.6, scholarship: 3512751.3, tuition: 8305.2, dorm: 11.4 },
+      "2026": { employ: 68.3, scholarship: 3534708.5, tuition: 8587.2, dorm: 11.7 },
+    },
+  },
+  "충남대학교": {
+    years: {
+      "2024": { employ: 61.1, scholarship: 2891901.1, tuition: 4191.0, dorm: 21.2 },
+      "2025": { employ: 61.1, scholarship: 2957867.7, tuition: 4298.1, dorm: 21.6 },
+      "2026": { employ: 61.7, scholarship: 2995863.1, tuition: 4401.8, dorm: 21.4 },
+    },
+  },
+  "포항공과대학교": {
+    years: {
+      "2024": { employ: 79.9, scholarship: 7818487.1, tuition: 5480.5, dorm: 78.2 },
+      "2025": { employ: 79.8, scholarship: 7985906.9, tuition: 5593.1, dorm: 79.8 },
+      "2026": { employ: 80.5, scholarship: 8041517.7, tuition: 5613.5, dorm: 80.2 },
+    },
+  },
+  "한국교원대학교": {
+    years: {
+      "2024": { employ: 59.6, scholarship: 2886747.5, tuition: 3388.7, dorm: 71.6 },
+      "2025": { employ: 59.4, scholarship: 2966170.6, tuition: 3455.5, dorm: 73.2 },
+      "2026": { employ: 60.2, scholarship: 3063092.8, tuition: 3456.1, dorm: 73.9 },
+    },
+  },
+  "한국외국어대학교(서울)": {
+    years: {
+      "2024": { employ: 64.3, scholarship: 3075991.9, tuition: 7414.8, dorm: 16.9 },
+      "2025": { employ: 64.5, scholarship: 3144466.4, tuition: 7605.0, dorm: 17.4 },
+      "2026": { employ: 65.0, scholarship: 3177578.9, tuition: 7791.8, dorm: 18.0 },
+    },
+  },
+  "한양대학교(서울)": {
+    years: {
+      "2024": { employ: 68.1, scholarship: 3612045.4, tuition: 9094.8, dorm: 14.5 },
+      "2025": { employ: 68.9, scholarship: 3697639.4, tuition: 9276.8, dorm: 14.8 },
+      "2026": { employ: 68.9, scholarship: 3758936.7, tuition: 9289.9, dorm: 15.2 },
+    },
+  },
+  "한양대학교(ERICA)": {
+    years: {
+      "2024": { employ: 66.6, scholarship: 4415432.3, tuition: 8744.9, dorm: 19.6 },
+      "2025": { employ: 67.5, scholarship: 4505274.9, tuition: 8986.8, dorm: 20.1 },
+      "2026": { employ: 67.4, scholarship: 4516452.1, tuition: 9281.8, dorm: 20.8 },
+    },
+  },
+  "KAIST": {
+    years: {
+      "2024": { employ: 68.5, scholarship: 6968636.5, tuition: 6457.8, dorm: 49.0 },
+      "2025": { employ: 68.5, scholarship: 7141424.7, tuition: 6638.7, dorm: 50.4 },
+      "2026": { employ: 69.1, scholarship: 7292869.2, tuition: 6866.0, dorm: 52.3 },
+    },
+  },
+};
+
 window.ADMIT_UNI_HS = {
   "한국외국어대학교(서울)": [
     ["일반고", "68.20", "67.50", "66.80"],

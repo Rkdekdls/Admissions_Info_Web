@@ -1982,13 +1982,22 @@ const Guide = (() => {
           const quota = latest ? formatAdmitQuota(latest.quota) : formatAdmitQuota(item.quota);
           const rate = latest ? formatAdmitRate(latest.rate) : formatAdmitRate(item.rate);
           const fill = latest ? formatAdmitFill(latest.fill) : formatAdmitFill(item.fill);
+          const ind = uniIndicatorFor(item.name, "2026");
+          const employ = formatAdmitIndicatorPct(ind?.employ);
+          const tuition = formatAdmitTuitionChon(ind?.tuition);
+          const scholarship = formatAdmitWon(ind?.scholarship);
+          const dorm = formatAdmitIndicatorPct(ind?.dorm);
           return `<tr data-uni-row data-year="2026"${cls}>
               <td class="admit-data-name">${escapeHtml(item.name)}</td>
               <td>${escapeHtml(item.region)}</td>
               <td>${escapeHtml(item.founding)}</td>
               <td>${quota}</td>
-              <td>${rate}</td>
               <td>${fill}</td>
+              <td>${rate}</td>
+              <td>${employ}</td>
+              <td>${tuition}</td>
+              <td>${scholarship}</td>
+              <td>${dorm}</td>
               <td><button type="button" class="admit-data-view">보기</button></td>
             </tr>`;
         })
@@ -2024,10 +2033,18 @@ const Guide = (() => {
             <option value="name">대학명순</option>
             <option value="quota-desc">입학정원 많은순</option>
             <option value="quota-asc">입학정원 적은순</option>
-            <option value="rate-desc">경쟁률 높은순</option>
-            <option value="rate-asc">경쟁률 낮은순</option>
             <option value="fill-desc">충원율 높은순</option>
             <option value="fill-asc">충원율 낮은순</option>
+            <option value="rate-desc">경쟁률 높은순</option>
+            <option value="rate-asc">경쟁률 낮은순</option>
+            <option value="employ-desc">취업률 높은순</option>
+            <option value="employ-asc">취업률 낮은순</option>
+            <option value="tuition-desc">평균 등록금 많은순</option>
+            <option value="tuition-asc">평균 등록금 적은순</option>
+            <option value="scholarship-desc">1인당 장학금 많은순</option>
+            <option value="scholarship-asc">1인당 장학금 적은순</option>
+            <option value="dorm-desc">기숙사 수용률 높은순</option>
+            <option value="dorm-asc">기숙사 수용률 낮은순</option>
           </select>
         </div>
         <div class="admit-data-wrap">
@@ -2038,8 +2055,12 @@ const Guide = (() => {
                 <th style="padding: 3mm 2mm !important; height: 12mm !important;">지역</th>
                 <th style="padding: 3mm 2mm !important; height: 12mm !important;">설립 유형</th>
                 <th style="padding: 3mm 2mm !important; height: 12mm !important;">입학정원</th>
-                <th style="padding: 3mm 2mm !important; height: 12mm !important;">신입생 경쟁률</th>
                 <th style="padding: 3mm 2mm !important; height: 12mm !important;">신입생 충원율</th>
+                <th style="padding: 3mm 2mm !important; height: 12mm !important;">신입생 경쟁률</th>
+                <th style="padding: 3mm 2mm !important; height: 12mm !important;">취업률</th>
+                <th style="padding: 3mm 2mm !important; height: 12mm !important;">평균 등록금</th>
+                <th style="padding: 3mm 2mm !important; height: 12mm !important;">1인당 장학금</th>
+                <th style="padding: 3mm 2mm !important; height: 12mm !important;">기숙사 수용률</th>
                 <th style="padding: 3mm 2mm !important; height: 12mm !important;">상세</th>
               </tr>
             </thead>
@@ -2726,6 +2747,39 @@ const Guide = (() => {
     return Number.isFinite(n) ? `${n.toFixed(1)}%` : "-";
   }
 
+  /* 대학알리미 지표 %: 0·없음은 "-" (예: 68.0%, 45.1%) */
+  function formatAdmitIndicatorPct(value) {
+    if (isAdmitBlank(value)) return "-";
+    const n = parseAdmitNumber(String(value).replace(/%/g, ""));
+    if (!Number.isFinite(n) || n === 0) return "-";
+    return `${n.toFixed(1)}%`;
+  }
+
+  /* 금액(원): 천단위 콤마 + 원 (예: 2,653,833원) */
+  function formatAdmitWon(value) {
+    if (isAdmitBlank(value)) return "-";
+    const n = parseAdmitNumber(value);
+    if (!Number.isFinite(n) || n === 0) return "-";
+    return `${Math.round(n).toLocaleString("ko-KR")}원`;
+  }
+
+  /* 평균 등록금(천원 입력 → 원 표기) */
+  function formatAdmitTuitionChon(value) {
+    if (isAdmitBlank(value)) return "-";
+    const n = parseAdmitNumber(value);
+    if (!Number.isFinite(n) || n === 0) return "-";
+    return `${Math.round(n * 1000).toLocaleString("ko-KR")}원`;
+  }
+
+  function uniIndicatorFor(name, year = "2026") {
+    const pack = window.ADMIT_UNI_INDICATORS && window.ADMIT_UNI_INDICATORS[name];
+    if (!pack) return null;
+    if (pack.years) {
+      return pack.years[year] || pack.years["2026"] || pack.years["2025"] || null;
+    }
+    return pack;
+  }
+
   /* 인원: 천단위 콤마 + 명 (예: 3,163명) */
   function formatAdmitQuota(value) {
     if (isAdmitBlank(value)) return "-";
@@ -2840,8 +2894,12 @@ const Guide = (() => {
       compareAdmitRows(a, b, sortVal, {
         name: (row) => row.cells[0]?.textContent.trim() || "",
         quota: (row) => parseAdmitNumber(row.cells[3]?.textContent),
-        rate: (row) => parseAdmitNumber(row.cells[4]?.textContent),
-        fill: (row) => parseAdmitNumber(row.cells[5]?.textContent),
+        fill: (row) => parseAdmitNumber(row.cells[4]?.textContent),
+        rate: (row) => parseAdmitNumber(row.cells[5]?.textContent),
+        employ: (row) => parseAdmitNumber(row.cells[6]?.textContent),
+        tuition: (row) => parseAdmitNumber(row.cells[7]?.textContent),
+        scholarship: (row) => parseAdmitNumber(row.cells[8]?.textContent),
+        dorm: (row) => parseAdmitNumber(row.cells[9]?.textContent),
       })
     );
     rows.forEach((row) => tbody.appendChild(row));
@@ -4347,7 +4405,7 @@ const Guide = (() => {
     const materialsTab = root.querySelector('[data-admit-detail-tab="materials"]');
     if (mode === "university") {
       if (infoTab) {
-        infoTab.textContent = "신입생 현황";
+        infoTab.textContent = "대학 개요";
         infoTab.hidden = false;
         infoTab.classList.add("is-active");
         infoTab.setAttribute("aria-selected", "true");
@@ -4915,8 +4973,13 @@ const Guide = (() => {
     const yearOrder = ["2024", "2025", "2026"];
     const latest = uniExtra?.years?.["2026"] || null;
     const quotaText = latest ? formatAdmitQuota(latest.quota) : formatAdmitQuota(textAt(3)) || "-";
-    const rateText = latest ? formatAdmitRate(latest.rate) : formatAdmitRate(textAt(4)) || "-";
-    const fillText = latest ? formatAdmitFill(latest.fill) : formatAdmitFill(textAt(5)) || "-";
+    const fillText = latest ? formatAdmitFill(latest.fill) : formatAdmitFill(textAt(4)) || "-";
+    const rateText = latest ? formatAdmitRate(latest.rate) : formatAdmitRate(textAt(5)) || "-";
+    const ind = uniIndicatorFor(univ, "2026");
+    const employText = formatAdmitIndicatorPct(ind?.employ) || textAt(6) || "-";
+    const tuitionText = formatAdmitTuitionChon(ind?.tuition) || textAt(7) || "-";
+    const scholarshipText = formatAdmitWon(ind?.scholarship) || textAt(8) || "-";
+    const dormText = formatAdmitIndicatorPct(ind?.dorm) || textAt(9) || "-";
     const applicantsN = latest?.applicants || 0;
     const enrolledN = latest?.enrolled || 0;
     const chartPoints = yearOrder.map((y) => {
@@ -4950,21 +5013,30 @@ const Guide = (() => {
         </button>`;
     }
 
-    const stats = [
+    const renderUniStatCards = (items) =>
+      items
+        .map(
+          ([label, value]) => `
+        <div class="admit-detail-uni-stat">
+          <span class="admit-detail-uni-stat-label">${escapeHtml(label)}</span>
+          <strong class="admit-detail-uni-stat-value">${escapeHtml(value)}</strong>
+        </div>`
+        )
+        .join("");
+
+    const recruitStats = renderUniStatCards([
       ["입학정원", quotaText || "-"],
       ["지원자", applicantsN ? formatAdmitCount(applicantsN) : "-"],
       ["입학자", enrolledN ? formatAdmitCount(enrolledN) : "-"],
       ["신입생 충원율", fillText || "-"],
       ["신입생 경쟁률", rateText || "-"],
-    ]
-      .map(
-        ([label, value]) => `
-        <div class="admit-detail-uni-stat">
-          <span class="admit-detail-uni-stat-label">${escapeHtml(label)}</span>
-          <strong class="admit-detail-uni-stat-value">${escapeHtml(value)}</strong>
-        </div>`
-      )
-      .join("");
+    ]);
+    const indicatorStats = renderUniStatCards([
+      ["취업률", employText || "-"],
+      ["평균 등록금", tuitionText || "-"],
+      ["1인당 장학금", scholarshipText || "-"],
+      ["기숙사 수용률", dormText || "-"],
+    ]);
 
     const formatTrendCount = (n) =>
       n == null || n === "" || n === 0 ? "-" : `${Math.round(n).toLocaleString("ko-KR")}명`;
@@ -4997,6 +5069,19 @@ const Guide = (() => {
       )
       .join("");
 
+    const indicatorRows = yearOrder
+      .map((y) => {
+        const rowInd = uniIndicatorFor(univ, y);
+        return `<tr>
+          <th scope="row">${escapeHtml(y)}</th>
+          <td>${escapeHtml(formatAdmitIndicatorPct(rowInd?.employ))}</td>
+          <td>${escapeHtml(formatAdmitTuitionChon(rowInd?.tuition))}</td>
+          <td>${escapeHtml(formatAdmitWon(rowInd?.scholarship))}</td>
+          <td>${escapeHtml(formatAdmitIndicatorPct(rowInd?.dorm))}</td>
+        </tr>`;
+      })
+      .join("");
+
     const hsSource =
       (window.ADMIT_UNI_HS && (window.ADMIT_UNI_HS[univ] || window.ADMIT_UNI_HS.default)) || [];
     const hsRows = hsSource
@@ -5017,10 +5102,10 @@ const Guide = (() => {
     infoPanel.innerHTML = `
       <section class="admit-detail-section">
         <div class="admit-detail-section-head">
-          <h3 class="admit-detail-section-title">신입생 충원</h3>
+          <h3 class="admit-detail-section-title">신입생 모집 결과</h3>
           <span class="admit-detail-section-meta">기준: 2026년</span>
         </div>
-        <div class="admit-detail-uni-stats">${stats}</div>
+        <div class="admit-detail-uni-stats">${recruitStats}</div>
       </section>
 
       <section class="admit-detail-section">
@@ -5043,6 +5128,30 @@ const Guide = (() => {
               </tr>
             </thead>
             <tbody>${trendRows}</tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admit-detail-section">
+        <div class="admit-detail-section-head">
+          <h3 class="admit-detail-section-title">주요 공시 지표</h3>
+        </div>
+        <div class="admit-detail-uni-stats is-cols-4">${indicatorStats}</div>
+      </section>
+
+      <section class="admit-detail-section">
+        <div class="admit-detail-table-wrap">
+          <table class="admit-detail-table admit-detail-table-uni-trend admit-detail-table-uni-indicators">
+            <thead>
+              <tr>
+                <th scope="col">기준연도</th>
+                <th scope="col">취업률</th>
+                <th scope="col">평균 등록금</th>
+                <th scope="col">1인당 장학금</th>
+                <th scope="col">기숙사 수용률</th>
+              </tr>
+            </thead>
+            <tbody>${indicatorRows}</tbody>
           </table>
         </div>
       </section>`;

@@ -1721,14 +1721,18 @@ input {
   white-space: nowrap;
 }
 
-.admit-search[data-search-type="university"] .admit-data-table th:nth-child(1),
-.admit-search[data-search-type="university"] .admit-data-table td:nth-child(1) {
-  width: 22%;
+.admit-search[data-search-type="university"] .admit-data-table {
+  min-width: max(var(--pc-table-min), 1380px);
 }
 
-.admit-search[data-search-type="university"] .admit-data-table th:nth-child(7),
-.admit-search[data-search-type="university"] .admit-data-table td:nth-child(7) {
-  width: 12%;
+.admit-search[data-search-type="university"] .admit-data-table th:nth-child(1),
+.admit-search[data-search-type="university"] .admit-data-table td:nth-child(1) {
+  width: 16%;
+}
+
+.admit-search[data-search-type="university"] .admit-data-table th:nth-child(11),
+.admit-search[data-search-type="university"] .admit-data-table td:nth-child(11) {
+  width: 8%;
 }
 
 /* 수시: 대학명(캠퍼스)만 볼드(500), 나머지 셀은 기본 400 */
@@ -3939,6 +3943,14 @@ input {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.admit-detail-uni-stats.is-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* 신입생 경쟁률 추이 그래프(.admit-detail-uni-chart)와 동일: 아래 표와 12px 간격 */
+  margin-bottom: 12px;
 }
 
 .admit-detail-uni-stat {
@@ -3948,20 +3960,27 @@ input {
   justify-content: center;
   gap: 6px;
   box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   min-height: 0;
-  padding: 14px 12px;
+  padding: 14px 10px;
   border: 1px solid #e5e7eb;
   background: #fff;
   text-align: center;
+  overflow: hidden;
 }
 
 .admit-detail-uni-stat-value {
   margin: 0;
+  max-width: 100%;
   color: #1a4796;
-  font-size: 20px;
+  font-size: clamp(14px, 1.55vw, 20px);
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.2;
+  line-height: 1.25;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
 }
 
 .admit-detail-uni-stat-label {
@@ -3970,6 +3989,18 @@ input {
   font-weight: 500;
   line-height: 1.35;
   word-break: keep-all;
+}
+
+.admit-detail-table.admit-detail-table-uni-indicators {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.admit-detail-table.admit-detail-table-uni-indicators th,
+.admit-detail-table.admit-detail-table-uni-indicators td {
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+  white-space: normal;
 }
 
 .admit-detail-uni-chart {
@@ -5746,7 +5777,8 @@ table.admit-detail-table td {
     gap: 10px;
   }
 
-  .admit-detail-uni-stats {
+  .admit-detail-uni-stats,
+  .admit-detail-uni-stats.is-cols-4 {
     grid-template-columns: 1fr;
     gap: 10px;
   }
