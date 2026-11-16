@@ -1703,6 +1703,9 @@ li::before {
         /* 라벨 열 축소, 내용 열 확대 */
         table.dataset.declaredColWidths = "14,86";
       }
+      if (table.classList.contains("glossary-terms-table")) {
+        table.dataset.declaredColWidths = "30,70";
+      }
 
       /* containCells가 width를 지우기 전에 헤더 % 비율 보관 */
       const headCells = [...(table.querySelector("thead tr")?.cells || [])];
@@ -1834,6 +1837,11 @@ li::before {
   width: 100% !important;
   min-width: var(--pc-table-min, 924px) !important;
   max-width: none !important;
+}
+/* 대입 용어 정리집: 다른 표와 동일하게 min-width 유지 → 모바일·태블릿 좌우 스크롤 */
+.page .table-scroll > table.glossary-terms-table th,
+.page .table-scroll > table.glossary-terms-table td {
+  text-align: center !important;
 }
 /* 가이드 표 공통: 셀 밖으로 텍스트 돌출 금지 (페이지 nowrap/fit-content 덮어씀) */
 .page .table-scroll > table,

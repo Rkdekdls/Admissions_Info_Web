@@ -110,7 +110,7 @@ const Guide = (() => {
         { href: "#screening-holistic", label: "[수시] 학생부 종합 전형" },
         { href: "#screening-essay", label: "[수시] 논술 전형" },
         { href: "#screening-csat", label: "[정시] 수능 위주 전형" },
-        { href: "#life-roadmap", label: "고교 3년 주요 일정" },
+        { href: "#screening-glossary", label: "대입 용어 정리집" },
       ],
       blocks: [
         {
@@ -144,10 +144,15 @@ const Guide = (() => {
           pages: series("part5", 6, 6),
         },
         {
-          id: "life-roadmap",
+          id: "screening-glossary",
           title: "PART 5",
-          heading: "고교 3년 주요 일정",
-          pages: series("part1", 6, 6),
+          heading: "대입 용어 정리집",
+          slices: true,
+          pages: [
+            src("appendix2-01"),
+            src("appendix2-03"),
+            src("appendix2-04"),
+          ],
         },
       ],
     },
@@ -155,10 +160,17 @@ const Guide = (() => {
       kicker: "PART 6",
       title: "일정 및 원서접수",
       nav: [
+        { href: "#life-roadmap", label: "고교 3년 주요 일정" },
         { href: "#schedule-plan", label: "원서접수 전략 설계 방식" },
         { href: "#schedule-after", label: "원서접수 이후 진행 흐름" },
       ],
       blocks: [
+        {
+          id: "life-roadmap",
+          title: "PART 6",
+          heading: "고교 3년 주요 일정",
+          pages: series("part1", 6, 6),
+        },
         {
           id: "schedule-plan",
           title: "PART 6",
@@ -756,13 +768,15 @@ const Guide = (() => {
         if (index % 2 === 1) classes.push("is-alt");
         if (index === list.length - 1) classes.push("is-last-visible");
         const cls = classes.length ? ` class="${classes.join(" ")}"` : "";
-        const keywords = (item.keywords || [])
+        const keywordList = item.keywords || [];
+        const keywords = keywordList
           .slice(0, 3)
           .map((word) => `<span class="admit-major-tag">#${escapeHtml(word)}</span>`)
           .join(" ");
+        const keywordData = escapeHtml(keywordList.join(" "));
         return `<tr data-major-row data-track="${escapeHtml(item.track)}" data-subtrack="${escapeHtml(
           item.subtrack
-        )}" data-major="${escapeHtml(item.name)}"${cls}>
+        )}" data-major="${escapeHtml(item.name)}" data-keywords="${keywordData}"${cls}>
             <td>${escapeHtml(item.track)}</td>
             <td>${escapeHtml(item.subtrack)}</td>
             <td class="admit-data-name">${escapeHtml(item.name)}</td>
@@ -774,6 +788,13 @@ const Guide = (() => {
 
     return `<section class="admit-search" data-admit-search data-search-type="major-explore">
       <div class="admit-search-bar">
+        <label class="admit-search-field">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m20 20-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <input type="search" name="keyword" placeholder="핵심 키워드 검색" aria-label="핵심 키워드 검색">
+        </label>
         <select class="admit-search-select" name="track" aria-label="전공 계열">
           <option value="">전공 계열 전체</option>
           ${majorExploreOptionHtml(tracks)}
@@ -3030,6 +3051,10 @@ const Guide = (() => {
     const trackVal = root.querySelector('select[name="track"]')?.value || "";
     const subtrackVal = root.querySelector('select[name="subtrack"]')?.value || "";
     const majorVal = root.querySelector('select[name="major"]')?.value || "";
+    const keyword = (root.querySelector('input[name="keyword"]')?.value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/#/g, "");
 
     const rows = [...tbody.querySelectorAll("tr[data-major-row]")];
     let visible = 0;
@@ -3037,7 +3062,11 @@ const Guide = (() => {
       const trackOk = !trackVal || row.dataset.track === trackVal;
       const subtrackOk = !subtrackVal || row.dataset.subtrack === subtrackVal;
       const majorOk = !majorVal || row.dataset.major === majorVal;
-      const show = trackOk && subtrackOk && majorOk;
+      const keywordText = String(row.dataset.keywords || "")
+        .toLowerCase()
+        .replace(/#/g, "");
+      const keywordOk = !keyword || keywordText.includes(keyword);
+      const show = trackOk && subtrackOk && majorOk && keywordOk;
       row.hidden = !show;
       if (show) visible += 1;
     });
@@ -8466,7 +8495,10 @@ const Guide = (() => {
     const nav = document.createElement("div");
     nav.className = "slice-nav";
     nav.setAttribute("role", "tablist");
-    nav.setAttribute("aria-label", "2022 개정 학생부 구성 항목");
+    const guideKey = (block.closest("[data-guide]") || {}).dataset?.guide;
+    const guide = guideKey && guides[guideKey];
+    const blockMeta = guide && guide.blocks.find((item) => item.id === block.dataset.section);
+    nav.setAttribute("aria-label", `${blockMeta?.heading || "구성"} 항목`);
     order.forEach((id, index) => {
       const button = document.createElement("button");
       button.type = "button";

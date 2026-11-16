@@ -761,7 +761,11 @@ input {
   margin: 0;
 }
 
-.admit-search[data-search-type="major-explore"] .admit-search-bar,
+.admit-search[data-search-type="major-explore"] .admit-search-bar {
+  grid-template-columns: minmax(200px, 1.25fr) repeat(3, minmax(120px, 0.75fr));
+  margin: 0;
+}
+
 .admit-search[data-search-type="major-by-field"] .admit-search-bar {
   grid-template-columns: repeat(3, minmax(140px, 1fr));
   margin: 0;

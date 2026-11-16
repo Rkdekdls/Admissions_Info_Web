@@ -8,71 +8,15 @@
   <style>body{min-height:100vh;min-height:100dvh}</style>
   <script src="../../../js/page.js"></script>
   <style>
-    /* 용어 사전 표 스타일 */
-    .glossary-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      margin: 3mm 0 2mm 0;
-      font-size: 15px;
-      border: 1px solid #E5E7EB;
-      border-radius: 0;
-      overflow: hidden;
-      background-color: #ffffff;
+    /* 용어 표: comparison-table + 중앙 정렬 (min-width는 공통 표 스크롤 규칙 따름) */
+    .comparison-table th,
+    .comparison-table td {
+      text-align: center !important;
     }
-    
-    .glossary-table th,
-    .glossary-table td {
-      padding: 3mm 4mm;
-      text-align: left;
-      border-bottom: 1px solid #E5E7EB;
-      border-right: 1px solid #E5E7EB;
-      vertical-align: top;
-    }
-    
-    .glossary-table th {
-      background-color: var(--color-primary);
-      font-size: 15px;
+    .comparison-table th:first-child,
+    .comparison-table tbody td:first-child {
+      width: 30%;
       font-weight: 600;
-      color: #ffffff;
-      text-align: center;
-      padding-top: 4mm;
-      padding-bottom: 4mm;
-    }
-    
-    .glossary-table th:first-child {
-      width: 25%;
-    }
-    
-    .glossary-table th:last-child {
-      width: 75%;
-    }
-    
-    .glossary-table tbody tr:nth-child(even) {
-      background-color: #FAFAFA;
-    }
-    
-    .glossary-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-    
-    .glossary-table td:first-child {
-      font-size: 14.5px;
-      color: var(--color-text);
-      text-align: center;
-      font-weight: 600;
-    }
-    
-    .glossary-table td:last-child {
-      font-size: 14.5px;
-      color: var(--color-text);
-      line-height: 1.6;
-      text-align: left;
-    }
-    
-    .glossary-table th:last-child,
-    .glossary-table td:last-child {
-      border-right: none;
     }
   </style>
 </head>
@@ -83,11 +27,11 @@
       Chapter 2. 대입 용어 정리집
     </h2>
     
-    <!-- 소제목 1-3 -->
-    <h3 class="title-3">2-1. 전형·자격·평가 방식</h3>
+    <!-- 소제목 -->
+    <h3 class="title-3">6-1. 전형 유형·평가 기준</h3>
     
     <!-- 용어 사전 표 -->
-    <table class="glossary-table">
+    <table class="comparison-table glossary-terms-table">
       <thead>
         <tr>
           <th>용어</th>
@@ -120,56 +64,8 @@
           <td>대학이 공식 발표하는 선발 기준(예: 전형 방법, 반영 비율, 일정, 제출 서류 등)</td>
         </tr>
         <tr>
-          <td>전형요소</td>
-          <td>평가에 포함되는 항목(예: 내신, 출결, 비교과 활동, 면접, 논술, 수능 성적 등)</td>
-        </tr>
-        <tr>
-          <td>반영비율</td>
-          <td>전형요소가 최종 점수에 반영되는 비율(예: 교과 70 + 출결 10 + 서류 20)</td>
-        </tr>
-        <tr>
-          <td>정량평가</td>
-          <td>점수나 등급 등 수치로 비교하는 평가 방식(예: 교과 성적, 수능 성적 등)</td>
-        </tr>
-        <tr>
-          <td>정성평가</td>
-          <td>기록된 내용의 맥락과 의미를 평가하는 방식(예: 세특, 비교과 활동, 면접 등)</td>
-        </tr>
-        <tr>
-          <td>서류평가</td>
-          <td>학생부에 담긴 교과·비교과 내용을 종합적으로 살펴보는 평가 방식</td>
-        </tr>
-        <tr>
-          <td>면접평가</td>
-          <td>면접을 통해 학업 역량·전공 적합성·인성·소통 능력 등을 평가하는 방식</td>
-        </tr>
-        <tr>
-          <td>논술고사</td>
-          <td>대학이 실시하는 논술 시험으로 사고력과 표현력을 평가하는 방식</td>
-        </tr>
-        <tr>
-          <td>실기</td>
-          <td>예체능 계열에서 실기 수행 능력을 평가하는 전형요소</td>
-        </tr>
-        <tr>
-          <td>단계별 전형</td>
-          <td>1단계 평가로 일정 배수 선발 후 2단계 평가를 통해 최종 합격자를 결정하는 방식</td>
-        </tr>
-        <tr>
-          <td>선발 배수</td>
-          <td>1단계에서 모집 인원의 몇 배수를 선발하는지에 대한 기준</td>
-        </tr>
-        <tr>
-          <td>가산점</td>
-          <td>특정 조건이나 요소를 충족한 경우 총점에 추가 점수를 부여하는 제도</td>
-        </tr>
-        <tr>
-          <td>감점</td>
-          <td>출결·서류 미비 등 일정 기준에 따라 점수를 차감하는 방식</td>
-        </tr>
-        <tr>
-          <td>동점자 처리 기준</td>
-          <td>점수가 같을 때 우선순위를 정하는 규칙(예: 수능 특정 영역, 학생부, 면접 등)</td>
+          <td>지원자격</td>
+          <td>해당 대학·전형에 지원하기 위해 충족해야 하는 기본 조건</td>
         </tr>
         <tr>
           <td>정원내 전형</td>
@@ -211,7 +107,46 @@
           <td>검정고시/동등학력</td>
           <td>검정고시 등 동등 학력으로 대학 지원이 가능한 경우에 적용되는 전형</td>
         </tr>
-
+        <tr>
+          <td>전형요소</td>
+          <td>평가에 포함되는 항목(예: 내신, 출결, 비교과 활동, 면접, 논술, 수능 성적 등)</td>
+        </tr>
+        <tr>
+          <td>정량평가</td>
+          <td>점수나 등급 등 수치로 비교하는 평가 방식(예: 교과 성적, 수능 성적 등)</td>
+        </tr>
+        <tr>
+          <td>정성평가</td>
+          <td>기록된 내용의 맥락과 의미를 평가하는 방식(예: 세특, 비교과 활동, 면접 등)</td>
+        </tr>
+        <tr>
+          <td>서류평가</td>
+          <td>학생부에 담긴 교과·비교과 내용을 종합적으로 살펴보는 평가 방식</td>
+        </tr>
+        <tr>
+          <td>면접평가</td>
+          <td>면접을 통해 학업 역량·전공 적합성·인성·소통 능력 등을 평가하는 방식</td>
+        </tr>
+        <tr>
+          <td>논술고사</td>
+          <td>대학이 실시하는 논술 시험으로 사고력과 표현력을 평가하는 방식</td>
+        </tr>
+        <tr>
+          <td>실기</td>
+          <td>예체능 계열에서 실기 수행 능력을 평가하는 전형요소</td>
+        </tr>
+        <tr>
+          <td>단계별 전형</td>
+          <td>1단계 평가로 일정 배수 선발 후 2단계 평가를 통해 최종 합격자를 결정하는 방식</td>
+        </tr>
+        <tr>
+          <td>선발 배수</td>
+          <td>1단계에서 모집 인원의 몇 배수를 선발하는지에 대한 기준</td>
+        </tr>
+        <tr>
+          <td>동점자 처리 기준</td>
+          <td>점수가 같을 때 우선순위를 정하는 규칙(예: 수능 특정 영역, 학생부, 면접 등)</td>
+        </tr>
       </tbody>
     </table>
     <!-- 페이지 하단 번호 -->
