@@ -5102,7 +5102,7 @@ const Guide = (() => {
     infoPanel.innerHTML = `
       <section class="admit-detail-section">
         <div class="admit-detail-section-head">
-          <h3 class="admit-detail-section-title">신입생 모집 결과</h3>
+          <h3 class="admit-detail-section-title">신입생 현황</h3>
           <span class="admit-detail-section-meta">기준: 2026년</span>
         </div>
         <div class="admit-detail-uni-stats">${recruitStats}</div>
@@ -5134,7 +5134,7 @@ const Guide = (() => {
 
       <section class="admit-detail-section">
         <div class="admit-detail-section-head">
-          <h3 class="admit-detail-section-title">주요 공시 지표</h3>
+          <h3 class="admit-detail-section-title">대학 공시 현황</h3>
         </div>
         <div class="admit-detail-uni-stats is-cols-4">${indicatorStats}</div>
       </section>
