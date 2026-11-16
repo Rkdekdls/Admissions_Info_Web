@@ -793,7 +793,7 @@ const Guide = (() => {
             <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
             <path d="m20 20-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
-          <input type="search" name="keyword" placeholder="핵심 키워드 검색" aria-label="핵심 키워드 검색">
+          <input type="search" name="keyword" placeholder="전공명 또는 키워드 검색" aria-label="전공명 또는 키워드 검색">
         </label>
         <select class="admit-search-select" name="track" aria-label="전공 계열">
           <option value="">전공 계열 전체</option>
@@ -3120,11 +3120,24 @@ const Guide = (() => {
       const trackOk = !trackVal || row.dataset.track === trackVal;
       const subtrackOk = !subtrackVal || row.dataset.subtrack === subtrackVal;
       const majorOk = !majorVal || row.dataset.major === majorVal;
-      const keywordText = String(row.dataset.keywords || "")
+      const majorName = (
+        row.querySelector(".admit-data-name")?.textContent ||
+        row.dataset.major ||
+        ""
+      )
+        .trim()
+        .toLowerCase();
+      const keywordText = (
+        row.querySelector(".admit-major-keywords")?.textContent ||
+        row.dataset.keywords ||
+        ""
+      )
         .toLowerCase()
         .replace(/#/g, "");
-      const keywordOk = !keyword || keywordText.includes(keyword);
-      const show = trackOk && subtrackOk && majorOk && keywordOk;
+      /* 전공명 컬럼 OR 핵심 키워드 컬럼 */
+      const nameOrKeywordOk =
+        !keyword || majorName.includes(keyword) || keywordText.includes(keyword);
+      const show = trackOk && subtrackOk && majorOk && nameOrKeywordOk;
       row.hidden = !show;
       if (show) visible += 1;
     });
