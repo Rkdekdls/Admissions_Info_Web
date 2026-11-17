@@ -5,12 +5,20 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
   const TARGET = 30;
   const CORE_HUM = "국어, 영어, 사회";
   const CORE_HUM_HIST = "국어, 영어, 사회, 한국사";
+  const CORE_HUM_ETH = "국어, 영어, 생활과 윤리, 한국사";
   const CORE_BIZ = "국어, 영어, 수학(대수, 미적분Ⅰ, 확률과 통계)";
+  const CORE_BIZ_ECO = "영어, 경제, 수학(확률과 통계, 미적분Ⅰ)";
   const CORE_MATH = "대수, 미적분Ⅰ, 확률과 통계, 미적분Ⅱ, 기하";
+  const CORE_MATH_PHY = "미적분Ⅱ, 기하, 확률과 통계, 물리학";
+  const CORE_MATH_INFO = "미적분Ⅱ, 기하, 정보, 프로그래밍";
   const CORE_SCI = "대수, 미적분Ⅰ, 확률과 통계, 화학, 생명과학";
+  const CORE_SCI_PHY = "미적분Ⅱ, 확률과 통계, 물리학, 화학";
   const CORE_MED = "대수, 미적분Ⅰ, 확률과 통계, 미적분Ⅱ, 화학, 생명과학";
+  const CORE_MED_ADV = "미적분Ⅱ, 기하, 화학Ⅱ, 생명과학Ⅱ";
   const CORE_NURSE = "생명과학, 화학, 수학(대수·확률과 통계)";
+  const CORE_NURSE_ENG = "생명과학, 화학, 영어, 확률과 통계";
   const CORE_EDU = "국어, 영어, 수학(대수·미적분Ⅰ·확률과 통계), 한국사";
+  const CORE_EDU_SOC = "국어, 영어, 한국사, 사회·문화";
   const CORE_FREE = "계열 구분 없이 자신의 진로 및 적성을 고려하여 교과목 선택 이수";
 
   const POOLS = {
@@ -153,16 +161,24 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
     return h;
   }
 
-  function pickCore(unit, theme) {
-    if (/의예|치의|한의|수의|약학/.test(unit)) return CORE_MED;
-    if (/간호|보건|임상|물리치료|식품영양|의공/.test(unit)) return CORE_NURSE;
-    if (/교육|초등|유아|특수/.test(unit)) return CORE_EDU;
-    if (/수학|물리|화학|생명|지구|컴퓨터|소프트웨어|인공|전자|전기|기계|화공|소재|산업|건축|토목|항공|반도체|정보|데이터|바이오|계약|팩토리|배터리|디스플레이|전산/.test(unit))
-      return CORE_MATH;
-    if (/경영|경제|무역|회계|금융|관광|호텔|부동산|통계/.test(unit)) return CORE_BIZ;
-    if (theme === "advanced" || theme === "contract") return CORE_MATH;
-    if (theme === "med") return CORE_SCI;
-    return CORE_HUM_HIST;
+  function pickFrom(list, seed) {
+    return list[seed % list.length];
+  }
+
+  function pickCore(unit, theme, univ = "") {
+    const seed = hashStr(`${univ}|${unit}|core`);
+    if (/의예|치의|한의|수의|약학/.test(unit)) return pickFrom([CORE_MED, CORE_MED_ADV, CORE_SCI], seed);
+    if (/간호|보건|임상|물리치료|식품영양|의공/.test(unit)) return pickFrom([CORE_NURSE, CORE_NURSE_ENG, CORE_SCI], seed);
+    if (/교육|초등|유아|특수/.test(unit)) return pickFrom([CORE_EDU, CORE_EDU_SOC, CORE_HUM_HIST], seed);
+    if (/컴퓨터|소프트웨어|인공|데이터|전산|정보통신|IT계약/.test(unit))
+      return pickFrom([CORE_MATH_INFO, CORE_MATH, CORE_MATH_PHY], seed);
+    if (/수학|물리|화학|생명|지구|전자|전기|기계|화공|소재|산업|건축|토목|항공|반도체|정보|바이오|계약|팩토리|배터리|디스플레이/.test(unit))
+      return pickFrom([CORE_MATH, CORE_MATH_PHY, CORE_SCI_PHY, CORE_MATH_INFO], seed);
+    if (/경영|경제|무역|회계|금융|관광|호텔|부동산|통계/.test(unit)) return pickFrom([CORE_BIZ, CORE_BIZ_ECO, CORE_HUM_HIST], seed);
+    if (/경찰|행정|커뮤니케이션|미디어/.test(unit)) return pickFrom([CORE_HUM_ETH, CORE_HUM_HIST, CORE_HUM], seed);
+    if (theme === "advanced" || theme === "contract") return pickFrom([CORE_MATH, CORE_MATH_PHY, CORE_MATH_INFO], seed);
+    if (theme === "med") return pickFrom([CORE_SCI, CORE_SCI_PHY, CORE_MED], seed);
+    return pickFrom([CORE_HUM_HIST, CORE_HUM, CORE_HUM_ETH], seed);
   }
 
   /* 핵심과목에 이미 있는 과목은 권장에서 제외 (분리 컬럼일 때만) */
@@ -193,10 +209,11 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
     return /컴퓨터|소프트웨어|인공|데이터|전산|정보통신|IT계약/.test(String(unit || ""));
   }
 
-  function pickRecommend(unit, style, idx, core = "") {
+  function pickRecommend(unit, style, idx, core = "", univ = "") {
     if (style === "colspan") return null;
     /* empty여도 IT·AI 계열은 정보/인공지능 기초/프로그래밍을 남겨 전공별 권장과목과 맞춤 */
     if (style === "empty" && !isTechUnit(unit)) return "-";
+    const seed = hashStr(`${univ}|${unit}|rec|${idx}`);
     let raw = "-";
     if (isTechUnit(unit)) {
       const opts = [
@@ -205,16 +222,27 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
         "정보, 프로그래밍",
         "인공지능 기초",
         "프로그래밍, 정보",
+        "데이터과학, 정보",
       ];
-      raw = opts[idx % opts.length];
+      raw = opts[seed % opts.length];
     } else if (/기계|전자|전기|항공|반도체|화공|소재|산업공학|계약|팩토리|배터리|디스플레이/.test(unit)) {
-      const opts = ["물리학", "물리학, 화학", "물리학, 정보", "정보"];
-      raw = opts[idx % opts.length];
-    } else if (/의예|치의|한의|수의|약학|간호|생명/.test(unit)) raw = idx % 3 ? "물리학" : "기하";
-    else if (/경영|경제/.test(unit)) raw = idx % 2 ? "경제" : "사회";
-    else if (/교육|초등|유아|특수/.test(unit)) raw = idx % 2 ? "제2외국어/한문" : "사회, 과학";
-    else if (/국어|영어|사학|철학|중어|일어/.test(unit)) raw = idx % 2 ? "제2외국어/한문" : "지리";
-    else if (idx % 4 === 0) raw = "제2외국어/한문";
+      const opts = ["물리학", "물리학, 화학", "물리학, 정보", "정보", "화학, 정보", "물리학Ⅱ"];
+      raw = opts[seed % opts.length];
+    } else if (/의예|치의|한의|수의|약학|간호|생명/.test(unit)) {
+      const opts = ["물리학", "기하", "지구과학", "영어"];
+      raw = opts[seed % opts.length];
+    } else if (/경영|경제|관광|호텔/.test(unit)) {
+      const opts = ["경제", "사회", "정치와 법", "세계사"];
+      raw = opts[seed % opts.length];
+    } else if (/교육|초등|유아|특수/.test(unit)) {
+      const opts = ["제2외국어/한문", "사회, 과학", "통합과학", "생활과 윤리"];
+      raw = opts[seed % opts.length];
+    } else if (/국어|영어|사학|철학|중어|일어|커뮤니케이션|경찰|행정/.test(unit)) {
+      const opts = ["제2외국어/한문", "지리", "세계사", "정치와 법"];
+      raw = opts[seed % opts.length];
+    } else if (seed % 5 === 0) raw = "제2외국어/한문";
+    else if (seed % 5 === 1) raw = "정보";
+    else if (seed % 5 === 2) raw = "사회";
     return withoutCoreOverlap(core, raw);
   }
 
@@ -265,8 +293,8 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
       const pattern = (hashStr(meta.name + units[i]) + style) % 5;
       if (pattern === 0 && i + 2 < TARGET) {
         /* 핵심 3행 병합 */
-        const core = pickCore(units[i], meta.theme);
-        const rec = pickRecommend(units[i], "empty", i, core);
+        const core = pickCore(units[i], meta.theme, meta.name);
+        const rec = pickRecommend(units[i], "empty", i, core, meta.name);
         rows.push({
           unit: units[i],
           core,
@@ -278,32 +306,32 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
         rows.push({
           unit: units[i + 1],
           coreSkip: true,
-          recommend: rec === "-" ? undefined : pickRecommend(units[i + 1], "sep", i + 1, core),
+          recommend: rec === "-" ? undefined : pickRecommend(units[i + 1], "sep", i + 1, core, meta.name),
           recommendSkip: rec === "-",
           guide: "-",
         });
         rows.push({
           unit: units[i + 2],
           coreSkip: true,
-          recommend: rec === "-" ? undefined : pickRecommend(units[i + 2], "sep", i + 2, core),
+          recommend: rec === "-" ? undefined : pickRecommend(units[i + 2], "sep", i + 2, core, meta.name),
           recommendSkip: rec === "-",
           guide: "-",
         });
         i += 3;
       } else if (pattern === 1 && i + 1 < TARGET) {
         /* 핵심 2행 병합, 권장은 각각 */
-        const core = pickCore(units[i], meta.theme);
+        const core = pickCore(units[i], meta.theme, meta.name);
         rows.push({
           unit: units[i],
           core,
-          recommend: pickRecommend(units[i], "sep", i, core),
+          recommend: pickRecommend(units[i], "sep", i, core, meta.name),
           guide: "-",
           coreRowspan: 2,
         });
         rows.push({
           unit: units[i + 1],
           coreSkip: true,
-          recommend: pickRecommend(units[i + 1], "sep", i + 1, core),
+          recommend: pickRecommend(units[i + 1], "sep", i + 1, core, meta.name),
           guide: "-",
         });
         i += 2;
@@ -311,18 +339,18 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
         /* 핵심+권장 가로 병합 — 한 칸이라 중복 허용 */
         rows.push({
           unit: units[i],
-          core: style === 2 && i % 7 === 0 ? CORE_FREE : pickCore(units[i], meta.theme),
+          core: style === 2 && i % 7 === 0 ? CORE_FREE : pickCore(units[i], meta.theme, meta.name),
           recommend: null,
           guide: "-",
           coreColspan: 2,
         });
         i += 1;
       } else {
-        const core = pickCore(units[i], meta.theme);
+        const core = pickCore(units[i], meta.theme, meta.name);
         rows.push({
           unit: units[i],
           core,
-          recommend: pickRecommend(units[i], "sep", i, core),
+          recommend: pickRecommend(units[i], "sep", i, core, meta.name),
           guide: "-",
         });
         i += 1;
@@ -331,11 +359,11 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
     /* 정확히 TARGET 행 맞추기 (rowspan 때문에 넘치면 자름) */
     while (rows.length > TARGET) rows.pop();
     while (rows.length < TARGET && i < units.length) {
-      const core = pickCore(units[i], meta.theme);
+      const core = pickCore(units[i], meta.theme, meta.name);
       rows.push({
         unit: units[i],
         core,
-        recommend: pickRecommend(units[i], "sep", i, core),
+        recommend: pickRecommend(units[i], "sep", i, core, meta.name),
         guide: "-",
       });
       i += 1;
@@ -388,7 +416,7 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
     "동국대학교(서울)": ["경찰행정학부"],
   };
 
-  function ensureTechRecommend(rows) {
+  function ensureTechRecommend(rows, univ = "") {
     return (rows || []).map((row, idx) => {
       if (!isTechUnit(row.unit)) return row;
       const rec = String(row.recommend ?? "").trim();
@@ -396,7 +424,7 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
       const core = row.coreSkip ? "" : row.core || "";
       return {
         ...row,
-        recommend: pickRecommend(row.unit, "sep", idx, core),
+        recommend: pickRecommend(row.unit, "sep", idx, core, univ),
         recommendSkip: false,
       };
     });
@@ -404,7 +432,7 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
 
   const packs = {};
   UNIV_META.forEach((meta) => {
-    packs[meta.name] = ensureTechRecommend(buildRows(meta, DEMO_UNIT_BY_UNIV[meta.name] || []));
+    packs[meta.name] = ensureTechRecommend(buildRows(meta, DEMO_UNIT_BY_UNIV[meta.name] || []), meta.name);
   });
 
   /* 데모 목록 외 보강 대학 */
@@ -415,7 +443,7 @@ window.ADMIT_UNIV_RECOMMEND = (() => {
     { name: "전북대학교", theme: "med", bias: ["hum", "biz", "stem", "health", "edu"] },
     { name: "강원대학교", theme: "edu-elem", bias: ["edu", "hum", "stem", "health", "biz"] },
   ].forEach((meta) => {
-    packs[meta.name] = ensureTechRecommend(buildRows(meta, DEMO_UNIT_BY_UNIV[meta.name] || []));
+    packs[meta.name] = ensureTechRecommend(buildRows(meta, DEMO_UNIT_BY_UNIV[meta.name] || []), meta.name);
   });
 
   return packs;
