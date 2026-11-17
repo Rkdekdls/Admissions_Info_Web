@@ -2002,9 +2002,6 @@ const Guide = (() => {
     if (!univ) return;
     /* 팝업 제목: 줄임말 없이 정식명(캠퍼스 포함) */
     const label = univ;
-    const fallbackMeta = majorByUnivMetaFor(univ);
-    const zoneLabel = String(meta.zoneLabel || fallbackMeta.zoneLabel || "").trim();
-    const region = String(meta.region || fallbackMeta.region || "").trim();
     const highlightUnit = String(meta.highlightUnit || "").trim();
     const rows = resolveMajorByUnivRecommendRows(univ);
     const focusUnit =
@@ -2024,14 +2021,9 @@ const Guide = (() => {
 
     if (crumb) crumb.textContent = label;
     if (tags) {
-      const metaTags = [
-        zoneLabel ? `<span class="admit-detail-tag">${escapeHtml(zoneLabel)}</span>` : "",
-        region ? `<span class="admit-detail-tag">${escapeHtml(region)}</span>` : "",
-      ]
-        .filter(Boolean)
-        .join("");
+      /* 권역·지역 태그 없이 PDF 뷰어만 표시 (전공별/대학별 권장과목 공통) */
+      tags.querySelectorAll(".admit-detail-tag").forEach((el) => el.remove());
       tags.innerHTML = `
-        ${metaTags}
         <button type="button" class="admit-detail-link-btn is-unlinked" aria-disabled="true">
           PDF 뷰어
           <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
@@ -2148,13 +2140,7 @@ const Guide = (() => {
       if (!item) return;
       const name = item.dataset.univ || "";
       if (!name) return;
-      const zoneId = item.dataset.zone || "";
-      const zoneLabel =
-        MAJOR_BY_UNIV_ZONES.find((zone) => zone.id === zoneId)?.label || "";
-      openMajorByUnivRecommendDetail(name, {
-        zoneLabel,
-        region: item.dataset.region || "",
-      });
+      openMajorByUnivRecommendDetail(name);
     });
     apply();
   }
@@ -4977,7 +4963,6 @@ const Guide = (() => {
             <p class="admit-detail-crumb" id="major-detail-crumb"></p>
           </div>
           <div class="admit-detail-head-actions">
-            <div class="major-detail-keywords" data-major-detail-keywords></div>
             <button type="button" class="admit-detail-close" data-major-detail-close aria-label="닫기">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -5155,7 +5140,6 @@ const Guide = (() => {
     const data = resolveMajorExploreDetail(row);
     const root = ensureMajorDetailModal();
     const crumb = root.querySelector("#major-detail-crumb");
-    const keywordBox = root.querySelector("[data-major-detail-keywords]");
     const body = root.querySelector("[data-major-detail-body]");
 
     if (crumb) {
@@ -5163,13 +5147,6 @@ const Guide = (() => {
       crumb.innerHTML = `${escapeHtml(data.track)}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(
         data.subtrack
       )}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(data.name)}`;
-    }
-    if (keywordBox) {
-      /* 수시 상세 팝업의 상단 태그(X 왼쪽)와 동일 디자인 */
-      keywordBox.innerHTML = (data.keywords || [])
-        .slice(0, 3)
-        .map((word) => `<span class="admit-detail-tag">#${escapeHtml(word)}</span>`)
-        .join("");
     }
 
     const introHtml = (data.intro || [])
@@ -6688,12 +6665,13 @@ const Guide = (() => {
     const showMaterials = typeKey === "종합" || typeKey === "논술";
     const materialsKind = typeKey === "논술" ? "논술" : "종합";
 
-    crumb.innerHTML = `${escapeHtml(univ)}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(unit)}`;
-    /* 수시 팝업: 입학처 버튼 없음 */
-    tags.innerHTML = `
-      <span class="admit-detail-tag is-primary">수시</span>
-      <span class="admit-detail-tag">${escapeHtml(typeKey)}</span>
-      <span class="admit-detail-tag">${escapeHtml(typeName)}</span>`;
+    crumb.innerHTML = `${escapeHtml(univ)}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(
+      typeKey
+    )}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(typeName)}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(
+      unit
+    )}`;
+    /* 수시 팝업: 헤더 태그·입학처 버튼 없음 (유형은 브레드크럼에 표시) */
+    if (tags) tags.innerHTML = "";
     setAdmitDetailTabMode(root, "susi");
     if (materialsTab) {
       materialsTab.hidden = !showMaterials;
@@ -7170,12 +7148,14 @@ const Guide = (() => {
       return map;
     };
 
-    crumb.innerHTML = `${escapeHtml(univ)}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(unit)}`;
     const groupFull = /군$/.test(groupLabel) ? groupLabel : `${groupLabel}군`;
-    tags.innerHTML = `
-      <span class="admit-detail-tag is-primary">정시</span>
-      <span class="admit-detail-tag">${escapeHtml(groupFull)}</span>
-      <span class="admit-detail-tag">${escapeHtml(typeName)}</span>`;
+    crumb.innerHTML = `${escapeHtml(univ)}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(
+      groupFull
+    )}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(typeName)}<span class="admit-detail-crumb-sep">›</span>${escapeHtml(
+      unit
+    )}`;
+    /* 정시 팝업: 헤더 태그 없음 (군·전형은 브레드크럼에 표시) */
+    if (tags) tags.innerHTML = "";
     setAdmitDetailTabMode(root, "jeongsi");
     if (materialsPanel) {
       materialsPanel.innerHTML = "";
