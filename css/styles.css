@@ -1058,22 +1058,8 @@ input {
     border-radius: 50%;
   }
 
-  .major-by-field-hint-icon svg {
-    width: 54px;
-    height: 54px;
-  }
-
   .major-by-field-hint-title {
     font-size: 23px;
-  }
-
-  .major-by-field-hint-desc {
-    font-size: 15px;
-  }
-
-  .major-by-field-step-dot {
-    width: 32px;
-    height: 32px;
   }
 }
 
@@ -2459,9 +2445,6 @@ input {
     right: 12px;
   }
 
-  .admit-grade-method-pop.is-sheet .admit-grade-method-pop-title {
-    font-size: 15px;
-  }
 }
 
 .admit-grade-method-body {
@@ -2751,6 +2734,11 @@ input {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
+  }
+
+  .admit-list-head .admit-list-title,
+  .admit-list-head .admit-list-title.title-3 {
+    padding-right: 0;
   }
 
   .admit-list-head .admit-select,
@@ -3577,11 +3565,6 @@ input {
 
   .panel {
     padding-top: 22px;
-  }
-
-  .panel h1 {
-    font-size: 22px;
-    margin: 0 0 22px;
   }
 
   /* 대탭: 한 줄씩 가로 꽉 차게 */
@@ -4440,12 +4423,39 @@ input {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* 출신 고교 막대: PC 본문 폭(1006px) 유지, 좁으면 카드 안에서 가로 스크롤 */
+  .admit-detail-uni-hs-card {
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+  }
+
+  .admit-detail-uni-hs-card::-webkit-scrollbar {
+    width: var(--scroll-size);
+    height: var(--scroll-size);
+  }
+
+  .admit-detail-uni-hs-card::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb);
+  }
+
+  .admit-detail-uni-hs-card-head,
+  .admit-detail-uni-hs-list {
+    width: 1006px;
+    min-width: 1006px;
+  }
 }
 
 /* 전체 전형 상세: 이 표 래퍼만 가로 스크롤 (팝업·다른 표는 그대로) */
 .admit-detail-table-wrap.admit-detail-table-wrap-hs-detail {
   overflow-x: auto !important;
-  overflow-y: hidden;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
   max-width: 100%;
@@ -5627,10 +5637,6 @@ table.admit-detail-table td {
     margin-bottom: 0;
   }
 
-  .admit-detail-crumb {
-    font-size: 16px;
-  }
-
   /* 표: PC 원본 크기·간격 유지 · 좁으면 가로 스크롤만 */
   .admit-detail-body,
   .admit-detail-panel,
@@ -5646,7 +5652,7 @@ table.admit-detail-table td {
     max-width: 100%;
     min-width: 0;
     overflow-x: auto !important;
-    overflow-y: hidden;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
   }
@@ -7026,6 +7032,7 @@ table.admit-detail-table td {
     height: auto;
     grid-template-columns: 1fr;
     overflow: visible;
+    padding: 24px 16px;
   }
 
   .home-feature-art {
@@ -7042,7 +7049,7 @@ table.admit-detail-table td {
     max-width: 168px;
     height: 168px;
     flex: 0 0 168px;
-    transform: rotate(3deg);
+    transform: rotate(4deg);
     overflow: visible;
   }
 
@@ -7074,11 +7081,20 @@ table.admit-detail-table td {
   .home-panel {
     height: auto;
     min-height: 0;
+    padding-right: 24px;
   }
 
   .home-guide-list li,
   .home-schedule-list li {
     flex: 0 0 auto;
+  }
+
+  .home-guide-list li {
+    min-height: 44px;
+  }
+
+  .home-guide-list button {
+    height: 100%;
   }
 
   .home-schedule-list li {
@@ -7096,6 +7112,16 @@ table.admit-detail-table td {
 
   .home-major-board {
     grid-template-columns: 1fr;
+  }
+
+  .home-major-links {
+    flex: 0 0 auto;
+    height: auto;
+  }
+
+  .home-major-link {
+    flex: 0 0 auto;
+    min-height: 52px;
   }
 
   .home-major-quick {
@@ -7138,8 +7164,8 @@ table.admit-detail-table td {
 
   .home-search-type .admit-select-trigger,
   .home-search-field input {
-    height: 46px;
-    min-height: 46px;
+    height: 48px;
+    min-height: 48px;
   }
 
   .home-chips {
@@ -7147,7 +7173,7 @@ table.admit-detail-table td {
   }
 
   .home-feature {
-    padding: 24px 16px 24px 24px;
+    padding: 24px 16px;
     border-radius: 18px;
     gap: 12px;
   }
@@ -7162,7 +7188,7 @@ table.admit-detail-table td {
     max-width: 168px;
     height: 168px;
     flex: 0 0 168px;
-    transform: rotate(3deg);
+    transform: rotate(4deg);
   }
 
   .home-panel {
@@ -8447,7 +8473,6 @@ table.admit-detail-table td {
 
   .campus-map-stage {
     order: 1;
-    min-height: 360px;
   }
 
   .campus-roadview-layout {
@@ -8459,16 +8484,6 @@ table.admit-detail-table td {
     max-height: 220px;
   }
 
-  .campus-roadview-stage,
-  .campus-map-stage {
-    min-height: 420px;
-  }
-
-  .campus-roadview-viewer,
-  .campus-roadview-frame,
-  .campus-map-canvas {
-    min-height: 360px;
-  }
 }
 
 /* ===== 전공 탐색 상세 팝업 ===== */

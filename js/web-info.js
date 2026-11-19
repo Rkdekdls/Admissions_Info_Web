@@ -1168,7 +1168,7 @@ const WebInfo = (() => {
     const shadow = sheet.attachShadow({ mode: "open" });
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "css/page.css?v=69";
+    link.href = "css/page.css?v=71";
     const extra = document.createElement("style");
     extra.textContent = `${[...doc.querySelectorAll("style")].map((node) => node.textContent).join("\n")}\n${bookVars}
 @media (max-width: 860px) {
@@ -1202,7 +1202,6 @@ const WebInfo = (() => {
     align-self: center !important;
     transform: rotate(90deg) !important;
     padding: 0.5mm 0 !important;
-    font-size: 14px !important;
   }
   .flow-row .flow-card {
     width: 100% !important;
@@ -1213,13 +1212,7 @@ const WebInfo = (() => {
     padding: 10px 12px !important;
   }
   .flow-row .flow-card > div:first-child {
-    font-size: 18px !important;
     margin: 0 0 2px !important;
-  }
-  .flow-row .flow-card > div:last-child,
-  .flow-row .flow-card > *:last-child {
-    font-size: 14px !important;
-    line-height: 1.3 !important;
   }
   .icon-grid {
     flex-direction: column !important;
@@ -1288,25 +1281,15 @@ const WebInfo = (() => {
     min-height: 0 !important;
     gap: 3mm !important;
     padding: 3mm 1mm !important;
-  }
-  .chart-compare > div:not(.chart-arrow) {
-    width: 22mm !important;
-    flex: 0 0 22mm !important;
-  }
-  .chart-compare svg {
-    width: 22mm !important;
-    height: 22mm !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
   }
   .chart-compare > .chart-arrow {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 4mm !important;
-    flex: 0 0 4mm !important;
-    height: 22mm !important;
     margin: 0 0 12px !important;
     padding: 0 !important;
-    font-size: 14px !important;
     color: #6b7280 !important;
     transform: none !important;
   }
@@ -1397,11 +1380,6 @@ li::before {
 .pie-label {
   font-size: 12px !important;
 }
-@media (max-width: 860px) {
-  .pie-label {
-    font-size: 15px !important;
-  }
-}
 /* 불릿·체크: 여러 줄이어도 첫 줄 왼쪽에 고정 (세로 중앙 정렬 금지) */
 .section-content li::before,
 .section-content li:before,
@@ -1469,11 +1447,8 @@ li::before {
       node.style.setProperty("font-size", "13px", "important");
     });
     /* 표 래퍼 + 창의적 체험표 열 비율 강제 */
-    const isNarrow = window.matchMedia(
-      "(max-width: 860px), (max-width: 1279px) and (max-height: 500px) and (orientation: landscape)"
-    ).matches;
     page.querySelectorAll(".pie-label").forEach((node) => {
-      const size = isNarrow ? "15" : "12";
+      const size = "12";
       node.setAttribute("font-size", size);
       node.style.setProperty("font-size", `${size}px`, "important");
     });
