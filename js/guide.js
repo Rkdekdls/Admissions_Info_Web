@@ -762,6 +762,13 @@ const Guide = (() => {
       .join("");
 
     return `<section class="admit-search" data-admit-search data-search-type="major-explore">
+      <div class="mf-banner">
+        <div class="mf-banner-copy">
+          <p class="mf-banner-kicker">어떤 전공이 나와 잘 맞을까요?<span class="mf-banner-icon" aria-hidden="true">🤔</span></p>
+          <p class="mf-banner-title">평소 좋아하는 주제와 활동을 선택하면, 관련 전공을 추천해 드려요</p>
+        </div>
+        <button type="button" class="mf-banner-start" data-major-find-open>전공 찾기 시작<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
       <div class="admit-search-bar">
         <label class="admit-search-field">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1716,6 +1723,18 @@ const Guide = (() => {
     setAdmitSelectDisabled(subtrackSelect, true);
     setAdmitSelectDisabled(majorSelect, true);
     showHint(1);
+
+    root._openMajorByName = (name) => {
+      const item = getMajorExploreRows().find((row) => row.name === name);
+      if (!item) return false;
+      trackSelect.value = item.track;
+      sync("track");
+      subtrackSelect.value = item.subtrack;
+      sync("subtrack");
+      majorSelect.value = item.name;
+      sync("major");
+      return true;
+    };
   }
 
   const MAJOR_BY_UNIV_ZONES = [
@@ -4945,7 +4964,8 @@ const Guide = (() => {
     const root = document.getElementById("major-detail-root");
     if (!root) return;
     root.hidden = true;
-    document.body.style.removeProperty("overflow");
+    const finder = document.getElementById("mf-root");
+    if (!finder || finder.hidden) document.body.style.removeProperty("overflow");
   }
 
   function ensureMajorDetailModal() {
@@ -5135,7 +5155,7 @@ const Guide = (() => {
     }
   }
 
-  function openMajorExploreDetail(row) {
+  function openMajorExploreDetail(row, options) {
     if (!row) return;
     const data = resolveMajorExploreDetail(row);
     const root = ensureMajorDetailModal();
@@ -5322,6 +5342,11 @@ const Guide = (() => {
       });
     });
     applyUnivFilter();
+    if (options && options.focusUnits && section) {
+      requestAnimationFrame(() => {
+        body.scrollTop = section.offsetTop;
+      });
+    }
 
     closeAdmitDetailModal();
     root.hidden = false;
@@ -7615,6 +7640,9 @@ const Guide = (() => {
     root.dataset.bound = "1";
 
     enhanceAdmitSelects(root);
+    root.querySelector("[data-major-find-open]")?.addEventListener("click", () => {
+      if (window.MajorFinderUI) window.MajorFinderUI.open();
+    });
     const sectionId = root.closest(".guide-block")?.dataset.section || "";
     const refresh = () => applyAdmitFilters(panel, sectionId || undefined);
 
@@ -9739,5 +9767,52 @@ const Guide = (() => {
     closeGradeMethodExample();
   });
 
-  return { open, guides, enhanceAdmitSelects };
+  function openMajorExploreByName(name, options) {
+    if (typeof window.selectGuideTab === "function") window.selectGuideTab("major", "major-explore");
+    const row = document.querySelector(`#panel-major [data-major-row][data-major="${CSS.escape(String(name || ""))}"]`);
+    if (!row) return false;
+    openMajorExploreDetail(row, options || {});
+    return true;
+  }
+
+  function openMajorDetailFromFinder(name, meta) {
+    const existing = document.querySelector(
+      `#panel-major [data-major-row][data-major="${CSS.escape(String(name || ""))}"]`
+    );
+    if (existing) {
+      openMajorExploreDetail(existing);
+      return true;
+    }
+    const track = String((meta && meta.track) || "");
+    const subtrack = String((meta && meta.subtrack) || "");
+    const row = document.createElement("tr");
+    row.dataset.major = String(name || "");
+    row.dataset.track = /계열$/.test(track) ? track : track ? `${track}계열` : "전공";
+    row.dataset.subtrack = subtrack || "전공";
+    openMajorExploreDetail(row);
+    return true;
+  }
+
+  function majorDetailSectionsHtml(name) {
+    const data = resolveMajorExploreDetail({
+      dataset: { major: String(name || ""), track: "", subtrack: "" },
+      querySelector() { return null; },
+    });
+    const introHtml = (data.intro || []).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("");
+    const collegeHtml = (data.college || []).slice(0, 3).map((item) => majorDetailPill(item, "accent")).join("");
+    const traitsHtml = (data.traits || []).map((item) => majorDetailTrait(item)).join("");
+    const careersHtml = (data.careers || []).map((item) => `<article class="major-detail-career-card"><h4 class="major-detail-career-title">${escapeHtml(item.title)}</h4><p class="major-detail-career-body">${escapeHtml(item.body)}</p></article>`).join("");
+    const jobsHtml = (data.jobs || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+    return `<h3 class="sec">어떤 전공인가요?</h3><div class="intro">${introHtml}</div><h3 class="sec">무엇을 배우나요?</h3><div class="learn"><div class="major-detail-pill-wrap">${collegeHtml}</div></div><h3 class="sec">어떤 학생에게 잘 맞을까요?</h3><ul class="major-detail-traits">${traitsHtml}</ul><h3 class="sec">어떤 분야로 진출하나요?</h3><div class="major-detail-career-grid">${careersHtml}</div><h3 class="sec">어떤 일을 하나요?</h3><div class="jobs">${jobsHtml ? `<ul class="admit-record-list">${jobsHtml}</ul>` : `<p>-</p>`}</div>`;
+  }
+
+  function openMajorSubjectsByName(name) {
+    if (typeof window.selectGuideTab === "function") window.selectGuideTab("major", "major-by-field");
+    const root = document.querySelector('#panel-major [data-search-type="major-by-field"]');
+    if (!root || typeof root._openMajorByName !== "function") return false;
+    return root._openMajorByName(name);
+  }
+
+  return { open, guides, enhanceAdmitSelects, openMajorExploreByName, openMajorSubjectsByName, openMajorDetailFromFinder, majorDetailSectionsHtml };
 })();
+window.Guide = Guide;

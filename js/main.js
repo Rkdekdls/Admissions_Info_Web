@@ -105,6 +105,7 @@ function parseRoute() {
       "university-map": ["university", "university-map"],
       "university-roadview": ["university", "university-roadview"],
       "major-explore": ["major", "major-explore"],
+      "major-find": ["major", "major-explore"],
       "major-by-field": ["major", "major-by-field"],
       "major-by-univ": ["major", "major-by-univ"],
       "life-system": ["curriculum", "life-system"],
