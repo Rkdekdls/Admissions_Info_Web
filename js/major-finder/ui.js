@@ -691,6 +691,13 @@
       });
     }
 
+    function pdfSaveTitle() {
+      const now = new Date();
+      const pad = (value) => String(value).padStart(2, "0");
+      const stamp = `${String(now.getFullYear()).slice(2)}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+      return `전공 찾기 결과_${stamp}`;
+    }
+
     function savePdf() {
       if (!result || !result.ok) return;
       const frame = document.createElement("iframe");
@@ -712,7 +719,9 @@
       window.addEventListener("afterprint", restoreTitle, { once: true });
       win.requestAnimationFrame(() => win.requestAnimationFrame(() => {
         fitPdfSheets(doc);
-        document.title = "전공 찾기 결과";
+        const fileTitle = pdfSaveTitle();
+        doc.title = fileTitle;
+        document.title = fileTitle;
         win.focus();
         win.print();
       }));
