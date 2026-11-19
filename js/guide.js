@@ -228,11 +228,11 @@ const Guide = (() => {
     },
     major: {
       kicker: "",
-      title: "전공·권장과목",
+      title: "전공 및 권장과목",
       numberNav: false,
       hideSectionNav: true,
       nav: [
-        { href: "#major-explore", label: "전공 탐색" },
+        { href: "#major-explore", label: "전공 정보" },
         { href: "#major-by-field", label: "전공별 권장과목" },
         { href: "#major-by-univ", label: "대학별 권장과목" },
       ],
@@ -240,7 +240,7 @@ const Guide = (() => {
         {
           id: "major-explore",
           title: "",
-          heading: "전공 탐색",
+          heading: "전공 정보",
           pages: [],
         },
         {

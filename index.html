@@ -16,7 +16,7 @@
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=20261118mf102">
+  <link rel="stylesheet" href="css/styles.css?v=20261118mf165">
 </head>
 <body>
   <div class="app" id="app">
@@ -93,7 +93,7 @@
 
           <div class="submenu" id="major-tabs" role="tablist" aria-label="전공·권장과목">
             <button class="tab" type="button" role="tab" id="tab-major-explore" aria-controls="panel-major" aria-selected="false" data-tab="major" data-section="major-explore" data-group="major">
-              전공 탐색
+              전공 정보
             </button>
             <button class="tab" type="button" role="tab" id="tab-major-by-field" aria-controls="panel-major" aria-selected="false" data-tab="major" data-section="major-by-field" data-group="major">
               전공별 권장과목
@@ -236,9 +236,9 @@
                 <h2 class="home-feature-title">수시 전형 조회</h2>
                 <p class="home-feature-desc">모집인원 · 학생부 반영 · 수능 최저</p>
                 <div class="home-feature-actions">
-                  <button type="button" data-home-go="susi" data-home-section="susi-subject">교과 →</button>
-                  <button type="button" data-home-go="susi" data-home-section="susi-holistic">종합 →</button>
-                  <button type="button" data-home-go="susi" data-home-section="susi-essay">논술 →</button>
+                  <button type="button" data-home-go="susi" data-home-section="susi-subject">교과</button>
+                  <button type="button" data-home-go="susi" data-home-section="susi-holistic">종합</button>
+                  <button type="button" data-home-go="susi" data-home-section="susi-essay">논술</button>
                 </div>
               </div>
               <div class="home-feature-art" aria-hidden="true">
@@ -261,7 +261,7 @@
                 <h2 class="home-feature-title">정시 전형 조회</h2>
                 <p class="home-feature-desc">가·나·다군 · 수능 반영 영역 · 탐구 반영</p>
                 <div class="home-feature-actions">
-                  <button type="button" data-home-go="jeongsi">정시 →</button>
+                  <button type="button" data-home-go="jeongsi">정시</button>
                 </div>
               </div>
               <div class="home-feature-art" aria-hidden="true">
@@ -284,7 +284,7 @@
                 <h2 class="home-feature-title">대학 정보 조회</h2>
                 <p class="home-feature-desc">캠퍼스 · 입학정원 · 신입생 경쟁률</p>
                 <div class="home-feature-actions">
-                  <button type="button" data-home-go="university" data-home-section="university-info">대학 →</button>
+                  <button type="button" data-home-go="university" data-home-section="university-info">대학</button>
                 </div>
               </div>
               <div class="home-feature-art" aria-hidden="true">
@@ -308,52 +308,63 @@
             <div class="home-panel">
               <h2 class="home-panel-title is-marked">대입 준비 가이드</h2>
               <ul class="home-guide-list">
-                <li><button type="button" data-home-go="curriculum">교육과정 체계<span aria-hidden="true">→</span></button></li>
-                <li><button type="button" data-home-go="record">학교생활기록부<span aria-hidden="true">→</span></button></li>
-                <li><button type="button" data-home-go="exam">수능 및 모의고사<span aria-hidden="true">→</span></button></li>
-                <li><button type="button" data-home-go="screening">대입전형 이해<span aria-hidden="true">→</span></button></li>
-                <li><button type="button" data-home-go="schedule">일정 및 원서접수<span aria-hidden="true">→</span></button></li>
+                <li><button type="button" data-home-go="curriculum">교육과정 체계<svg class="home-major-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></li>
+                <li><button type="button" data-home-go="record">학교생활기록부<svg class="home-major-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></li>
+                <li><button type="button" data-home-go="exam">수능 및 모의고사<svg class="home-major-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></li>
+                <li><button type="button" data-home-go="screening">대입전형 이해<svg class="home-major-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></li>
+                <li><button type="button" data-home-go="schedule">일정 및 원서접수<svg class="home-major-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></li>
               </ul>
             </div>
             <div class="home-panel">
-              <h2 class="home-panel-title is-marked">다가오는 입시 일정</h2>
-              <ul class="home-schedule-list">
-                <li class="is-soon">
-                  <div class="home-schedule-main">
-                    <span class="home-schedule-d">D-10</span>
-                    <span class="home-schedule-name">2027학년도 수능</span>
-                    <span class="home-schedule-date">11/19(목)</span>
+              <h2 class="home-panel-title is-marked">전공 및 권장과목</h2>
+              <div class="home-major">
+                <div class="home-major-board">
+                  <div class="home-major-find">
+                    <div class="home-major-find-copy">
+                      <span class="home-major-beta">BETA</span>
+                      <p class="home-major-find-title">전공 찾기</p>
+                      <p class="home-major-find-desc">12문항 · 약 3분 · 전공 추천</p>
+                    </div>
+                    <button type="button" class="home-major-start" data-major-find-open>바로 시작하기</button>
                   </div>
-                </li>
-                <li>
-                  <div class="home-schedule-main">
-                    <span class="home-schedule-d">D-14</span>
-                    <span class="home-schedule-name">수능 응시료 환불 신청</span>
-                    <span class="home-schedule-date">11/23~11/27</span>
+                  <div class="home-major-links">
+                    <button type="button" class="home-major-link" data-home-go="major" data-home-section="major-explore">
+                      <span class="home-major-link-label">전공 정보 조회</span>
+                      <svg class="home-major-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                    </button>
+                    <button type="button" class="home-major-link" data-home-go="major" data-home-section="major-by-field">
+                      <span class="home-major-link-label">전공별 권장과목</span>
+                      <svg class="home-major-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                    </button>
+                    <button type="button" class="home-major-link" data-home-go="major" data-home-section="major-by-univ">
+                      <span class="home-major-link-label">대학별 권장과목</span>
+                      <svg class="home-major-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                    </button>
                   </div>
-                </li>
-                <li>
-                  <div class="home-schedule-main">
-                    <span class="home-schedule-d">D-32</span>
-                    <span class="home-schedule-name">2027학년도 수능 성적 통지</span>
-                    <span class="home-schedule-date">12/11(금)</span>
-                  </div>
-                </li>
-                <li>
-                  <div class="home-schedule-main">
-                    <span class="home-schedule-d">D-39</span>
-                    <span class="home-schedule-name">수시 합격자 발표 마감</span>
-                    <span class="home-schedule-date">~12/18(금)</span>
-                  </div>
-                </li>
-                <li>
-                  <div class="home-schedule-main">
-                    <span class="home-schedule-d">D-46</span>
-                    <span class="home-schedule-name">정시 원서접수 시작</span>
-                    <span class="home-schedule-date">12/29(월)</span>
-                  </div>
-                </li>
-              </ul>
+                </div>
+                <div class="home-major-quick">
+                  <button type="button" class="home-major-quick-item" data-home-major="인공지능공학">
+                    <span class="home-major-quick-icon" aria-hidden="true">🤖</span>
+                    <span>#인공지능공학</span>
+                  </button>
+                  <button type="button" class="home-major-quick-item" data-home-major="반도체공학">
+                    <span class="home-major-quick-icon" aria-hidden="true">💾</span>
+                    <span>#반도체공학</span>
+                  </button>
+                  <button type="button" class="home-major-quick-item" data-home-major="기계공학">
+                    <span class="home-major-quick-icon" aria-hidden="true">⚙️</span>
+                    <span>#기계공학</span>
+                  </button>
+                  <button type="button" class="home-major-quick-item" data-home-major="간호학">
+                    <span class="home-major-quick-icon" aria-hidden="true">❤️‍🩹</span>
+                    <span>#간호학</span>
+                  </button>
+                  <button type="button" class="home-major-quick-item" data-home-major="경영학">
+                    <span class="home-major-quick-icon" aria-hidden="true">👔</span>
+                    <span>#경영학</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -23058,11 +23069,11 @@
   <script src="js/admit-uni-data.js?v=10"></script>
   <script src="js/admit-susi-yearly.js?v=5"></script>
   <script src="js/kakao-config.js?v=3"></script>
-  <script src="js/major-finder/data.js?v=29"></script>
-  <script src="js/major-finder/engine.js?v=8"></script>
-  <script src="js/major-finder/ui.js?v=72"></script>
-  <script src="js/guide.js?v=542"></script>
-  <script src="js/home.js?v=6"></script>
-  <script src="js/main.js?v=85"></script>
+  <script src="js/major-finder/data.js?v=31"></script>
+  <script src="js/major-finder/engine.js?v=9"></script>
+  <script src="js/major-finder/ui.js?v=74"></script>
+  <script src="js/guide.js?v=545"></script>
+  <script src="js/home.js?v=10"></script>
+  <script src="js/main.js?v=87"></script>
 </body>
 </html>

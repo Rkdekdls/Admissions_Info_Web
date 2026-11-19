@@ -18,7 +18,7 @@ const titles = {
   exam: "수능 및 모의고사",
   screening: "대입전형 이해",
   schedule: "일정 및 원서접수",
-  major: "전공·권장과목",
+  major: "전공 및 권장과목",
   susi: "수시",
   jeongsi: "정시",
   university: "대학·캠퍼스 정보",
@@ -299,7 +299,7 @@ groups.forEach((group) => {
       setGroupOpen(group.dataset.group, false);
       return;
     }
-    /* 대입 준비 가이드 → 교육과정 / 전공·권장과목 → 전공 탐색 / 대학·캠퍼스 → 대학별 현황 / 수시·정시 → 수시 */
+    /* 대입 준비 가이드 → 교육과정 / 전공 및 권장과목 → 전공 탐색 / 대학·캠퍼스 → 대학별 현황 / 수시·정시 → 수시 */
     const fallback = DEFAULT_BY_GROUP[group.dataset.group] || { tab: HOME_TAB, section: HOME_SECTION };
     selectTab(fallback.tab, true, fallback.section || undefined);
   });
@@ -343,7 +343,7 @@ MOBILE_MQ.addEventListener("change", () => {
  * - 새로고침 → 현재 해시(탭/섹션) 유지
  * - 로고 클릭 → 홈
  * - 대입 준비 가이드 그룹만 클릭 → 교육과정 체계
- * - 전공·권장과목 그룹만 클릭 → 전공 탐색
+ * - 전공 및 권장과목 그룹만 클릭 → 전공 탐색
  * - 대학·캠퍼스 정보 그룹만 클릭 → 대학별 현황
  * - 수시·정시 정보 그룹만 클릭 → 수시 › 교과
  */

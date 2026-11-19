@@ -355,7 +355,92 @@
       return top.concat(extra).map(function (row) { return row.profile; });
     }
 
+    function coreTagsSelected(answers) {
+      var order = [];
+      answers.forEach(function (answer) {
+        var question = questionById.get(answer.questionId);
+        if (!question || question.kind !== "topic") return;
+        answer.choiceIds.forEach(function (id) {
+          var choice = question.choices.find(function (c) { return c.id === id; });
+          (choice && choice.tags || []).forEach(function (tag) {
+            if (order.indexOf(tag) !== -1) return;
+            var isCore = profiles.some(function (profile) { return profile.coreTopics.indexOf(tag) !== -1; });
+            if (isCore) order.push(tag);
+          });
+        });
+      });
+      return order;
+    }
+
+    function bestPoints(scored, tag) {
+      var best = 0;
+      scored.rows.forEach(function (row) {
+        if (row.profile.coreTopics.indexOf(tag) !== -1 && row.points2 > best) best = row.points2;
+      });
+      return best;
+    }
+
+    function rankedCoreTags(answers) {
+      var tags = coreTagsSelected(answers);
+      if (tags.length < 2) return tags;
+      var scored = scoreRows(answers);
+      return tags.slice().sort(function (a, b) {
+        var diff = bestPoints(scored, b) - bestPoints(scored, a);
+        if (diff) return diff;
+        return tags.indexOf(a) - tags.indexOf(b);
+      });
+    }
+
+    function activityCount(answers) {
+      return answers.filter(function (answer) {
+        var question = questionById.get(answer.questionId);
+        return question && question.kind === "activity";
+      }).length;
+    }
+
+    function unaskedActivities(answers) {
+      var asked = {};
+      answers.forEach(function (answer) { asked[answer.questionId] = true; });
+      return data.questions.filter(function (question) {
+        return question.kind === "activity" && !asked[question.id];
+      });
+    }
+
+    function pickActivityForTag(answers, tag) {
+      var pool = unaskedActivities(answers);
+      var members = profiles.filter(function (profile) { return profile.coreTopics.indexOf(tag) !== -1; });
+      if (!pool.length || !members.length) return null;
+      var ranked = pool.map(function (question) {
+        var weight = 0;
+        var values = members.map(function (profile) {
+          if (profile.coreActivity === question.activityId) {
+            weight += 2;
+            return 25;
+          }
+          if (profile.relatedActivity === question.activityId) {
+            weight += 1;
+            return 10;
+          }
+          return 0;
+        });
+        var spread = Math.max.apply(null, values) - Math.min.apply(null, values);
+        return { question: question, weight: weight, spread: spread };
+      }).sort(function (a, b) {
+        if (b.weight !== a.weight) return b.weight - a.weight;
+        if (b.spread !== a.spread) return b.spread - a.spread;
+        return a.question.id < b.question.id ? -1 : 1;
+      });
+      if (!ranked.length || ranked[0].weight <= 0) return null;
+      return ranked[0].question;
+    }
+
     function pickNextActivity(answers) {
+      var cores = coreTagsSelected(answers);
+      if (cores.length >= 2) {
+        var target = activityCount(answers) === 1 ? cores[1] : cores[0];
+        var aimed = pickActivityForTag(answers, target);
+        if (aimed) return aimed;
+      }
       var asked = {};
       answers.forEach(function (answer) { asked[answer.questionId] = true; });
       var pool = data.questions.filter(function (question) {
@@ -430,7 +515,63 @@
       };
     }
 
+    function selectLateForTag(answers, tag) {
+      var asked = askedState(answers);
+      var ids = {};
+      profiles.forEach(function (profile) {
+        if (profile.coreTopics.indexOf(tag) !== -1) ids[profile.majorId] = true;
+      });
+      function fresh(question) {
+        return question && !asked.ids.has(question.id) && !asked.diffs.has(question.diffId) && question.role !== "default";
+      }
+      function hits(question) {
+        var count = 0;
+        question.choices.forEach(function (choice) {
+          if (choice.special) return;
+          choice.coreMajorIds.forEach(function (id) { if (ids[id]) count += 1; });
+        });
+        return count;
+      }
+      var ranking = [];
+      data.lateQuestions.forEach(function (question) {
+        if (!fresh(question) || hits(question) < 1) return;
+        var real = question.choices.filter(function (choice) { return !choice.special; }).length;
+        if (real < 2) return;
+        var before = scoreRows(answers).rows.filter(function (row) { return ids[row.majorId]; }).slice(0, 2);
+        var changeCount = 0;
+        question.choices.forEach(function (choice) {
+          if (choice.special || !choice.coreMajorIds.some(function (id) { return ids[id]; })) return;
+          var next = scoreRows(answers, { question: question, choiceIds: [choice.id] }).rows.filter(function (row) {
+            return ids[row.majorId];
+          }).slice(0, before.length);
+          if (before.some(function (row, index) { return !next[index] || next[index].majorId !== row.majorId; })) changeCount += 1;
+        });
+        ranking.push({
+          question: question,
+          hits: hits(question),
+          changeCount: changeCount,
+          topicHit: (question.topicTags || []).indexOf(tag) !== -1 ? 1 : 0,
+        });
+      });
+      ranking.sort(function (a, b) {
+        if (b.changeCount !== a.changeCount) return b.changeCount - a.changeCount;
+        if (b.hits !== a.hits) return b.hits - a.hits;
+        if (b.topicHit !== a.topicHit) return b.topicHit - a.topicHit;
+        return a.question.id < b.question.id ? -1 : 1;
+      });
+      return ranking.length ? ranking[0].question : null;
+    }
+
     function selectLateQuestion(answers) {
+      var lateCount = answers.filter(function (answer) { return lateById.has(answer.questionId); }).length;
+      if (lateCount < 3) {
+        var pre = answers.filter(function (answer) { return !lateById.has(answer.questionId); });
+        var cores = rankedCoreTags(pre);
+        if (cores.length >= 2) {
+          var aimed = selectLateForTag(answers, lateCount < 2 ? cores[0] : cores[1]);
+          if (aimed) return aimed;
+        }
+      }
       var scored = scoreRows(answers);
       scored.candidates = candidateSet(scored);
       var asked = askedState(answers);
@@ -708,6 +849,116 @@
       return { ok: true };
     }
 
+    function isEligible(row) {
+      return row.lateCoreCount >= 1 || (row.coreTopicMatch === 1 && row.activityPoints2 > 0);
+    }
+
+    function compareRows(a, b) {
+      if (b.points2 !== a.points2) return b.points2 - a.points2;
+      if (b.lateCoreCount !== a.lateCoreCount) return b.lateCoreCount - a.lateCoreCount;
+      if (b.coreTopicMatch !== a.coreTopicMatch) return b.coreTopicMatch - a.coreTopicMatch;
+      if (b.activityPoints2 !== a.activityPoints2) return b.activityPoints2 - a.activityPoints2;
+      return a.majorId < b.majorId ? -1 : a.majorId > b.majorId ? 1 : 0;
+    }
+
+    function rowsForTag(scored, tag) {
+      return scored.rows.filter(function (row) { return row.profile.coreTopics.indexOf(tag) !== -1; });
+    }
+
+    function preferEligible(rows) {
+      return rows.filter(isEligible).concat(rows.filter(function (row) { return !isEligible(row); }));
+    }
+
+    function takeRows(rows, limit, used) {
+      var got = [];
+      rows.forEach(function (row) {
+        if (got.length >= limit || used[row.majorId]) return;
+        used[row.majorId] = true;
+        got.push(row);
+      });
+      return got;
+    }
+
+    function relatedRows(scored, sourceRows, used) {
+      var tags = [];
+      sourceRows.forEach(function (row) {
+        (row.profile.relatedTopics || []).forEach(function (tag) {
+          if (tags.indexOf(tag) === -1) tags.push(tag);
+        });
+      });
+      var rows = [];
+      var seen = {};
+      tags.forEach(function (tag) {
+        rowsForTag(scored, tag).forEach(function (row) {
+          if (used[row.majorId] || seen[row.majorId]) return;
+          seen[row.majorId] = true;
+          rows.push(row);
+        });
+      });
+      rows.sort(compareRows);
+      return rows;
+    }
+
+    function rowsInSameMids(scored, sourceRows, used) {
+      var mids = [];
+      sourceRows.forEach(function (row) {
+        if (row.mid && mids.indexOf(row.mid) === -1) mids.push(row.mid);
+      });
+      var rows = scored.rows.filter(function (row) {
+        return !used[row.majorId] && mids.indexOf(row.mid) !== -1;
+      });
+      rows.sort(compareRows);
+      return rows;
+    }
+
+    function chooseSeats(scored, answers) {
+      var selected = rankedCoreTags(answers);
+      if (!selected.length) return null;
+      var used = {};
+      var chosen = [];
+      if (selected.length === 1) {
+        chosen = chosen.concat(takeRows(preferEligible(rowsForTag(scored, selected[0])), 3, used));
+      } else {
+        var primary = preferEligible(rowsForTag(scored, selected[0]));
+        var secondary = preferEligible(rowsForTag(scored, selected[1]));
+        chosen = chosen.concat(takeRows(primary, 2, used));
+        chosen = chosen.concat(takeRows(secondary, 1, used));
+        if (chosen.length < 3) chosen = chosen.concat(takeRows(primary, 3 - chosen.length, used));
+        if (chosen.length < 3) chosen = chosen.concat(takeRows(secondary, 3 - chosen.length, used));
+        for (var i = 2; i < selected.length && chosen.length < 3; i += 1) {
+          chosen = chosen.concat(takeRows(preferEligible(rowsForTag(scored, selected[i])), 3 - chosen.length, used));
+        }
+      }
+      if (chosen.length < 3) {
+        var flat = [];
+        selected.forEach(function (tag) {
+          rowsForTag(scored, tag).forEach(function (row) { flat.push(row); });
+        });
+        var related = relatedRows(scored, flat, used);
+        chosen = chosen.concat(takeRows(preferEligible(related), 3 - chosen.length, used));
+        if (chosen.length < 3) {
+          chosen = chosen.concat(takeRows(preferEligible(rowsInSameMids(scored, flat.concat(related), used)), 3 - chosen.length, used));
+        }
+      }
+      if (chosen.length < 3) {
+        chosen = chosen.concat(takeRows(scored.rows.filter(function (row) {
+          return connected(row.profile, selected);
+        }), 3 - chosen.length, used));
+      }
+      if (chosen.length < 3) chosen = chosen.concat(takeRows(scored.rows, 3 - chosen.length, used));
+      chosen.sort(compareRows);
+      return chosen;
+    }
+
+    function presentSeats(rows, answers) {
+      var selected = coreTagsSelected(answers);
+      return rows.map(function (row) {
+        var own = row.profile.coreTopics.some(function (tag) { return selected.indexOf(tag) !== -1; });
+        var kind = (own && row.activityPoints2 >= 0) || isEligible(row) ? "recommended" : "also";
+        return present(row, kind, reasonFor(row, answers));
+      });
+    }
+
     function recommend(input) {
       var answers = Array.isArray(input) ? input : (input && input.answers);
       var version = Array.isArray(input) ? data.version : (input && input.version);
@@ -722,31 +973,31 @@
         });
         return { ok: true, version: data.version, kind: "explore", items: explore };
       }
-      var eligible = scored.rows.filter(function (row) {
-        return row.lateCoreCount >= 1 || (row.coreTopicMatch === 1 && row.activityPoints2 > 0);
-      });
-      var items = eligible.slice(0, 3).map(function (row) {
-        return present(row, "recommended", reasonFor(row, answers));
-      });
-      if (items.length < 3) {
-        var rest = scored.rows.filter(function (row) {
-          return !items.some(function (item) { return item.majorId === row.majorId; });
+      var seated = chooseSeats(scored, answers);
+      var items;
+      if (seated) {
+        items = presentSeats(seated, answers);
+      } else {
+        var eligible = scored.rows.filter(isEligible);
+        items = eligible.slice(0, 3).map(function (row) {
+          return present(row, "recommended", reasonFor(row, answers));
         });
-        rest.sort(function (a, b) {
-          var ai = connected(a.profile, scored.tags) ? 1 : 0;
-          var bi = connected(b.profile, scored.tags) ? 1 : 0;
-          if (bi !== ai) return bi - ai;
-          if (b.points2 !== a.points2) return b.points2 - a.points2;
-          if (b.lateCoreCount !== a.lateCoreCount) return b.lateCoreCount - a.lateCoreCount;
-          if (b.coreTopicMatch !== a.coreTopicMatch) return b.coreTopicMatch - a.coreTopicMatch;
-          if (b.activityPoints2 !== a.activityPoints2) return b.activityPoints2 - a.activityPoints2;
-          return a.majorId < b.majorId ? -1 : a.majorId > b.majorId ? 1 : 0;
-        });
-        rest.some(function (row) {
-          if (items.length >= 3) return true;
-          items.push(present(row, "also", reasonFor(row, answers)));
-          return false;
-        });
+        if (items.length < 3) {
+          var rest = scored.rows.filter(function (row) {
+            return !items.some(function (item) { return item.majorId === row.majorId; });
+          });
+          rest.sort(function (a, b) {
+            var ai = connected(a.profile, scored.tags) ? 1 : 0;
+            var bi = connected(b.profile, scored.tags) ? 1 : 0;
+            if (bi !== ai) return bi - ai;
+            return compareRows(a, b);
+          });
+          rest.some(function (row) {
+            if (items.length >= 3) return true;
+            items.push(present(row, "also", reasonFor(row, answers)));
+            return false;
+          });
+        }
       }
       var kind = items.every(function (item) { return item.slotKind === "recommended"; }) ? "personalized" : "mixed";
       return { ok: true, version: data.version, kind: kind, items: items };

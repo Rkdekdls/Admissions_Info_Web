@@ -5838,12 +5838,14 @@ table.admit-detail-table td {
   min-height: 0;
 }
 
-/* PC만 한 화면 맞춤 — 태블릿·모바일은 스크롤 허용 */
+/* PC: 본문 좌측 여백(48px)과 같은 아래 여백까지 홈을 채운다 */
 @media (min-width: 1280px) {
   .home {
+    flex: 1 1 auto;
+    gap: 12px;
     min-height: calc(100dvh - 96px);
-    max-height: calc(100dvh - 96px);
-    overflow: hidden;
+    max-height: none;
+    overflow: visible;
   }
 }
 
@@ -5877,13 +5879,13 @@ table.admit-detail-table td {
   line-height: 1.2;
 }
 
-.home-title {
+.panel-home h1.home-title {
   margin: 0;
   padding: 0;
   color: #0f274f;
-  font-size: 40px;
-  font-weight: 800;
-  line-height: 1.05;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
   letter-spacing: -0.03em;
 }
 
@@ -5892,7 +5894,7 @@ table.admit-detail-table td {
 }
 
 .home-lead {
-  margin: 2px 0 0;
+  margin: 14px 0 0;
   padding: 0;
   color: #6b7280;
   font-size: 15px;
@@ -5915,7 +5917,7 @@ table.admit-detail-table td {
   border-radius: 14px;
   background: #fff;
   overflow: visible;
-  box-shadow: 0 8px 24px rgba(15, 39, 79, 0.06);
+  box-shadow: none;
 }
 
 .home-search-type {
@@ -6049,7 +6051,7 @@ table.admit-detail-table td {
   border: 1px solid transparent;
   overflow: hidden;
   isolation: isolate;
-  box-shadow: 0 8px 20px rgba(15, 39, 79, 0.06);
+  box-shadow: none;
 }
 
 .home-feature.is-susi {
@@ -6132,6 +6134,9 @@ table.admit-detail-table td {
 
 .home-feature-actions button {
   appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   background: #fff;
   color: #0f274f;
@@ -6486,11 +6491,32 @@ table.admit-detail-table td {
 
 .home-lower {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   flex: 1.15 1 0;
   min-height: 220px;
   align-items: stretch;
+}
+
+@media (min-width: 1280px) {
+  .home-features {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  .home-feature {
+    height: auto;
+  }
+
+  .home-lower {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .home-lower > .home-panel {
+    height: 100%;
+    min-height: 0;
+  }
 }
 
 .home-panel {
@@ -6544,6 +6570,21 @@ table.admit-detail-table td {
   min-height: 0;
 }
 
+/* 제목 위 여백과 마지막 박스 아래는 24px, 제목 아래는 글자 여백을 빼 위와 같아 보이게 둔다 */
+.home-panel:has(.home-guide-list) {
+  padding-bottom: 24px;
+}
+
+.home-panel:has(.home-guide-list) .home-panel-title,
+.home-panel:has(.home-major) .home-panel-title {
+  margin-bottom: 20px;
+}
+
+.home-guide-list {
+  flex: 0 0 auto;
+  gap: 12px;
+}
+
 .home-guide-list li,
 .home-schedule-list li {
   position: relative;
@@ -6554,22 +6595,27 @@ table.admit-detail-table td {
   box-sizing: border-box;
 }
 
-/* 구분선 = 위·아래 글자 사이이자, 오른쪽 박스 간격의 중앙 */
-.home-guide-list li:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -5.5px; /* gap 10px의 중앙 */
-  height: 1px;
-  background: #eef2f7;
-  pointer-events: none;
+.home-guide-list li {
+  flex: 0 0 auto;
+  align-items: stretch;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid #e5eaf2;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.home-guide-list li:hover,
+.home-guide-list li:focus-within {
+  border-color: #1a4796;
+  background: #fff;
 }
 
 .home-guide-list button {
   appearance: none;
   width: 100%;
-  height: 100%;
+  height: auto;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -6578,27 +6624,13 @@ table.admit-detail-table td {
   background: transparent;
   color: #1f2937;
   font: inherit;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
+  letter-spacing: -0.03em;
   line-height: 1.35;
-  padding: 0;
+  padding: 6px 14px;
   cursor: pointer;
   text-align: left;
-}
-
-.home-guide-list button span {
-  color: #9aa6b8;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.35;
-}
-
-.home-guide-list button:hover {
-  color: #1A4796;
-}
-
-.home-guide-list button:hover span {
-  color: #1A4796;
 }
 
 .home-schedule-list li {
@@ -6617,15 +6649,16 @@ table.admit-detail-table td {
 .home-schedule-main {
   flex: 1;
   min-width: 0;
+  width: 100%;
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr) auto;
+  grid-template-columns: 44px minmax(0, 1fr) max-content;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .home-schedule-d {
   color: #1A4796;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
   line-height: 1.35;
 }
@@ -6636,17 +6669,15 @@ table.admit-detail-table td {
 
 .home-schedule-name {
   color: #1f2937;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.35;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
 }
 
 .home-schedule-date {
   color: #6b7280;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.35;
   white-space: nowrap;
@@ -6691,6 +6722,280 @@ table.admit-detail-table td {
   text-decoration: underline;
 }
 
+.home-major {
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.home-major-board {
+  flex: 0 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.home-major-find {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: 12px 16px 12px;
+  border: 1px solid rgba(219, 39, 119, 0.18);
+  border-radius: 12px;
+  background: linear-gradient(145deg, #fdf2f8 0%, #fce7f3 55%, #fbcfe8 100%);
+  box-shadow: none;
+  box-sizing: border-box;
+}
+
+.home-major-find-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+.home-major-find-title {
+  margin: 0 0 8px;
+  color: #9d174d;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.home-major-beta {
+  display: inline-flex;
+  align-self: flex-start;
+  margin: 0 0 14px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fff;
+  color: #db2777;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.home-major-find-desc {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.45;
+}
+
+.home-major-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: #1A4796;
+}
+
+.home-major-icon svg,
+.home-major-link-arrow,
+.home-major-start svg {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.home-major-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.home-major-start {
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 100%;
+  height: 42px;
+  margin-top: 0;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #db2777;
+  color: #fff;
+  box-shadow: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.home-major-start:hover,
+.home-major-start:active {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.home-major-links {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.home-major-link {
+  appearance: none;
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid #e5eaf2;
+  border-radius: 12px;
+  background: #fff;
+  color: #1f2937;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.home-major-link-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.home-major-link-arrow {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  color: #9aa6b8;
+}
+
+.home-major-link:hover,
+.home-major-link:focus-visible {
+  border-color: #1a4796;
+  background: #fff;
+  color: #1f2937;
+  outline: none;
+}
+
+.home-major-quick {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  min-width: 0;
+}
+
+.home-major-quick-item {
+  appearance: none;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 2px;
+  border: 1px solid #e5eaf2;
+  background: #fafafa;
+  color: #1f2937;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  text-align: center;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.home-major-quick-icon {
+  flex: 0 0 auto;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.home-major-quick-item span:last-child {
+  min-width: 0;
+  max-width: 100%;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.home-major-quick-item:hover,
+.home-major-quick-item:focus-visible {
+  border-color: #1a4796;
+  background: #fafafa;
+  color: #1f2937;
+  outline: none;
+}
+
+/* PC: 상단 3카드는 조금 더 길게, 아래 박스들은 패널을 채워 하단 여백을 좌측(24px)과 맞춘다 */
+@media (min-width: 1280px) {
+  .home-feature {
+    min-height: clamp(280px, 30vh, 340px);
+  }
+
+  .home-guide-list {
+    flex: 1 1 auto;
+  }
+
+  .home-guide-list li {
+    flex: 1 1 0;
+    min-height: 40px;
+  }
+
+  .home-guide-list button {
+    height: 100%;
+    flex: 1 1 auto;
+  }
+
+  .home-major {
+    flex: 1 1 auto;
+  }
+
+  .home-major-board {
+    flex: 1 1 auto;
+  }
+
+  .home-major-links {
+    height: 100%;
+  }
+
+  .home-major-quick {
+    flex: 0 0 auto;
+  }
+
+  .home-major-quick-item {
+    min-height: 78px;
+  }
+}
+
 /* 태블릿·모바일: 다른 탭처럼 한 줄씩 세로 스택 */
 @media (max-width: 1279px) {
   .home {
@@ -6704,10 +7009,6 @@ table.admit-detail-table td {
     grid-template-columns: 1fr;
     align-items: start;
     gap: 20px;
-  }
-
-  .home-title {
-    font-size: 34px;
   }
 
   .home-chips {
@@ -6792,6 +7093,23 @@ table.admit-detail-table td {
   .home-schedule-date {
     grid-column: 1;
   }
+
+  .home-major-board {
+    grid-template-columns: 1fr;
+  }
+
+  .home-major-quick {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .home-major-quick-item {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 78px;
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 860px) {
@@ -6809,12 +7127,8 @@ table.admit-detail-table td {
     gap: 16px;
   }
 
-  .home-title {
-    font-size: 28px;
-  }
-
   .home-lead {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .home-search-type {
@@ -6833,9 +7147,9 @@ table.admit-detail-table td {
   }
 
   .home-feature {
-    padding: 18px 16px;
+    padding: 24px 16px 24px 24px;
     border-radius: 18px;
-    gap: 10px;
+    gap: 12px;
   }
 
   .home-feature-art {
@@ -6844,28 +7158,24 @@ table.admit-detail-table td {
   }
 
   .home-art {
-    width: 152px;
-    max-width: 152px;
-    height: 152px;
-    flex: 0 0 152px;
+    width: 168px;
+    max-width: 168px;
+    height: 168px;
+    flex: 0 0 168px;
     transform: rotate(3deg);
-  }
-
-  .home-glass-donut-ring {
-    width: min(100%, 96px);
-  }
-
-  .home-glass-donut-center strong {
-    font-size: 16px;
-  }
-
-  .home-feature-title {
-    font-size: 20px;
   }
 
   .home-panel {
     padding: 16px;
     border-radius: 14px;
+  }
+
+  .home-major-board {
+    grid-template-columns: 1fr;
+  }
+
+  .home-major-link {
+    min-height: 52px;
   }
 }
 
@@ -9517,13 +9827,13 @@ button.major-detail-admit-chip.is-on.is-jeongsi:hover {
 }
 
 .mf-linked .admit-record-method-badge[data-mf-tone="activity"] {
-  background: #f0fdf4;
-  color: #16a34a;
+  background: #f5f3ff;
+  color: #7c3aed;
 }
 
 .mf-linked .admit-record-method-badge[data-mf-tone="late"] {
-  background: #f5f3ff;
-  color: #7c3aed;
+  background: #ecfdf8;
+  color: #0f766e;
 }
 
 

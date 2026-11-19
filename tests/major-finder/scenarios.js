@@ -89,11 +89,11 @@ const surveyBase = pathWith(["t_number", "t_soft"], "설문");
 assert.strictEqual(surveyBase.items[0].name, "통계학");
 assert.notStrictEqual(surveyBase.items[0].reason, surveySwap.items[0].reason);
 
-const sportSwap = finishAfterSwap(sport.answers, "기록", "움직임");
+const sportSwap = finishAfterSwap(sport.answers, "기록", "춤 동작");
 assert.strictEqual(sportSwap.items[0].name, "무용");
-assert.ok(sportSwap.items[0].reason.indexOf("움직임") !== -1);
+assert.ok(sportSwap.items[0].reason.indexOf("춤 동작") !== -1);
 
-const languageSwap = finishAfterSwap(korean.answers, "우리말", "영어");
+const languageSwap = finishAfterSwap(korean.answers, "한국어", "영어");
 assert.strictEqual(languageSwap.items[0].name, "영어영문학");
 assert.ok(languageSwap.items[0].reason.indexOf("영어") !== -1);
 

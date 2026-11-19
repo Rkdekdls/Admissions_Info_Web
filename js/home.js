@@ -95,6 +95,31 @@
       });
     });
 
+    root.querySelectorAll("[data-major-find-open]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        go("major", "major-explore");
+        if (window.MajorFinderUI) window.MajorFinderUI.open();
+      });
+    });
+
+    const homeMajorExplore = {
+      인공지능공학: "인공지능학과",
+      반도체공학: "반도체공학과",
+      기계공학: "기계공학부",
+      간호학: "간호학과",
+      경영학: "경영학부",
+    };
+
+    root.querySelectorAll("[data-home-major]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const name = btn.getAttribute("data-home-major");
+        const exploreName = homeMajorExplore[name] || name;
+        if (exploreName && window.Guide && typeof window.Guide.openMajorExploreByName === "function") {
+          window.Guide.openMajorExploreByName(exploreName);
+        }
+      });
+    });
+
     const form = root.querySelector("[data-home-search]");
     const chipsRoot = root.querySelector("[data-home-chips]");
     if (form) {

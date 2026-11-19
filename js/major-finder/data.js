@@ -4696,7 +4696,7 @@
           "relatedMajorIds": [],
           "reason": "작은 칩 안에 전기 신호가 지나는 회로 만들기를 골랐어요.",
           "special": false,
-          "emoji": "🧱"
+          "emoji": "💾"
         },
         {
           "id": "lq-15-4",
