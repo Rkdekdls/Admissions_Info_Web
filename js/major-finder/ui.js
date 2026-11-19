@@ -597,9 +597,67 @@
           <h3 class="mf-result-name"><span class="mf-result-emoji" aria-hidden="true">${emoji}</span><span>${escapeHtml(item.name)}</span></h3>
           <p class="mf-result-meta">${parts}</p>
         </div>
-        ${item.slotKind === "also" ? `<p class="mf-result-also">함께 살펴볼 전공</p>` : ""}
         ${linkedHtml(item)}
       </article>`;
+    }
+
+    const emojiPngCache = new Map();
+
+    function emojiPng(emoji) {
+      const key = String(emoji || "");
+      if (emojiPngCache.has(key)) return emojiPngCache.get(key);
+      const canvas = document.createElement("canvas");
+      const size = 64;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, size, size);
+      ctx.font = "52px 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(key, size / 2, size / 2 + 2);
+      const pixels = ctx.getImageData(0, 0, size, size).data;
+      let minX = size;
+      let minY = size;
+      let maxX = 0;
+      let maxY = 0;
+      for (let y = 0; y < size; y += 1) {
+        for (let x = 0; x < size; x += 1) {
+          if (pixels[(y * size + x) * 4 + 3] <= 16) continue;
+          if (x < minX) minX = x;
+          if (y < minY) minY = y;
+          if (x > maxX) maxX = x;
+          if (y > maxY) maxY = y;
+        }
+      }
+      let url = canvas.toDataURL("image/png");
+      if (maxX >= minX) {
+        const pad = 1;
+        minX = Math.max(0, minX - pad);
+        minY = Math.max(0, minY - pad);
+        maxX = Math.min(size - 1, maxX + pad);
+        maxY = Math.min(size - 1, maxY + pad);
+        const w = maxX - minX + 1;
+        const h = maxY - minY + 1;
+        const side = Math.max(w, h);
+        const out = document.createElement("canvas");
+        out.width = side;
+        out.height = side;
+        out.getContext("2d").drawImage(
+          canvas,
+          minX,
+          minY,
+          w,
+          h,
+          Math.floor((side - w) / 2),
+          Math.floor((side - h) / 2),
+          w,
+          h
+        );
+        url = out.toDataURL("image/png");
+      }
+      emojiPngCache.set(key, url);
+      return url;
     }
 
     function pdfDocument() {
@@ -608,18 +666,16 @@
         : "";
       const sheets = result.items.map((item) => {
         const parts = metaParts(item).map((part, index) => `<span${index === 0 ? ' class="is-track"' : ""}>${escapeHtml(part)}</span>`).join("");
-        const emoji = majorEmoji.get(item.majorId) || "✨";
-        const also = item.slotKind === "also" ? `<p class="also">함께 살펴볼 전공</p>` : "";
+        const emoji = emojiPng(majorEmoji.get(item.majorId) || "✨");
         const picks = linkedGroups(item).length
           ? `<h3 class="sec">전공과 관련된 내 답변</h3>${linkedGroups(item).map((row) => `<p class="pick"><b class="tone-${escapeHtml(row.key)}">${escapeHtml(row.name)}</b><span>${escapeHtml(row.text)}</span></p>`).join("")}`
           : "";
         return `<section class="sheet">
           <div class="fit"><article>
             <div class="kicker">
-              <h2><span class="emoji">${emoji}</span><span>${escapeHtml(item.name)}</span></h2>
+              <h2><img class="emoji" src="${emoji}" alt="" width="22" height="22"><span>${escapeHtml(item.name)}</span></h2>
               <p class="meta">${parts}</p>
             </div>
-            ${also}
             ${picks}
             ${detailHtml(item.name)}
           </article></div>
@@ -636,8 +692,7 @@
           .fit { transform-origin: top center; }
           article { padding: 0; border: 0; }
           h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 22px; line-height: 1; letter-spacing: -0.04em; }
-          h2 > span:last-child { position: relative; top: -3px; }
-          h2 .emoji { margin-left: -3px; font-size: 18px; line-height: 1; }
+          h2 .emoji { display: block; width: 22px; height: 22px; object-fit: contain; }
           h3.sec { display: flex; align-items: center; gap: 8px; margin: 15px 0; color: #1f2937; font-size: 15px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
           h3.sec::before { content: ""; width: 7px; height: 7px; background: #1a4796; }
           p.pick { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin: 0 0 8px; padding: 14px 16px; border: 1px solid #e5e7eb; line-height: 1.35; }
@@ -648,7 +703,6 @@
           p.pick span { color: #1f2937; font-size: 13px; font-weight: 500; letter-spacing: -0.2px; }
           p { margin: 0; line-height: 1.55; }
           .kicker { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; }
-          .also { margin-top: 10px; color: #1a4796; font-size: 13px; font-weight: 600; }
           .meta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin: 0 0 0 auto; }
           .meta span { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 10px; border: 1px solid #d1d5db; background: #fff; color: #1f2937; font-size: 13px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.2; }
           .meta span.is-track { border-color: #dbe4f3; background: #eef4fb; color: #1a4796; }
