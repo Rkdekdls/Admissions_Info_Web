@@ -6084,7 +6084,6 @@ table.admit-detail-table td {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding-bottom: 2px;
 }
 
 .home-feature-label {
@@ -6145,7 +6144,7 @@ table.admit-detail-table td {
   justify-content: center;
   border: 0;
   background: #fff;
-  color: #0f274f;
+  color: #fff;
   font: inherit;
   font-size: 13px;
   font-weight: 700;
@@ -6153,7 +6152,7 @@ table.admit-detail-table td {
   border-radius: 999px;
   cursor: pointer;
   line-height: 1;
-  box-shadow: 0 6px 16px rgba(15, 39, 79, 0.08);
+  box-shadow: none;
 }
 
 .home-feature.is-susi .home-feature-actions button {
@@ -6756,7 +6755,7 @@ table.admit-detail-table td {
   min-width: 0;
   min-height: 0;
   height: 100%;
-  padding: 12px 16px 12px;
+  padding: 12px 16px 16px;
   border: 1px solid rgba(219, 39, 119, 0.18);
   border-radius: 12px;
   background: linear-gradient(145deg, #fdf2f8 0%, #fce7f3 55%, #fbcfe8 100%);
@@ -6843,8 +6842,8 @@ table.admit-detail-table td {
   color: #fff;
   box-shadow: none;
   font: inherit;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   letter-spacing: -0.02em;
   white-space: nowrap;
   cursor: pointer;
@@ -7032,7 +7031,7 @@ table.admit-detail-table td {
     height: auto;
     grid-template-columns: 1fr;
     overflow: visible;
-    padding: 24px 16px;
+    padding: 24px 16px 16px;
   }
 
   .home-feature-art {
@@ -7173,7 +7172,7 @@ table.admit-detail-table td {
   }
 
   .home-feature {
-    padding: 24px 16px;
+    padding: 24px 16px 16px;
     border-radius: 18px;
     gap: 12px;
   }
