@@ -326,9 +326,12 @@
         panel.style.width = "";
         cal.style.removeProperty("--cal-gap");
         const across = cells[1].getBoundingClientRect().left - cells[0].getBoundingClientRect().right;
-        daysEl.style.setProperty("--cal-join", `${Math.max(0, across)}px`);
+        const size = Math.max(0, across);
+        daysEl.style.setProperty("--cal-join", `${size}px`);
+        daysEl.style.setProperty("--cal-row", `${size}px`);
         return;
       }
+      daysEl.style.removeProperty("--cal-row");
       const lowerW = cal.closest(".home-lower").getBoundingClientRect().width;
       const daySize = 28;
       const oldGap = Math.max(0, ((lowerW - 24) / 4 - 26.6 - daySize * 7) / 6);
