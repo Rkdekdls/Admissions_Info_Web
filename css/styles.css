@@ -3779,7 +3779,8 @@ input {
 .feature-icon,
 .step-icon,
 .card li::before,
-.info-list li::before {
+.info-list li::before,
+.home-cal-day {
   border-radius: 50% !important;
 }
 
@@ -6496,7 +6497,7 @@ table.admit-detail-table td {
 
 .home-lower {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr);
   gap: 12px;
   flex: 1.15 1 0;
   min-height: 220px;
@@ -6516,6 +6517,7 @@ table.admit-detail-table td {
   .home-lower {
     flex: 1 1 auto;
     min-height: 0;
+    grid-template-columns: max-content minmax(0, 1fr) calc(50% - 12px);
   }
 
   .home-lower > .home-panel {
@@ -6530,8 +6532,7 @@ table.admit-detail-table td {
   min-width: 0;
   min-height: 100%;
   height: 100%;
-  /* 좌·상·하 여백 24 통일 */
-  padding: 24px 20px 24px 24px;
+  padding: 24px;
   border: 1px solid #e5eaf2;
   border-radius: 16px;
   background: #fff;
@@ -6581,8 +6582,253 @@ table.admit-detail-table td {
 }
 
 .home-panel:has(.home-guide-list) .home-panel-title,
+.home-panel:has(.home-cal) .home-panel-title,
 .home-panel:has(.home-major) .home-panel-title {
   margin-bottom: 20px;
+}
+
+.home-panel:has(.home-cal) {
+  padding-right: 24px;
+}
+
+.home-cal {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-left: -12px;
+  margin-right: -11.4px;
+  margin-bottom: -7.5px;
+}
+
+.home-cal-head,
+.home-cal-week,
+.home-cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 28px);
+  justify-content: start;
+  column-gap: var(--cal-gap, 8px);
+  width: max-content;
+  max-width: 100%;
+}
+
+.home-cal-head {
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.home-cal-nav[data-cal-prev] {
+  grid-column: 1;
+  justify-self: center;
+}
+
+.home-cal-month {
+  grid-column: 2 / 7;
+}
+
+.home-cal-nav[data-cal-next] {
+  grid-column: 7;
+  justify-self: center;
+}
+
+.home-cal-month {
+  margin: 0;
+  color: #0f274f;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.home-cal-nav {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #9aa6b8;
+  cursor: pointer;
+}
+
+.home-cal-nav .is-prev {
+  transform: rotate(180deg);
+}
+
+.home-cal-nav:hover {
+  color: #1A4796;
+}
+
+.home-cal-week {
+  flex: 0 0 auto;
+  margin-top: 14.5px;
+  margin-bottom: 11.5px;
+}
+
+.home-cal-week span {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.home-cal-days {
+  flex: 1 1 auto;
+  grid-template-rows: repeat(6, 28px);
+  align-content: space-between;
+  justify-items: center;
+  align-items: center;
+  row-gap: 0;
+  min-height: 0;
+}
+
+.home-cal-day {
+  appearance: none;
+  position: relative;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #1f2937;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  cursor: default;
+}
+
+.home-cal-day.is-out {
+  color: #c5ced9;
+}
+
+.home-cal-day.is-event,
+.home-cal-day.is-event:hover,
+.home-cal-day.is-event:focus-visible,
+.home-cal-day.is-event:active {
+  background: #eef3fb;
+  color: #1A4796;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
+.home-cal-day.is-today,
+.home-cal-day.is-today:hover,
+.home-cal-day.is-today:focus-visible,
+.home-cal-day.is-today:active {
+  background: #1A4796;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: none;
+  outline: none;
+  border-radius: 50% !important;
+}
+
+.home-cal-day.is-join-start {
+  border-radius: 50% 0 0 50% !important;
+}
+
+.home-cal-day.is-join-mid {
+  border-radius: 0 !important;
+}
+
+.home-cal-day.is-join-end {
+  border-radius: 0 50% 50% 0 !important;
+}
+
+.home-cal-day.is-today.is-join-start,
+.home-cal-day.is-today.is-join-mid,
+.home-cal-day.is-today.is-join-end {
+  border-radius: 50% !important;
+}
+
+.home-cal-day.is-join-start::after,
+.home-cal-day.is-join-mid::after,
+.home-cal-day.is-join-end::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  height: 100%;
+  background: #eef3fb;
+  pointer-events: none;
+}
+
+.home-cal-day.is-join-start::after {
+  left: 100%;
+  width: calc(var(--cal-join, 0px) + 1px);
+}
+
+.home-cal-day.is-join-end::after {
+  right: 100%;
+  width: calc(var(--cal-join, 0px) + 1px);
+}
+
+.home-cal-day.is-join-mid::after {
+  left: calc((var(--cal-join, 0px) + 1px) * -1);
+  width: calc(100% + (var(--cal-join, 0px) + 1px) * 2);
+}
+
+.home-cal-day.is-today.is-join-mid::after {
+  background:
+    linear-gradient(#eef3fb, #eef3fb) left center / calc(var(--cal-join, 0px) + 1px) 100% no-repeat,
+    linear-gradient(#eef3fb, #eef3fb) right center / calc(var(--cal-join, 0px) + 1px) 100% no-repeat;
+}
+
+.home-cal-tip {
+  position: absolute;
+  z-index: 5;
+  width: max-content;
+  max-width: min(280px, calc(100vw - 24px));
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  pointer-events: none;
+}
+
+.home-cal-tip p {
+  margin: 0;
+}
+
+.home-cal-tip p + p {
+  margin-top: 6px;
+}
+
+.home-cal-tip-title {
+  color: #1A4796;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.home-cal-tip-body {
+  color: #1f2937;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.45;
 }
 
 .home-guide-list {
@@ -6761,6 +7007,16 @@ table.admit-detail-table td {
   background: linear-gradient(145deg, #fdf2f8 0%, #fce7f3 55%, #fbcfe8 100%);
   box-shadow: none;
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+.home-major-find-body {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .home-major-find-copy {
@@ -6768,6 +7024,7 @@ table.admit-detail-table td {
   flex-direction: column;
   gap: 0;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .home-major-find-title {
@@ -6777,6 +7034,7 @@ table.admit-detail-table td {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .home-major-beta {
@@ -6790,7 +7048,6 @@ table.admit-detail-table td {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  line-height: 1.4;
 }
 
 .home-major-find-desc {
@@ -7081,6 +7338,30 @@ table.admit-detail-table td {
     height: auto;
     min-height: 0;
     padding-right: 24px;
+  }
+
+  .home-panel:has(.home-cal) {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    justify-self: stretch;
+    align-self: start;
+    height: auto;
+    padding: 24px;
+    border-radius: 16px;
+  }
+
+  .home-panel:has(.home-cal) .home-cal-head,
+  .home-panel:has(.home-cal) .home-cal-week,
+  .home-panel:has(.home-cal) .home-cal-days {
+    width: 100%;
+    justify-content: space-between;
+    column-gap: 0;
+  }
+
+  .home-panel:has(.home-cal) .home-cal-days {
+    row-gap: 6px;
+    align-content: start;
   }
 
   .home-guide-list li,

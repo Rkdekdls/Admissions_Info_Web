@@ -16,7 +16,7 @@
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=20261120btn2">
+  <link rel="stylesheet" href="css/styles.css?v=20261123week">
 </head>
 <body>
   <div class="app" id="app">
@@ -306,6 +306,25 @@
 
           <section class="home-lower">
             <div class="home-panel">
+              <h2 class="home-panel-title is-marked">입시 캘린더</h2>
+              <div class="home-cal" data-home-cal>
+                <div class="home-cal-head">
+                  <button type="button" class="home-cal-nav" data-cal-prev aria-label="이전 달">
+                    <svg class="home-major-link-arrow is-prev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                  </button>
+                  <p class="home-cal-month" data-cal-month>2026년 11월</p>
+                  <button type="button" class="home-cal-nav" data-cal-next aria-label="다음 달">
+                    <svg class="home-major-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                  </button>
+                </div>
+                <div class="home-cal-week" aria-hidden="true">
+                  <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                </div>
+                <div class="home-cal-days" data-cal-days role="grid" aria-label="입시 일정 달력"></div>
+                <div class="home-cal-tip" data-cal-tip role="tooltip" hidden></div>
+              </div>
+            </div>
+            <div class="home-panel">
               <h2 class="home-panel-title is-marked">대입 준비 가이드</h2>
               <ul class="home-guide-list">
                 <li><button type="button" data-home-go="curriculum">교육과정 체계<svg class="home-major-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></li>
@@ -320,10 +339,12 @@
               <div class="home-major">
                 <div class="home-major-board">
                   <div class="home-major-find">
-                    <div class="home-major-find-copy">
-                      <span class="home-major-beta">BETA</span>
-                      <p class="home-major-find-title">전공 찾기</p>
-                      <p class="home-major-find-desc">12문항 · 약 3분 · 전공 추천</p>
+                    <div class="home-major-find-body">
+                      <div class="home-major-find-copy">
+                        <span class="home-major-beta">BETA</span>
+                        <p class="home-major-find-title">전공 찾기</p>
+                        <p class="home-major-find-desc">12문항 · 약 3분 · 전공 추천</p>
+                      </div>
                     </div>
                     <button type="button" class="home-major-start" data-major-find-open>바로 시작하기</button>
                   </div>
@@ -23073,7 +23094,7 @@
   <script src="js/major-finder/engine.js?v=9"></script>
   <script src="js/major-finder/ui.js?v=77"></script>
   <script src="js/guide.js?v=545"></script>
-  <script src="js/home.js?v=10"></script>
+  <script src="js/home.js?v=18"></script>
   <script src="js/main.js?v=87"></script>
 </body>
 </html>
