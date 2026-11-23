@@ -327,8 +327,9 @@
         cal.style.removeProperty("--cal-gap");
         const across = cells[1].getBoundingClientRect().left - cells[0].getBoundingClientRect().right;
         const size = Math.max(0, across);
+        const row = Math.min(size, 22, 6 + Math.max(0, size - 6) * 0.35);
         daysEl.style.setProperty("--cal-join", `${size}px`);
-        daysEl.style.setProperty("--cal-row", `${size}px`);
+        daysEl.style.setProperty("--cal-row", `${row}px`);
         return;
       }
       daysEl.style.removeProperty("--cal-row");
