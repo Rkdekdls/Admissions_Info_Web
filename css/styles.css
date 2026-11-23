@@ -6497,7 +6497,7 @@ table.admit-detail-table td {
 
 .home-lower {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) max-content;
   gap: 12px;
   flex: 1.15 1 0;
   min-height: 220px;
@@ -6517,7 +6517,7 @@ table.admit-detail-table td {
   .home-lower {
     flex: 1 1 auto;
     min-height: 0;
-    grid-template-columns: max-content minmax(0, 1fr) calc(50% - 12px);
+    grid-template-columns: calc((100% - 24px) / 3) minmax(0, 1fr) max-content;
   }
 
   .home-lower > .home-panel {
@@ -7288,7 +7288,7 @@ table.admit-detail-table td {
     height: auto;
     grid-template-columns: 1fr;
     overflow: visible;
-    padding: 24px 16px 16px;
+    padding: 24px;
   }
 
   .home-feature-art {
@@ -7354,14 +7354,26 @@ table.admit-detail-table td {
   .home-panel:has(.home-cal) .home-cal-head,
   .home-panel:has(.home-cal) .home-cal-week,
   .home-panel:has(.home-cal) .home-cal-days {
+    grid-template-columns: repeat(7, 32px);
     width: 100%;
     justify-content: space-between;
     column-gap: 0;
   }
 
+  .home-panel:has(.home-cal) .home-cal-week {
+    margin-top: 20.5px;
+    margin-bottom: 17.5px;
+  }
+
   .home-panel:has(.home-cal) .home-cal-days {
+    grid-template-rows: repeat(6, 32px);
     row-gap: var(--cal-row, 6px);
     align-content: start;
+  }
+
+  .home-panel:has(.home-cal) .home-cal-day {
+    width: 32px;
+    height: 32px;
   }
 
   .home-guide-list li,
@@ -7474,6 +7486,15 @@ table.admit-detail-table td {
   .home-panel {
     padding: 16px;
     border-radius: 14px;
+  }
+
+  .home-panel:has(.home-guide-list),
+  .home-panel:has(.home-cal) {
+    padding: 16px;
+  }
+
+  .home-panel:has(.home-cal) .home-cal {
+    margin: 0;
   }
 
   .home-major-board {
