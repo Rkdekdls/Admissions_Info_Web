@@ -276,9 +276,7 @@ window.selectGuideTab = (name, targetId) => selectTab(name, true, targetId);
 tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     if (!isMobileNav() && app.classList.contains("is-collapsed")) {
-      app.classList.remove("is-collapsed");
-      sidebarToggle.setAttribute("aria-expanded", "true");
-      sidebarToggle.setAttribute("aria-label", "사이드바 접기");
+      expandSidebar();
     }
     selectTab(tab.dataset.tab, true, tab.dataset.section || undefined);
   });
@@ -290,9 +288,7 @@ groups.forEach((group) => {
 
   parentButton.addEventListener("click", () => {
     if (!isMobileNav() && app.classList.contains("is-collapsed")) {
-      app.classList.remove("is-collapsed");
-      sidebarToggle.setAttribute("aria-expanded", "true");
-      sidebarToggle.setAttribute("aria-label", "사이드바 접기");
+      expandSidebar();
     }
     /* 이미 열린 그룹을 다시 누르면 접기 */
     if (group.classList.contains("is-open")) {
@@ -305,14 +301,27 @@ groups.forEach((group) => {
   });
 });
 
+function expandSidebar() {
+  if (!app.classList.contains("is-collapsed")) return;
+  app.classList.remove("is-collapsed");
+  if (sidebarToggle) {
+    sidebarToggle.setAttribute("aria-expanded", "true");
+    sidebarToggle.setAttribute("aria-label", "사이드바 접기");
+  }
+}
+
 sidebarToggle.addEventListener("click", () => {
   if (isMobileNav()) {
     setMobileNavOpen(!app.classList.contains("is-nav-open"));
     return;
   }
-  const collapsed = app.classList.toggle("is-collapsed");
-  sidebarToggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
-  sidebarToggle.setAttribute("aria-label", collapsed ? "사이드바 펼치기" : "사이드바 접기");
+  if (app.classList.contains("is-collapsed")) {
+    expandSidebar();
+    return;
+  }
+  app.classList.add("is-collapsed");
+  sidebarToggle.setAttribute("aria-expanded", "false");
+  sidebarToggle.setAttribute("aria-label", "사이드바 펼치기");
 });
 
 if (mobileNavBtn) {
@@ -373,5 +382,50 @@ if (brandHome) {
   brandHome.addEventListener("click", (event) => {
     event.preventDefault();
     selectTab(HOME_TAB, true);
+  });
+}
+
+function copyText(text) {
+  const legacy = () => new Promise((resolve, reject) => {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "0";
+    area.style.left = "0";
+    area.style.width = "1px";
+    area.style.height = "1px";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.focus();
+    area.select();
+    area.setSelectionRange(0, area.value.length);
+    let ok = false;
+    try {
+      ok = document.execCommand("copy");
+    } catch (err) {
+      ok = false;
+    }
+    area.remove();
+    ok ? resolve() : reject(new Error("copy"));
+  });
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text).catch(legacy);
+  }
+  return legacy();
+}
+
+const inquiryAddress = document.querySelector(".sidebar-inquiry-address");
+if (inquiryAddress) {
+  const address = inquiryAddress.textContent.trim();
+  let copiedTimer = 0;
+  inquiryAddress.addEventListener("click", () => {
+    copyText(address).then(() => {
+      inquiryAddress.textContent = "이메일 주소를 복사했어요";
+      window.clearTimeout(copiedTimer);
+      copiedTimer = window.setTimeout(() => {
+        inquiryAddress.textContent = address;
+      }, 1200);
+    }).catch(() => {});
   });
 }
