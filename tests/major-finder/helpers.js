@@ -31,15 +31,16 @@ function activityChoice(question, value) {
 
 function preferenceAnswers(engine, major, latePicker) {
   const answers = [];
-  for (let guard = 0; guard < 12; guard += 1) {
+  for (let guard = 0; guard < 10; guard += 1) {
     const question = engine.planNext(answers);
     if (!question) break;
     if (question.kind === "topic") {
       const picks = question.choices.filter((choice) => !choice.special && (choice.tags || []).some((tag) => {
         return tag === "track:" + major.track || tag === "mid:" + major.track + "|" + major.mid || (major.coreTopics || []).indexOf(tag) !== -1;
       }));
-      const ids = picks.slice(0, question.maxSelect || 2).map((choice) => choice.id);
-      answers.push({ questionId: question.id, choiceIds: ids.length ? ids : [question.id + "-unknown"] });
+      const ids = picks.slice(0, question.maxSelect || 1).map((choice) => choice.id);
+      const skip = question.choices.find((choice) => choice.specialKind === "unknown");
+      answers.push({ questionId: question.id, choiceIds: ids.length ? ids : [skip.id] });
       continue;
     }
     if (question.kind === "activity") {
@@ -58,7 +59,8 @@ function preferMajorLate(question, major) {
   if (core) return core.id;
   const related = question.choices.find((choice) => !choice.special && choice.relatedMajorIds.indexOf(major.majorId) !== -1);
   if (related) return related.id;
-  return question.choices.find((choice) => choice.special).id;
+  const skip = question.choices.find((choice) => choice.special);
+  return (skip || question.choices.find((choice) => !choice.special)).id;
 }
 
 module.exports = {

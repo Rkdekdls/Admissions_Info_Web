@@ -11,15 +11,14 @@
   const TAG_EMOJI = {
     t_mind: "🧠", t_care: "👨‍👩‍👧", t_law: "⚖️", t_school: "📚", t_history: "🏛️",
     t_body: "🩺", t_drug: "💊", t_life: "🧬", t_grow: "🌱", t_food: "🍽️",
-    t_number: "📊", t_phys: "🌊", t_earth: "🌍", t_matter: "🧪", t_eco: "🍃", t_sciphilo: "🔍",
+    t_number: "📊", t_phys: "🌊", t_earth: "🌍", t_matter: "🧪", t_eco: "🍃",
     t_city: "🏙️", t_machine: "⚙️", t_electro: "💡", t_soft: "💻", t_material: "🧱", t_safety: "🛡️",
     t_company: "💼", t_economy: "📈", t_logistics: "🚚", t_media: "📣", t_archive: "📁",
-    t_lang: "✏️", t_design: "🎨", t_music: "🎵", t_film: "🎬", t_game: "🎮", t_sport: "⚽",
+    t_lang: "✏️", t_design: "👕",
     "track:자연과학계열": "🔬",
     "track:공학계열": "⚙️",
     "track:의학계열": "🩺",
     "track:인문사회계열": "📚",
-    "track:예체능계열": "🎨",
   };
 
   const VALUE_EMOJI = {
@@ -118,7 +117,6 @@
     t_earth: "globe",
     t_matter: "flask",
     t_eco: "leaf",
-    t_sciphilo: "search",
     t_city: "city",
     t_machine: "cog",
     t_electro: "cpu",
@@ -132,10 +130,6 @@
     t_archive: "folder",
     t_lang: "pen",
     t_design: "palette",
-    t_music: "music",
-    t_film: "camera",
-    t_game: "gamepad",
-    t_sport: "activity",
   };
 
   const VALUE_ICON = { want: "smile", some: "meh", no: "no" };
@@ -348,22 +342,7 @@
       const current = question();
       if (!current || !choice) return;
       const id = choice.id;
-      const limit = current.maxSelect || 2;
-      if (choice.special || current.kind === "activity" || limit === 1) {
-        selection = selection.length === 1 && selection[0] === id ? [] : [id];
-      } else if (selection.indexOf(id) !== -1) {
-        selection = selection.filter((item) => item !== id);
-      } else {
-        selection = selection.filter((item) => {
-          const picked = current.choices.find((c) => c.id === item);
-          return picked && !picked.special;
-        });
-        if (selection.length >= limit) {
-          errorText = "최대 2개까지 고를 수 있어요";
-          return;
-        }
-        selection = selection.concat(id);
-      }
+      selection = selection.length === 1 && selection[0] === id ? [] : [id];
       errorText = "";
     }
 
@@ -439,8 +418,19 @@
 
     function progressHtml() {
       if (session.phase === "question") question();
-      const caps = { topic: 6, activity: 3, late: 3 };
-      const starts = { topic: 0, activity: 6, late: 9 };
+      const prior = [];
+      const steps = session.steps || [];
+      const limit = session.phase === "result" ? steps.length : session.cursor;
+      for (let index = 0; index < limit; index += 1) {
+        if (steps[index] && steps[index].answer) prior.push(steps[index].answer);
+      }
+      const topicsDone = prior.filter((answer) => {
+        const question = engine.questionById.get(answer.questionId);
+        return question && question.kind === "topic";
+      }).length >= 5;
+      const lateCap = topicsDone ? engine.comparisonCount(prior) : 3;
+      const caps = { topic: 5, activity: 2, late: lateCap || 1 };
+      const starts = { topic: 0, activity: 5, late: 7 };
       const phases = PHASES.map((phase) => {
         const start = starts[phase.key];
         const shown = caps[phase.key];
@@ -806,8 +796,7 @@
         if (!current) {
           main = `<div class="mf-q"><h2 class="mf-prompt">다음 문항을 만들지 못했습니다.</h2><button type="button" class="mf-next" data-mf-retry>다시 시도</button></div>`;
         } else {
-          const single = current.kind === "activity" || (current.maxSelect || 2) === 1;
-          const hint = single ? "하나만 골라 주세요" : "최대 2개를 골라 주세요";
+          const hint = "하나만 골라 주세요";
           const title = current.kind === "activity" ? current.activityPhrase || current.prompt : current.prompt;
           const isLast = engine.isLastQuestion(session);
           const prevBtn = session.cursor === 0
@@ -817,7 +806,7 @@
           main = `<div class="mf-q">
             <h2 class="mf-prompt" tabindex="-1">${session.cursor + 1}. ${escapeHtml(title)}</h2>
             <p class="mf-hint">${hint}</p>
-            <div class="mf-options" role="${single ? "radiogroup" : "group"}">${choiceButtons(current)}</div>
+            <div class="mf-options" role="radiogroup">${choiceButtons(current)}</div>
             ${errorText ? `<p class="mf-inline-error" role="alert">${escapeHtml(errorText)}</p>` : ""}
             <div class="mf-foot">
               ${prevBtn}

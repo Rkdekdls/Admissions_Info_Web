@@ -16,7 +16,7 @@ engine.profiles.forEach((major) => {
   }
   const top = result.items.map((item) => item.majorId);
   if (top.indexOf(major.majorId) === -1) {
-    const scored = engine.scoreRows(answers.slice(0, 12));
+    const scored = engine.scoreRows(answers.filter((answer) => !engine.lateById.has(answer.questionId)));
     const row = scored.rows.find((item) => item.majorId === major.majorId);
     const rank = scored.rows.findIndex((item) => item.majorId === major.majorId) + 1;
     const finalRank = engine.scoreRows(answers).rows.findIndex((item) => item.majorId === major.majorId) + 1;

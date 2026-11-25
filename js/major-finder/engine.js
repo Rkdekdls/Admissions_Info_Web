@@ -473,14 +473,14 @@
     }
 
     function planNext(answers) {
-      var topicIds = ["q1", "q2", "q3", "q4", "q5", "q6"];
+      var topicIds = ["q1", "q2", "q3", "q4", "q5"];
       if (topicIds.every(function (id) { return questionById.has(id); })) {
-        if (answers.length < 6) return questionById.get(topicIds[answers.length]);
+        if (answers.length < topicIds.length) return questionById.get(topicIds[answers.length]);
         var actCount = answers.filter(function (answer) {
           var question = questionById.get(answer.questionId);
           return question && question.kind === "activity";
         }).length;
-        if (actCount < 3) return pickNextActivity(answers);
+        if (actCount < 2) return pickNextActivity(answers);
         var lateCount = answers.filter(function (answer) { return lateById.has(answer.questionId); }).length;
         if (lateCount < 3) return selectLateQuestion(answers);
         return null;
@@ -564,11 +564,16 @@
 
     function selectLateQuestion(answers) {
       var lateCount = answers.filter(function (answer) { return lateById.has(answer.questionId); }).length;
-      if (lateCount < 3) {
-        var pre = answers.filter(function (answer) { return !lateById.has(answer.questionId); });
-        var cores = rankedCoreTags(pre);
-        if (cores.length >= 2) {
-          var aimed = selectLateForTag(answers, lateCount < 2 ? cores[0] : cores[1]);
+      var pre = answers.filter(function (answer) { return !lateById.has(answer.questionId); });
+      var cores = rankedCoreTags(pre);
+      if (lateCount < 3 && cores.length) {
+        var primary = cores.length === 1 ? cores[0] : (lateCount === 1 ? cores[1] : cores[0]);
+        var order = [primary];
+        cores.forEach(function (tag) {
+          if (order.indexOf(tag) === -1) order.push(tag);
+        });
+        for (var aim = 0; aim < order.length; aim += 1) {
+          var aimed = selectLateForTag(answers, order[aim]);
           if (aimed) return aimed;
         }
       }
@@ -579,6 +584,19 @@
       function fresh(question) {
         return question && !asked.ids.has(question.id) && !asked.diffs.has(question.diffId);
       }
+      function inChosenField(question) {
+        if (!cores.length) return true;
+        return cores.some(function (tag) {
+          if ((question.topicTags || []).indexOf(tag) !== -1) return true;
+          return question.choices.some(function (choice) {
+            if (choice.special) return false;
+            return choice.coreMajorIds.some(function (id) {
+              var profile = profileById.get(id);
+              return profile && profile.coreTopics.indexOf(tag) !== -1;
+            });
+          });
+        });
+      }
       var covered = {};
       answers.forEach(function (answer) {
         var question = lateById.get(answer.questionId);
@@ -587,7 +605,7 @@
       });
       var ranking = [];
       data.lateQuestions.forEach(function (question) {
-        if (!fresh(question) || question.role === "default") return;
+        if (!fresh(question) || question.role === "default" || !inChosenField(question)) return;
         var real = question.choices.filter(function (choice) { return !choice.special; }).length;
         if (real < 2) return;
         var info = rankingInfo(question, scored, answers);
@@ -605,15 +623,29 @@
       });
       if (ranking.length) return ranking[0].question;
       var clarify = data.lateQuestions.filter(function (question) {
-        return fresh(question) && question.role !== "default" && (question.topicTags || []).some(function (tag) {
+        return fresh(question) && question.role !== "default" && inChosenField(question) && (question.topicTags || []).some(function (tag) {
           return tags.indexOf(tag) !== -1;
         });
       });
       clarify.sort(function (a, b) { return a.id < b.id ? -1 : 1; });
       if (clarify.length) return clarify[0];
+      if (cores.length) return null;
       var rest = data.lateQuestions.filter(fresh);
       rest.sort(function (a, b) { return a.id < b.id ? -1 : 1; });
       return rest[0] || null;
+    }
+
+    function comparisonCount(answers) {
+      var prior = (answers || []).filter(function (answer) { return !lateById.has(answer.questionId); });
+      var count = 0;
+      for (var guard = 0; guard < 3; guard += 1) {
+        var next = selectLateQuestion(prior);
+        if (!next) break;
+        var skip = next.choices.filter(function (choice) { return choice.special; })[0] || next.choices[0];
+        prior = prior.concat([{ questionId: next.id, choiceIds: [skip.id] }]);
+        count += 1;
+      }
+      return count;
     }
 
     function hasPositive(answers, tags, activities) {
@@ -814,7 +846,7 @@
     function checkPath(answers) {
       if (!Array.isArray(answers) || !answers.length) return fail("응답이 없습니다.");
       if (answers[0] && answers[0].questionId === "q1") {
-        if (answers.length !== 12) return fail("응답은 12문항이어야 합니다.");
+        if (answers.length < 8 || answers.length > 10) return fail("응답 문항 수가 맞지 않습니다.");
         var prior = [];
         for (var i = 0; i < answers.length; i += 1) {
           var expected = planNext(prior);
@@ -861,6 +893,65 @@
       return a.majorId < b.majorId ? -1 : a.majorId > b.majorId ? 1 : 0;
     }
 
+    function listedOn(choice, majorId) {
+      return choice.coreMajorIds.indexOf(majorId) !== -1 || choice.relatedMajorIds.indexOf(majorId) !== -1;
+    }
+
+    function affinityOf(row, answers) {
+      var best = 0;
+      answers.forEach(function (answer) {
+        var question = lateById.get(answer.questionId);
+        if (!question) return;
+        var picked = false;
+        var sibling = false;
+        var seen = false;
+        question.choices.forEach(function (choice) {
+          if (choice.special || !listedOn(choice, row.majorId)) return;
+          seen = true;
+          if (answer.choiceIds.indexOf(choice.id) === -1) return;
+          if (choice.coreMajorIds.indexOf(row.majorId) !== -1) picked = true;
+          else sibling = true;
+        });
+        if (!seen) return;
+        if (picked) best = Math.max(best, 3);
+        else if (sibling) best = Math.max(best, 2);
+        else if (question.choices.some(function (choice) {
+          return !choice.special && answer.choiceIds.indexOf(choice.id) !== -1;
+        })) best = Math.max(best, 2);
+        else best = Math.max(best, 1);
+      });
+      return best;
+    }
+
+    function screenPosOf(row, answers) {
+      var asked = {};
+      answers.forEach(function (answer) { asked[answer.questionId] = true; });
+      var best = 1000;
+      data.lateQuestions.forEach(function (question, questionIndex) {
+        if (!asked[question.id]) return;
+        question.choices.forEach(function (choice, choiceIndex) {
+          if (choice.special || !listedOn(choice, row.majorId)) return;
+          var pos = questionIndex * 20 + choiceIndex;
+          if (pos < best) best = pos;
+        });
+      });
+      return best;
+    }
+
+    function compareShown(answers) {
+      return function (a, b) {
+        var ranked = compareRows(a, b);
+        if (a.points2 !== b.points2 || a.lateCoreCount !== b.lateCoreCount || a.coreTopicMatch !== b.coreTopicMatch || a.activityPoints2 !== b.activityPoints2) {
+          return ranked;
+        }
+        var affinity = affinityOf(b, answers) - affinityOf(a, answers);
+        if (affinity) return affinity;
+        var pos = screenPosOf(a, answers) - screenPosOf(b, answers);
+        if (pos) return pos;
+        return ranked;
+      };
+    }
+
     function rowsForTag(scored, tag) {
       return scored.rows.filter(function (row) { return row.profile.coreTopics.indexOf(tag) !== -1; });
     }
@@ -879,7 +970,7 @@
       return got;
     }
 
-    function relatedRows(scored, sourceRows, used) {
+    function relatedRows(scored, sourceRows, used, answers) {
       var tags = [];
       sourceRows.forEach(function (row) {
         (row.profile.relatedTopics || []).forEach(function (tag) {
@@ -895,11 +986,11 @@
           rows.push(row);
         });
       });
-      rows.sort(compareRows);
+      rows.sort(compareShown(answers));
       return rows;
     }
 
-    function rowsInSameMids(scored, sourceRows, used) {
+    function rowsInSameMids(scored, sourceRows, used, answers) {
       var mids = [];
       sourceRows.forEach(function (row) {
         if (row.mid && mids.indexOf(row.mid) === -1) mids.push(row.mid);
@@ -907,8 +998,12 @@
       var rows = scored.rows.filter(function (row) {
         return !used[row.majorId] && mids.indexOf(row.mid) !== -1;
       });
-      rows.sort(compareRows);
+      rows.sort(compareShown(answers));
       return rows;
+    }
+
+    function shownRows(rows, answers) {
+      return preferEligible(rows.slice().sort(compareShown(answers)));
     }
 
     function chooseSeats(scored, answers) {
@@ -917,16 +1012,16 @@
       var used = {};
       var chosen = [];
       if (selected.length === 1) {
-        chosen = chosen.concat(takeRows(preferEligible(rowsForTag(scored, selected[0])), 3, used));
+        chosen = chosen.concat(takeRows(shownRows(rowsForTag(scored, selected[0]), answers), 3, used));
       } else {
-        var primary = preferEligible(rowsForTag(scored, selected[0]));
-        var secondary = preferEligible(rowsForTag(scored, selected[1]));
+        var primary = shownRows(rowsForTag(scored, selected[0]), answers);
+        var secondary = shownRows(rowsForTag(scored, selected[1]), answers);
         chosen = chosen.concat(takeRows(primary, 2, used));
         chosen = chosen.concat(takeRows(secondary, 1, used));
         if (chosen.length < 3) chosen = chosen.concat(takeRows(primary, 3 - chosen.length, used));
         if (chosen.length < 3) chosen = chosen.concat(takeRows(secondary, 3 - chosen.length, used));
         for (var i = 2; i < selected.length && chosen.length < 3; i += 1) {
-          chosen = chosen.concat(takeRows(preferEligible(rowsForTag(scored, selected[i])), 3 - chosen.length, used));
+          chosen = chosen.concat(takeRows(shownRows(rowsForTag(scored, selected[i]), answers), 3 - chosen.length, used));
         }
       }
       if (chosen.length < 3) {
@@ -934,19 +1029,19 @@
         selected.forEach(function (tag) {
           rowsForTag(scored, tag).forEach(function (row) { flat.push(row); });
         });
-        var related = relatedRows(scored, flat, used);
-        chosen = chosen.concat(takeRows(preferEligible(related), 3 - chosen.length, used));
+        var related = relatedRows(scored, flat, used, answers);
+        chosen = chosen.concat(takeRows(shownRows(related, answers), 3 - chosen.length, used));
         if (chosen.length < 3) {
-          chosen = chosen.concat(takeRows(preferEligible(rowsInSameMids(scored, flat.concat(related), used)), 3 - chosen.length, used));
+          chosen = chosen.concat(takeRows(shownRows(rowsInSameMids(scored, flat.concat(related), used, answers), answers), 3 - chosen.length, used));
         }
       }
       if (chosen.length < 3) {
-        chosen = chosen.concat(takeRows(scored.rows.filter(function (row) {
+        chosen = chosen.concat(takeRows(shownRows(scored.rows.filter(function (row) {
           return connected(row.profile, selected);
-        }), 3 - chosen.length, used));
+        }), answers), 3 - chosen.length, used));
       }
-      if (chosen.length < 3) chosen = chosen.concat(takeRows(scored.rows, 3 - chosen.length, used));
-      chosen.sort(compareRows);
+      if (chosen.length < 3) chosen = chosen.concat(takeRows(shownRows(scored.rows, answers), 3 - chosen.length, used));
+      chosen.sort(compareShown(answers));
       return chosen;
     }
 
@@ -978,7 +1073,7 @@
       if (seated) {
         items = presentSeats(seated, answers);
       } else {
-        var eligible = scored.rows.filter(isEligible);
+        var eligible = scored.rows.filter(isEligible).slice().sort(compareShown(answers));
         items = eligible.slice(0, 3).map(function (row) {
           return present(row, "recommended", reasonFor(row, answers));
         });
@@ -1104,7 +1199,7 @@
         };
         if (question.kind === "topic") {
           var head = kept.slice(0, session.cursor + 1);
-          for (var t = session.cursor + 1; t < 6 && t < kept.length; t += 1) {
+          for (var t = session.cursor + 1; t < 5 && t < kept.length; t += 1) {
             if (!kept[t] || !kept[t].answer) break;
             head.push(kept[t]);
           }
@@ -1223,6 +1318,7 @@
       validateAnswer: validateAnswer,
       scoreRows: scoreRows,
       selectLateQuestion: selectLateQuestion,
+      comparisonCount: comparisonCount,
       planNext: planNext,
       phasePlan: phasePlan,
       recommend: recommend,

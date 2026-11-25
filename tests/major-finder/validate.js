@@ -63,7 +63,7 @@ const coreHits = new Map();
 data.lateQuestions.forEach((question) => {
   if (lateIds.has(question.id)) bad("중복 후반 문항: " + question.id);
   lateIds.add(question.id);
-  if (question.maxSelect !== 1) bad("전공 비교는 하나만 고를 수 있어야 합니다: " + question.id);
+  if (question.maxSelect !== 1) bad("문항은 하나만 고를 수 있어야 합니다: " + question.id);
   if (String(question.prompt || "").indexOf("끌리") !== -1) bad("끌리 표현: " + question.id);
   if (diffIds.has(question.diffId)) bad("중복 차이 ID: " + question.diffId);
   diffIds.add(question.diffId);
@@ -80,7 +80,7 @@ data.lateQuestions.forEach((question) => {
       coreHits.set(id, (coreHits.get(id) || 0) + 1);
     });
   });
-  if (!special) bad("특별 보기가 없는 후반 문항: " + question.id);
+  if (special !== 1) bad("모름 보기가 하나 있어야 합니다: " + question.id);
   question.topicTags.forEach((tag) => {
     if (!tagIds.has(tag)) bad("후반 문항의 없는 주제 태그: " + question.id + " " + tag);
   });
@@ -95,6 +95,9 @@ data.questions.concat(data.lateQuestions).forEach((question) => {
 
 const qids = new Set();
 data.questions.forEach((question) => {
+  if (question.maxSelect !== 1) bad("문항은 하나만 고를 수 있어야 합니다: " + question.id);
+  const skips = question.choices.filter((choice) => choice.specialKind === "unknown");
+  if (skips.length !== 1) bad("모름 보기가 하나 있어야 합니다: " + question.id);
   if (qids.has(question.id)) bad("중복 공통 문항: " + question.id);
   qids.add(question.id);
   const choiceIds = new Set();
@@ -103,7 +106,7 @@ data.questions.forEach((question) => {
     choiceIds.add(choice.id);
   });
 });
-["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14"].forEach((id) => {
+["q1", "q2", "q3", "q4", "q5", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14"].forEach((id) => {
   if (!qids.has(id)) bad("공통 문항 누락: " + id);
 });
 

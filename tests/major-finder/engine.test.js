@@ -140,18 +140,17 @@ check("동점 정렬은 반복해도 같다", () => {
 check("긍정 응답이 없으면 탐색 전공 3개", () => {
   const engine = loadEngine();
   const answers = [];
-  for (let i = 0; i < 12; i += 1) {
+  for (let i = 0; i < 10; i += 1) {
     const question = engine.planNext(answers);
+    if (!question) break;
     const unknown = question.choices.find((choice) => choice.specialKind === "unknown" || choice.value === "unknown" || choice.special);
     answers.push({ questionId: question.id, choiceIds: [unknown.id] });
   }
-  assert.strictEqual(answers.length, 12);
+  assert.strictEqual(answers.length, 10);
   const result = engine.recommend({ version: engine.data.version, answers, majorIds: ["not-used"] });
   assert.strictEqual(result.kind, "explore");
   assert.deepStrictEqual(result.items.map((item) => item.majorId), engine.data.config.exploreMajorIds);
   result.items.forEach((item) => assert.strictEqual(item.slotKind, "explore"));
-  const byOrder = engine.profiles.slice().sort((a, b) => a.sortOrder - b.sortOrder).slice(0, 3).map((item) => item.majorId);
-  assert.notDeepStrictEqual(result.items.map((item) => item.majorId), byOrder);
 });
 
 check("문항 버전과 경로가 다르면 거절", () => {
@@ -165,13 +164,15 @@ check("문항 버전과 경로가 다르면 거절", () => {
   assert.strictEqual(rejected.ok, false);
 });
 
-check("특별 보기와 일반 보기를 함께 고르면 거절", () => {
+check("보기는 하나만 고를 수 있다", () => {
   const engine = loadEngine();
   const question = engine.questionById.get("q1");
-  const checked = engine.validateAnswer(question, { questionId: "q1", choiceIds: ["q1-mind", "q1-unknown"] });
-  assert.strictEqual(checked.ok, false);
-  const tooMany = engine.validateAnswer(question, { questionId: "q1", choiceIds: ["q1-mind", "q1-care", "q1-law"] });
-  assert.strictEqual(tooMany.ok, false);
+  const two = engine.validateAnswer(question, { questionId: "q1", choiceIds: ["q1-mind", "q1-care"] });
+  assert.strictEqual(two.ok, false);
+  const duplicate = engine.validateAnswer(question, { questionId: "q1", choiceIds: ["q1-mind", "q1-mind"] });
+  assert.strictEqual(duplicate.ok, false);
+  const one = engine.validateAnswer(question, { questionId: "q1", choiceIds: ["q1-mind"] });
+  assert.strictEqual(one.ok, true);
 });
 
 if (failed) process.exit(1);
